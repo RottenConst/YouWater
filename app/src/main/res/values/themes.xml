@@ -5,6 +5,20 @@
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryDark">@color/purple_700</item>
         <item name="colorAccent">@color/teal_200</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.YouWater.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
+    <style name="Theme.YouWater.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light"/>
+
+    <style name="Theme.YouWater.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="EnterButton" parent="Theme.YouWater">
+        <item name="colorAccent">#3C88F0</item>
     </style>
 </resources>

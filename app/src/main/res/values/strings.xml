@@ -1,4 +1,31 @@
 <resources>
     <string name="app_name">YouWater</string>
+    <!--    экран входа-->
     <string name="begin">Начать</string>
+    <string name="tel_number">Номер мобильного телефона</string>
+    <string name="enter">Вход</string>
+    <string name="sent_code">Отправить код</string>
+    <string name="login_accept">Нажимая кнопку «Отправить код» вы принимаете условия «Пользовательского соглашения»</string>
+    <string name="info_code">Код отправлен на номер</string>
+    <string name="enter_code_on_sms">Введите код из СМС:</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--    sidebar-->
+    <string name="delivery_text">Доставка</string>
+    <string name="information_text">О компании</string>
+    <string name="send_text">Связаться с нами</string>
+
+    <!--    catalog names-->
+    <string name="drinking_water">Питьевая вода</string>
+    <string name="related_products">Сопутствующие товары</string>
+    <string name="disposable_tableware">Одноразовая посуда</string>
+    <string name="pumps_for_water">Помпы для воды</string>
+    <string name="water_coolers">Кулеры для воды</string>
+    <string name="new_containers_and_lids">Новая тара и крышки</string>
+    <string name="racks_for_bottles">Стойки для бутылей</string>
+    
+    <string name="str_name_product">«Классическая», в оборотной таре</string>
+    <string name="str_cost_product">от 230 ₽</string>
+    
 </resources>
