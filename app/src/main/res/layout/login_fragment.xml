@@ -71,17 +71,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_enter" />
 
-    <EditText
+    <ru.iwater.youwater.utils.PinEntryEditText
         android:id="@+id/et_pin_code"
-        android:layout_width="117dp"
+        android:layout_width="217dp"
         android:layout_height="66dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
+        android:cursorVisible="true"
+        android:digits="1234567890"
+        android:focusable="true"
         android:ems="10"
-        android:inputType="numberPassword"
+        android:inputType="number|numberPassword"
         android:maxLength="4"
+        android:textColor="@color/lightGrey"
+        android:textIsSelectable="false"
+        android:textSize="20sp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/tv_info_code"
         app:layout_constraintEnd_toEndOf="parent"
