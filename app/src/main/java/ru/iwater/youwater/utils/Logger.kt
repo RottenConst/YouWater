@@ -10,7 +10,7 @@ class Logger: LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
     fun logEvent(owner: LifecycleOwner, event: Lifecycle.Event) {
-        val message = "${owner.javaClass.simpleName}"
+        val message = owner.javaClass.simpleName
         Timber.d(message)
     }
 }

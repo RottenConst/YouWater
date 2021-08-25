@@ -52,7 +52,23 @@
         android:background="@drawable/bg_button"
         android:text="@string/sent_code"
         android:textColor="@color/white"
-        android:theme="@style/EnterButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.517"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btn_enter_home"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="255dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginBottom="292dp"
+        android:background="@drawable/bg_button"
+        android:text="@string/next"
+        android:textColor="@color/white"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.517"
@@ -132,6 +148,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_yourwater_logo" />
+        app:srcCompat="@drawable/ic_youwater_logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

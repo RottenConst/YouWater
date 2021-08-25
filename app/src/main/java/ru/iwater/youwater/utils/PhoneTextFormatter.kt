@@ -36,7 +36,7 @@ class PhoneTextFormatter(
 
     override fun afterTextChanged(s: Editable) {}
     private fun isValid(phone: String): Boolean {
-        for (i in 0 until phone.length) {
+        for (i in phone.indices) {
             val c = mPattern[i]
             if (c == '#') continue
             if (c != phone[i]) {

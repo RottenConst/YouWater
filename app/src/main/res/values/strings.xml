@@ -5,6 +5,7 @@
     <string name="tel_number">Номер мобильного телефона</string>
     <string name="enter">Вход</string>
     <string name="sent_code">Отправить код</string>
+    <string name="next">Продолжить</string>
     <string name="login_accept">Нажимая кнопку «Отправить код» вы принимаете условия «Пользовательского соглашения»</string>
     <string name="info_code">Код отправлен на номер</string>
     <string name="enter_code_on_sms">Введите код из СМС:</string>
@@ -28,5 +29,29 @@
     
     <string name="str_name_product">«Классическая», в оборотной таре</string>
     <string name="str_cost_product">от 230 ₽</string>
-    
+
+    <!--    basket names-->
+    <string name="ball_per_order">Количество баллов за заказ:</string>
+    <string name="total_sum_order">Общая сумма заказа:</string>
+    <string name="total_sum">Итого:</string>
+    <string name="checkout_order">Оформить заказ</string>
+    <string name="sample_sum">3020 ₽</string>
+    <string name="sample_balls">23</string>
+    <string name="sample_total_sum">3220 ₽</string>
+
+    <!--    profile-->
+    <string name="name">Имя Фамилия</string>
+    <string name="my_orders">Мои заказы</string>
+    <string name="my_data">Мои данные</string>
+    <string name="favorite">Избранное</string>
+    <string name="address">Адреса</string>
+    <string name="bank_card">Банковская карта</string>
+    <string name="notifications">Уведомления</string>
+    <string name="balls">У вас </string>
+    <string name="tanks">Бутелей к возврату:</string>
+
+    <!--    other data-->
+    <string name="btn_add_desc">Добавить продукт</string>
+    <string name="btn_сlose">Удалить</string>
+
 </resources>

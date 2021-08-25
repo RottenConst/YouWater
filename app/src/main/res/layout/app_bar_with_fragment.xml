@@ -33,6 +33,7 @@
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
         android:name="androidx.navigation.fragment.NavHostFragment"
         app:navGraph="@navigation/route_main"
-        app:defaultNavHost="true"/>
+        app:defaultNavHost="true"
+        tools:ignore="FragmentTagUsage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

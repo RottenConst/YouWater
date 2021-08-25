@@ -2,7 +2,6 @@ package ru.iwater.youwater.screen.home
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -76,9 +75,9 @@ class HomeFragment : BaseFragment() {
     private fun initRV(context: Context?, orientation: Int) {
         rv_water.layoutManager = LinearLayoutManager(context, orientation, false)
         rv_dishes_product.layoutManager = LinearLayoutManager(context, orientation, false)
-        rv_contaners.layoutManager = LinearLayoutManager(context, orientation, false)
+        rv_containers.layoutManager = LinearLayoutManager(context, orientation, false)
         rv_coolers.layoutManager = LinearLayoutManager(context, orientation, false)
-        rv_equpments.layoutManager = LinearLayoutManager(context, orientation, false)
+        rv_equipment.layoutManager = LinearLayoutManager(context, orientation, false)
         rv_racks_bottle.layoutManager = LinearLayoutManager(context, orientation, false)
         rv_related_prod.layoutManager = LinearLayoutManager(context, orientation, false)
         rv_water_pomp.layoutManager = LinearLayoutManager(context, orientation, false)
@@ -91,11 +90,11 @@ class HomeFragment : BaseFragment() {
         adapterRacks.notifyDataSetChanged()
         adapterRelated.notifyDataSetChanged()
         rv_water.adapter = adapterWatter
-        rv_contaners.adapter = adapterContainers
+        rv_containers.adapter = adapterContainers
         rv_water_pomp.adapter = adapterPomp
         rv_related_prod.adapter = adapterRelated
         rv_racks_bottle.adapter = adapterRacks
-        rv_equpments.adapter = adapterEquipments
+        rv_equipment.adapter = adapterEquipments
         rv_coolers.adapter = adapterCoolers
         rv_dishes_product.adapter = adapterDishes
     }

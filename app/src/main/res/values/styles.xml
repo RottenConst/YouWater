@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="StdButton" parent="Widget.AppCompat.Button">
+        <item name="color">@color/blue</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+</resources>

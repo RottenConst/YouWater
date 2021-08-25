@@ -29,19 +29,20 @@ class LoginFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         btn_enter.isEnabled = false
         et_tel_num.addTextChangedListener(PhoneTextFormatter(et_tel_num, "+7(###) ### ##-##", btn_enter))
+        et_pin_code.addTextChangedListener(PhoneTextFormatter(et_pin_code, "####", btn_enter_home))
         btn_enter.setOnClickListener {
             val tel = et_tel_num.text.toString()
             tv_info_code.text = "Код отправлен на номер: $tel"
             tv_enter_pin.visibility = View.VISIBLE
             tv_info_code.visibility = View.VISIBLE
+            btn_enter_home.visibility = View.VISIBLE
             et_pin_code.visibility = view.visibility
             et_tel_num.visibility = View.GONE
             til_tel_num.visibility = View.GONE
-            btn_enter.text = "Продолжить"
-
-            if (btn_enter.text == "Продолжить") {
-                MainActivity.start(context)
-            }
+            btn_enter.visibility = View.GONE
+        }
+        btn_enter_home.setOnClickListener {
+            MainActivity.start(context)
         }
     }
 
