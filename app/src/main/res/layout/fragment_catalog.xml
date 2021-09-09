@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/grey"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".screen.catalog.CatalogFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/grey"
+        tools:context=".screen.catalog.CatalogFragment">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_catalog_list"
@@ -16,6 +17,9 @@
             android:layout_marginBottom="60dp"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2"
-            tools:listitem="@layout/item_catalog"/>
+            tools:listitem="@layout/item_catalog" />
 
-</FrameLayout>
+    </FrameLayout>
+
+
+</layout>

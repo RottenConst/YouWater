@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
-import kotlinx.android.synthetic.main.fragment_catalog.*
-import ru.iwater.youwater.R
 import ru.iwater.youwater.base.BaseFragment
+import ru.iwater.youwater.databinding.FragmentCatalogBinding
+import ru.iwater.youwater.domain.TypeProduct
 import ru.iwater.youwater.screen.adapters.AdapterCatalogList
 
 // TODO: Rename parameter arguments, choose names that match
@@ -28,20 +28,21 @@ class CatalogFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_catalog, container, false)
-    }
+    ): View {
+        val binding = FragmentCatalogBinding.inflate(inflater)
+        binding.rvCatalogList.adapter = adapterCatalog
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initRv()
-    }
+        val typesProductList: List<TypeProduct> = listOf(
+            TypeProduct(0,"Питьевая вода"),
+            TypeProduct(1,"Сопутствующие товары"),
+            TypeProduct(2,"Одноразовая посуда"),
+            TypeProduct(3,"Помпы для воды"),
+            TypeProduct(4,"Кулеры для воды"),
+            TypeProduct(5,"Оборудование")
+        )
+        adapterCatalog.submitList(typesProductList)
 
-    private fun initRv() {
-        rv_catalog_list.layoutManager = GridLayoutManager(this.context, 2)
-        adapterCatalog.notifyDataSetChanged()
-        rv_catalog_list.adapter = adapterCatalog
+        return binding.root
     }
 
     companion object {
