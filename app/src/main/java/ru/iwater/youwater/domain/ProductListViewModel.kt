@@ -3,6 +3,8 @@ package ru.iwater.youwater.domain
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.repository.ProductRepository
 import ru.iwater.youwater.utils.Generator
@@ -10,16 +12,21 @@ import javax.inject.Inject
 
 @OnScreen
 class ProductListViewModel @Inject constructor(
-    val productRepo: ProductRepository,
+    private val productRepo: ProductRepository,
 ): ViewModel() {
-    private val mProductLiveData: MutableLiveData<List<Product>> = MutableLiveData()
-    val productLiveData: LiveData<List<Product>> get() = mProductLiveData
+    private val _productLiveData: MutableLiveData<List<Product>> = MutableLiveData()
+    val productLiveData: LiveData<List<Product>> get() = _productLiveData
 
     init {
-        mProductLiveData.value = productRepo.getProductList(Generator)
+        viewModelScope.launch {
+            _productLiveData.value = productRepo.getProductList()
+        }
     }
 
     fun refreshListProduct() {
-        mProductLiveData.value = productRepo.getProductList(Generator)
+        viewModelScope.launch {
+            _productLiveData.value = productRepo.getProductList()
+        }
+
     }
 }
