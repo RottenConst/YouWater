@@ -30,13 +30,6 @@ class HomeFragment : BaseFragment() {
 
     private val screenComponent = App().buildScreenComponent()
     private val adapterWatter = CatalogWaterAdapter()
-    private val adapterContainers = CatalogWaterAdapter()
-    private val adapterCoolers = CatalogWaterAdapter()
-    private val adapterEquipments = CatalogWaterAdapter()
-    private val adapterRacks = CatalogWaterAdapter()
-    private val adapterRelated = CatalogWaterAdapter()
-    private val adapterPomp = CatalogWaterAdapter()
-    private val adapterDishes = CatalogWaterAdapter()
 //    private val adapterCategory = AdapterCategoryList()
     private val viewModel: ProductListViewModel by viewModels { factory }
 
@@ -52,17 +45,12 @@ class HomeFragment : BaseFragment() {
     ): View {
         val binding = FragmentHomeBinding.inflate(inflater)
         initRV(binding)
-        viewModel.productLiveData.observe(viewLifecycleOwner, Observer {
-//            adapterCategory.submitList(it)
-            adapterWatter.submitList(it)
-            adapterContainers.submitList(it)
-            adapterPomp.submitList(it)
-            adapterRelated.submitList(it)
-            adapterRacks.submitList(it)
-            adapterEquipments.submitList(it)
-            adapterCoolers.submitList(it)
-            adapterDishes.submitList(it)
+        viewModel.catalogProductMap.observe(viewLifecycleOwner, Observer { catalogs ->
+            adapterWatter.submitList(catalogs.toList())
         })
+
+
+
         viewModel.productLiveData.observe(viewLifecycleOwner, {
 
         })
@@ -72,14 +60,7 @@ class HomeFragment : BaseFragment() {
     private fun initRV(binding: FragmentHomeBinding) {
         binding.apply {
 //            rvCategoryList.adapter = adapterCategory
-            rvWater.adapter = adapterWatter
-            rvContainers.adapter = adapterContainers
-            rvWaterPomp.adapter = adapterPomp
-            rvRelatedProd.adapter = adapterRelated
-            rvRacksBottle.adapter = adapterRacks
-            rvEquipment.adapter = adapterEquipments
-            rvCoolers.adapter = adapterCoolers
-            rvDishesProduct.adapter = adapterDishes
+            rvTypeProductList.adapter = adapterWatter
         }
     }
 

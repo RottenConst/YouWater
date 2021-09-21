@@ -10,6 +10,7 @@ import com.bumptech.glide.request.RequestOptions
 import ru.iwater.youwater.R
 import ru.iwater.youwater.domain.Product
 import ru.iwater.youwater.domain.TypeProduct
+import ru.iwater.youwater.screen.adapters.AdapterProductList
 import ru.iwater.youwater.screen.adapters.CatalogWaterAdapter
 
 @BindingAdapter("nameProduct")
@@ -43,15 +44,16 @@ fun bindImageProduct(imgView: ImageView, file: String?) {
 }
 
 @BindingAdapter("labelType")
-fun TextView.bindLabelType(typeProduct: TypeProduct) {
-    text = typeProduct.category
+fun TextView.bindLabelType(category: TypeProduct) {
+        text = category.category
 }
 
 @BindingAdapter("listData")
 fun bindRecyclerView(recyclerView: RecyclerView, data: List<Product>?) {
-    val adapter = recyclerView.adapter as CatalogWaterAdapter
-    adapter.submitList(data)
-
+    if (data != null) {
+        val adapter = recyclerView.adapter as AdapterProductList
+        adapter.submitList(data)
+    }
 }
 
 @BindingAdapter("imageTypeProduct")

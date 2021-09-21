@@ -11,18 +11,18 @@ import javax.inject.Inject
 
 class ProductRepository @Inject constructor() {
 
-    val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
+    private val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
 
 //    fun getProductList(generator: Generator): List<Product> {
 //        return generator.getProduct()
 //    }
 
-    suspend fun getProductList(): List<Product> {
+    suspend fun getProductList(category: Int): List<Product> {
         var productList: List<Product> = emptyList()
         try {
             productList = apiWater.getProductList()
             if (!productList.isNullOrEmpty()) {
-                return productList.filter { it.category == 1 && it.app == 1 }
+                return productList.filter { it.category == category && it.app == 1 }
             }
         }catch (e: Exception) {
             Timber.e(e)

@@ -5,13 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import ru.iwater.youwater.R
-import ru.iwater.youwater.databinding.ItemCardProductBinding
+import ru.iwater.youwater.databinding.ItemCategoryProductBinding
 import ru.iwater.youwater.domain.Product
+import ru.iwater.youwater.domain.TypeProduct
+import timber.log.Timber
 
 class CatalogWaterAdapter :
-    ListAdapter<Product, CatalogWaterAdapter.CatalogWaterHolder>(ProductDiffCallback) {
+    ListAdapter<Pair<TypeProduct, List<Product>>, CatalogWaterAdapter.CatalogWaterHolder>(TypeProductDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CatalogWaterHolder {
         return CatalogWaterHolder.from(parent)
@@ -22,30 +22,32 @@ class CatalogWaterAdapter :
         holder.bindCardProduct(item)
     }
 
-    class CatalogWaterHolder(val binding: ItemCardProductBinding) :
+    class CatalogWaterHolder(val binding: ItemCategoryProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bindCardProduct(product: Product) {
-            binding.product = product
+        fun bindCardProduct(catalogItem: Pair<TypeProduct, List<Product>>) {
+            binding.category = catalogItem.first
+            binding.product = catalogItem.second
+            binding.rvProduct.adapter = AdapterProductList()
             binding.executePendingBindings()
         }
 
         companion object {
             fun from(parent: ViewGroup): CatalogWaterHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = ItemCardProductBinding.inflate(layoutInflater, parent, false)
+                val binding = ItemCategoryProductBinding.inflate(layoutInflater, parent, false)
                 return CatalogWaterHolder(binding)
             }
         }
 
     }
 
-    companion object ProductDiffCallback : DiffUtil.ItemCallback <Product>() {
-        override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
-            return  oldItem.id == newItem.id
+    companion object TypeProductDiffCallback : DiffUtil.ItemCallback <Pair<TypeProduct, List<Product>>>() {
+        override fun areItemsTheSame(oldItem: Pair<TypeProduct, List<Product>>, newItem: Pair<TypeProduct, List<Product>>): Boolean {
+            return  oldItem.first.id == newItem.first.id
         }
 
-        override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
+        override fun areContentsTheSame(oldItem: Pair<TypeProduct, List<Product>>, newItem: Pair<TypeProduct, List<Product>>): Boolean {
             return oldItem == newItem
         }
     }

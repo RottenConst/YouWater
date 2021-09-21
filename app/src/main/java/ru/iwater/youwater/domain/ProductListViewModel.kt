@@ -7,13 +7,20 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.repository.ProductRepository
-import ru.iwater.youwater.utils.Generator
 import javax.inject.Inject
 
 @OnScreen
 class ProductListViewModel @Inject constructor(
     private val productRepo: ProductRepository,
-): ViewModel() {
+) : ViewModel() {
+
+    private val catalogs = mutableListOf<TypeProduct>()
+
+    private val _catalogProductMap: MutableLiveData<Map<TypeProduct, List<Product>>> =
+        MutableLiveData()
+    val catalogProductMap: LiveData<Map<TypeProduct, List<Product>>>
+        get() = _catalogProductMap
+
     private val _catalogList: MutableLiveData<List<TypeProduct>> = MutableLiveData()
     val catalogList: LiveData<List<TypeProduct>> get() = _catalogList
 
@@ -22,15 +29,34 @@ class ProductListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _catalogList.value = productRepo.getCategoryList()
-            _productLiveData.value = productRepo.getProductList()
+            val category = productRepo.getCategoryList()
+            val catalogMap = mutableMapOf<TypeProduct, List<Product>>()
+            category.forEach {
+                val products = productRepo.getProductList(it.id)
+                catalogMap[it] = products
+            }
+            _catalogProductMap.value = catalogMap
+
         }
     }
 
-    fun refreshListProduct() {
+    suspend fun getAllProducts() {
+        val category = productRepo.getCategoryList()
+        val catalogMap = mutableMapOf<TypeProduct, List<Product>>()
         viewModelScope.launch {
-            _productLiveData.value = productRepo.getProductList()
+            category.forEach {
+                val products = productRepo.getProductList(it.id)
+                catalogMap[it] = products
+            }
+            _catalogProductMap.value = catalogMap
         }
+
+    }
+
+    fun refreshListProduct() {
+//        viewModelScope.launch {
+//            _productLiveData.value = productRepo.getProductList()
+//        }
 
     }
 }
