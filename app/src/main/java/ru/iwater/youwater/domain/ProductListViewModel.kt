@@ -14,11 +14,15 @@ import javax.inject.Inject
 class ProductListViewModel @Inject constructor(
     private val productRepo: ProductRepository,
 ): ViewModel() {
+    private val _catalogList: MutableLiveData<List<TypeProduct>> = MutableLiveData()
+    val catalogList: LiveData<List<TypeProduct>> get() = _catalogList
+
     private val _productLiveData: MutableLiveData<List<Product>> = MutableLiveData()
     val productLiveData: LiveData<List<Product>> get() = _productLiveData
 
     init {
         viewModelScope.launch {
+            _catalogList.value = productRepo.getCategoryList()
             _productLiveData.value = productRepo.getProductList()
         }
     }

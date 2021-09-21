@@ -37,6 +37,7 @@
                 android:adjustViewBounds="true"
                 android:background="@color/transparent"
                 android:contentDescription="@string/favorite"
+                app:imageUrl="@{product.gallery}"
                 tools:srcCompat="@tools:sample/avatars" />
 
             <ImageButton

@@ -5,11 +5,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.databinding.FragmentCatalogBinding
-import ru.iwater.youwater.domain.TypeProduct
+import ru.iwater.youwater.domain.ProductListViewModel
 import ru.iwater.youwater.screen.adapters.AdapterCatalogList
+import javax.inject.Inject
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -23,7 +27,17 @@ private const val ARG_PARAM2 = "param2"
  */
 class CatalogFragment : BaseFragment() {
 
+    @Inject
+    lateinit var factory: ViewModelProvider.Factory
+    private val screenComponent = App().buildScreenComponent()
+    private val viewModel: ProductListViewModel by viewModels { factory }
+
     private val adapterCatalog = AdapterCatalogList()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        screenComponent.inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,15 +46,10 @@ class CatalogFragment : BaseFragment() {
         val binding = FragmentCatalogBinding.inflate(inflater)
         binding.rvCatalogList.adapter = adapterCatalog
 
-        val typesProductList: List<TypeProduct> = listOf(
-            TypeProduct(0,"Питьевая вода"),
-            TypeProduct(1,"Сопутствующие товары"),
-            TypeProduct(2,"Одноразовая посуда"),
-            TypeProduct(3,"Помпы для воды"),
-            TypeProduct(4,"Кулеры для воды"),
-            TypeProduct(5,"Оборудование")
-        )
-        adapterCatalog.submitList(typesProductList)
+        viewModel.catalogList.observe(viewLifecycleOwner, {
+            adapterCatalog.submitList(it)
+        })
+
 
         return binding.root
     }

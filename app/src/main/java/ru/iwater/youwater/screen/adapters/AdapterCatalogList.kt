@@ -39,7 +39,7 @@ class AdapterCatalogList : ListAdapter<TypeProduct, HolderCatalogList>(TypeProdu
 
     companion object TypeProductDiffCallback : DiffUtil.ItemCallback<TypeProduct>() {
         override fun areItemsTheSame(oldItem: TypeProduct, newItem: TypeProduct): Boolean {
-            return oldItem.label == newItem.label
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: TypeProduct, newItem: TypeProduct): Boolean {

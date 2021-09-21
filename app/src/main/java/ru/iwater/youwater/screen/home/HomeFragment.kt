@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.ListFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -36,6 +37,7 @@ class HomeFragment : BaseFragment() {
     private val adapterRelated = CatalogWaterAdapter()
     private val adapterPomp = CatalogWaterAdapter()
     private val adapterDishes = CatalogWaterAdapter()
+//    private val adapterCategory = AdapterCategoryList()
     private val viewModel: ProductListViewModel by viewModels { factory }
 
 
@@ -51,6 +53,7 @@ class HomeFragment : BaseFragment() {
         val binding = FragmentHomeBinding.inflate(inflater)
         initRV(binding)
         viewModel.productLiveData.observe(viewLifecycleOwner, Observer {
+//            adapterCategory.submitList(it)
             adapterWatter.submitList(it)
             adapterContainers.submitList(it)
             adapterPomp.submitList(it)
@@ -60,11 +63,15 @@ class HomeFragment : BaseFragment() {
             adapterCoolers.submitList(it)
             adapterDishes.submitList(it)
         })
+        viewModel.productLiveData.observe(viewLifecycleOwner, {
+
+        })
         return binding.root
     }
 
     private fun initRV(binding: FragmentHomeBinding) {
         binding.apply {
+//            rvCategoryList.adapter = adapterCategory
             rvWater.adapter = adapterWatter
             rvContainers.adapter = adapterContainers
             rvWaterPomp.adapter = adapterPomp

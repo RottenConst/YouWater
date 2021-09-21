@@ -28,10 +28,6 @@ class CatalogWaterAdapter :
         fun bindCardProduct(product: Product) {
             binding.product = product
             binding.executePendingBindings()
-
-            Glide.with(itemView.context)
-                .load(R.mipmap.product_image)
-                .into(binding.ivProduct)
         }
 
         companion object {

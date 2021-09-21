@@ -1,6 +1,7 @@
 package ru.iwater.youwater.repository
 
 import ru.iwater.youwater.domain.Product
+import ru.iwater.youwater.domain.TypeProduct
 import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.RetrofitFactory
 import ru.iwater.youwater.utils.Generator
@@ -27,5 +28,18 @@ class ProductRepository @Inject constructor() {
             Timber.e(e)
         }
         return productList
+    }
+
+    suspend fun getCategoryList(): List<TypeProduct> {
+        var category: List<TypeProduct> = emptyList()
+        try {
+            category = apiWater.getCategoryList()
+            if (!category.isNullOrEmpty()) {
+                return category.filter { it.visible_app == 1 && it.company_id == "0007"}
+            }
+        }catch (e: Exception) {
+            Timber.e(e)
+        }
+        return category
     }
 }
