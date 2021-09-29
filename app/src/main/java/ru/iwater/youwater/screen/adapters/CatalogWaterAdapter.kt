@@ -6,10 +6,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.iwater.youwater.databinding.ItemCategoryProductBinding
-import ru.iwater.youwater.domain.Product
-import ru.iwater.youwater.domain.TypeProduct
-import timber.log.Timber
+import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.data.TypeProduct
 
+/**
+ * адаптер для вывода списка товаров всех категорий
+ */
 class CatalogWaterAdapter :
     ListAdapter<Pair<TypeProduct, List<Product>>, CatalogWaterAdapter.CatalogWaterHolder>(TypeProductDiffCallback) {
 

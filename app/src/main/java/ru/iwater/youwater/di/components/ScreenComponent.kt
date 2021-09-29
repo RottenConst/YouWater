@@ -3,6 +3,7 @@ package ru.iwater.youwater.di.components
 import dagger.Component
 import ru.iwater.youwater.di.viewModel.ViewModelFactoryModule
 import ru.iwater.youwater.screen.catalog.CatalogFragment
+import ru.iwater.youwater.screen.catalog.CatalogProductFragment
 import ru.iwater.youwater.screen.home.HomeFragment
 
 @OnScreen
@@ -10,4 +11,5 @@ import ru.iwater.youwater.screen.home.HomeFragment
 interface ScreenComponent {
     fun inject(homeFragment: HomeFragment)
     fun inject(catalogFragment: CatalogFragment)
+    fun inject(catalogProductFragment: CatalogProductFragment)
 }

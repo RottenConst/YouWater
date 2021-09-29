@@ -8,16 +8,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import ru.iwater.youwater.R
-import ru.iwater.youwater.domain.Product
-import ru.iwater.youwater.domain.TypeProduct
+import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.data.TypeProduct
+import ru.iwater.youwater.screen.adapters.AdapterCatalogList
 import ru.iwater.youwater.screen.adapters.AdapterProductList
-import ru.iwater.youwater.screen.adapters.CatalogWaterAdapter
 
+/**
+ * имя товара
+ */
 @BindingAdapter("nameProduct")
 fun TextView.bindNameProduct(product: Product) {
     text = product.name
 }
 
+/**
+ * отображение стоимости товара
+ */
 @BindingAdapter("costProduct")
 fun TextView.bindCostProduct(product: Product) {
     if (product.price.isNullOrBlank()) {
@@ -28,6 +34,9 @@ fun TextView.bindCostProduct(product: Product) {
     }
 }
 
+/**
+ * подгрузка картинок товаров
+ */
 @BindingAdapter("imageUrl")
 fun bindImageProduct(imgView: ImageView, file: String?) {
     val imgUrl = "http://dev.iwatercrm.ru/images/$file"
@@ -43,11 +52,17 @@ fun bindImageProduct(imgView: ImageView, file: String?) {
 
 }
 
+/**
+ * название категории
+ */
 @BindingAdapter("labelType")
 fun TextView.bindLabelType(category: TypeProduct) {
         text = category.category
 }
 
+/**
+ * инициализация адаптера и добавление списка продуктов
+ */
 @BindingAdapter("listData")
 fun bindRecyclerView(recyclerView: RecyclerView, data: List<Product>?) {
     if (data != null) {
@@ -56,15 +71,11 @@ fun bindRecyclerView(recyclerView: RecyclerView, data: List<Product>?) {
     }
 }
 
-@BindingAdapter("imageTypeProduct")
-fun ImageView.bindImageTypeProduct(typeProduct: TypeProduct) {
-    setImageResource(when (typeProduct.id) {
-        0 -> R.drawable.water
-        1 -> R.drawable.other
-        2 -> R.drawable.tableware
-        3 -> R.drawable.pump
-        4 -> R.drawable.cooler
-        5 -> R.drawable.equipment
-        else -> R.color.white
-    })
+/**
+ * инициализация адаптера и добавление списка категорий товаров
+ */
+@BindingAdapter("listCatalog")
+fun bindCatalogList(recyclerView: RecyclerView, data: List<TypeProduct>?) {
+    val adapter = recyclerView.adapter as AdapterCatalogList
+    adapter.submitList(data)
 }

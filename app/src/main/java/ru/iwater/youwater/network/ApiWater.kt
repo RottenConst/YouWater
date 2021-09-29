@@ -1,8 +1,8 @@
 package ru.iwater.youwater.network
 
 import retrofit2.http.GET
-import ru.iwater.youwater.domain.Product
-import ru.iwater.youwater.domain.TypeProduct
+import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.data.TypeProduct
 
 interface ApiWater {
 

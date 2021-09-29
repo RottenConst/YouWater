@@ -1,4 +1,4 @@
-package ru.iwater.youwater.domain
+package ru.iwater.youwater.data
 
 data class Product(
     val about: String,

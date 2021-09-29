@@ -7,14 +7,14 @@
     <data>
         <variable
             name="product"
-            type="ru.iwater.youwater.domain.Product" />
+            type="ru.iwater.youwater.data.Product" />
     </data>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/btn_add"
         android:layout_width="152dp"
         android:layout_height="201dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"

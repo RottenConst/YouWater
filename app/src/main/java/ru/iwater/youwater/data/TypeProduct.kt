@@ -1,6 +1,6 @@
-package ru.iwater.youwater.domain
+package ru.iwater.youwater.data
 
-data class TypeProduct(
+data class TypeProduct (
     val category: String,
     val company_id: String,
     val id: Int,

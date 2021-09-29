@@ -9,6 +9,9 @@ import ru.iwater.youwater.databinding.LoginFragmentBinding
 import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.utils.PhoneTextFormatter
 
+/**
+ * Фрагмент авторизации пользователя (ввод телефона\пин кода)
+ */
 class LoginFragment : BaseFragment() {
 
     override fun onCreateView(

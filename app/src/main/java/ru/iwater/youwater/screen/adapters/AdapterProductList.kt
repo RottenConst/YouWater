@@ -6,8 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.iwater.youwater.databinding.ItemCardProductBinding
-import ru.iwater.youwater.domain.Product
+import ru.iwater.youwater.data.Product
 
+/**
+ * адаптер для списка продуктов товаров
+ */
 class AdapterProductList : ListAdapter<Product, AdapterProductList.AdapterProductHolder>(ProductDiffCallback){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdapterProductHolder {

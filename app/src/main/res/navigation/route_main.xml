@@ -14,7 +14,11 @@
         android:id="@+id/catalogFragment"
         android:name="ru.iwater.youwater.screen.catalog.CatalogFragment"
         android:label="fragment_catalog"
-        tools:layout="@layout/fragment_catalog" />
+        tools:layout="@layout/fragment_catalog" >
+        <action
+            android:id="@+id/action_showTypeCatalog"
+            app:destination="@id/catalogProductFragment" />
+    </fragment>
     <fragment
         android:id="@+id/basketFragment"
         android:name="ru.iwater.youwater.screen.basket.BasketFragment"
@@ -25,5 +29,17 @@
         android:name="ru.iwater.youwater.screen.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/catalogProductFragment"
+        android:name="ru.iwater.youwater.screen.catalog.CatalogProductFragment"
+        android:label="CatalogProductFragment">
+        <argument
+            android:name="type_id"
+            app:argType="integer" />
+        <argument
+            android:name="type_string"
+            app:argType="string" />
+    </fragment>
+
 
 </navigation>

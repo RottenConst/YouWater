@@ -1,4 +1,4 @@
-package ru.iwater.youwater.domain
+package ru.iwater.youwater.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,7 +10,7 @@ import ru.iwater.youwater.repository.ProductRepository
 import javax.inject.Inject
 
 @OnScreen
-class ProductListViewModel @Inject constructor(
+class CatalogListViewModel @Inject constructor(
     private val productRepo: ProductRepository,
 ) : ViewModel() {
 
@@ -27,36 +27,32 @@ class ProductListViewModel @Inject constructor(
     private val _productLiveData: MutableLiveData<List<Product>> = MutableLiveData()
     val productLiveData: LiveData<List<Product>> get() = _productLiveData
 
+    private val _navigateToSelectCategory: MutableLiveData<TypeProduct> = MutableLiveData()
+    val navigateToSelectCategory: LiveData<TypeProduct>
+        get() = _navigateToSelectCategory
+
     init {
         viewModelScope.launch {
-            val category = productRepo.getCategoryList()
-            val catalogMap = mutableMapOf<TypeProduct, List<Product>>()
-            category.forEach {
-                val products = productRepo.getProductList(it.id)
-                catalogMap[it] = products
-            }
-            _catalogProductMap.value = catalogMap
-
+            catalogs.addAll(productRepo.getCategoryList())
+            _catalogList.value = catalogs
+            getAllProducts(catalogs)
         }
     }
 
-    suspend fun getAllProducts() {
-        val category = productRepo.getCategoryList()
+    private suspend fun getAllProducts(catalogs: List<TypeProduct>) {
         val catalogMap = mutableMapOf<TypeProduct, List<Product>>()
-        viewModelScope.launch {
-            category.forEach {
-                val products = productRepo.getProductList(it.id)
-                catalogMap[it] = products
-            }
-            _catalogProductMap.value = catalogMap
+        catalogs.forEach {
+            val products = productRepo.getProductList(it.id)
+            catalogMap[it] = products
         }
-
+        _catalogProductMap.value = catalogMap
     }
 
-    fun refreshListProduct() {
-//        viewModelScope.launch {
-//            _productLiveData.value = productRepo.getProductList()
-//        }
+    fun displayCatalogList(catalog: TypeProduct) {
+        _navigateToSelectCategory.value = catalog
+    }
 
+    fun displayCatalogListComplete() {
+        _navigateToSelectCategory.value = null
     }
 }

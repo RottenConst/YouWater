@@ -8,7 +8,9 @@ import android.widget.Button
 import android.widget.EditText
 import timber.log.Timber
 
-
+/**
+ * форматирование телефона
+ */
 class PhoneTextFormatter(
     private val mEditText: EditText,
     private val mPattern: String,

@@ -5,13 +5,13 @@
 
     <data>
         <import type="java.util.List"/>
-        <import type="ru.iwater.youwater.domain.Product"/>
+        <import type="ru.iwater.youwater.data.Product"/>
         <variable
             name="product"
             type="List&lt;Product>" />
         <variable
             name="category"
-            type="ru.iwater.youwater.domain.TypeProduct" />
+            type="ru.iwater.youwater.data.TypeProduct" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

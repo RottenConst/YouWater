@@ -1,8 +1,5 @@
 package ru.iwater.youwater.utils
 
-import ru.iwater.youwater.domain.Product
-import kotlin.random.Random
-
 object Generator {
 
 //    fun getProduct(): List<Product> {

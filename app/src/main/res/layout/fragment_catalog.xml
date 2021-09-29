@@ -2,6 +2,12 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="viewModel"
+            type="ru.iwater.youwater.data.CatalogListViewModel" />
+    </data>
+
     <FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,6 +23,7 @@
             android:layout_marginBottom="60dp"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2"
+            app:listCatalog="@{viewModel.catalogList}"
             tools:listitem="@layout/item_catalog" />
 
     </FrameLayout>

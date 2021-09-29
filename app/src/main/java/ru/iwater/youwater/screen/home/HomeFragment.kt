@@ -4,14 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.ListFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.databinding.FragmentHomeBinding
-import ru.iwater.youwater.domain.ProductListViewModel
+import ru.iwater.youwater.data.CatalogListViewModel
 import ru.iwater.youwater.screen.adapters.CatalogWaterAdapter
 import javax.inject.Inject
 
@@ -30,8 +29,7 @@ class HomeFragment : BaseFragment() {
 
     private val screenComponent = App().buildScreenComponent()
     private val adapterWatter = CatalogWaterAdapter()
-//    private val adapterCategory = AdapterCategoryList()
-    private val viewModel: ProductListViewModel by viewModels { factory }
+    private val viewModel: CatalogListViewModel by viewModels { factory }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

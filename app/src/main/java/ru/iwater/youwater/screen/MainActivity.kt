@@ -83,17 +83,6 @@ class MainActivity : BaseActivity() {
         }
     }
 
-//    private val bottomNav = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-//        when(item.itemId) {
-//            R.id.info_menu -> {
-//                drawerLayout.openDrawer(Gravity.LEFT)
-//                return@OnNavigationItemSelectedListener true
-//            }
-//        }
-//        false
-//
-//    }
-
     companion object {
         fun start(context: Context?) {
             if (context != null) {
