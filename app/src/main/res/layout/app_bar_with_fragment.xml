@@ -31,7 +31,7 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+        class="androidx.navigation.fragment.NavHostFragment"
         app:navGraph="@navigation/route_main"
         app:defaultNavHost="true"
         tools:ignore="FragmentTagUsage" />

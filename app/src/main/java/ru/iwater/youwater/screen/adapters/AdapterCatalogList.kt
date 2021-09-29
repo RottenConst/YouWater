@@ -2,69 +2,59 @@ package ru.iwater.youwater.screen.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.item_catalog.view.*
-import ru.iwater.youwater.R
-import ru.iwater.youwater.domain.TypeProduct
-import ru.iwater.youwater.screen.adapters.AdapterCatalogList.*
+import ru.iwater.youwater.databinding.ItemCatalogBinding
+import ru.iwater.youwater.data.TypeProduct
+import ru.iwater.youwater.screen.adapters.AdapterCatalogList.HolderCatalogList
 
-class AdapterCatalogList(
-    private val typesProductList: List<TypeProduct> = listOf(
-        TypeProduct("Питьевая вода"),
-        TypeProduct("Сопутствующие товары"),
-        TypeProduct("Одноразовая посуда"),
-        TypeProduct("Помпы для воды"),
-        TypeProduct("Кулеры для воды"),
-        TypeProduct("Оборудование")
-    )
-): RecyclerView.Adapter<HolderCatalogList>() {
+/**
+ * адаптер для вывода ссписка категорий
+ */
+class AdapterCatalogList(private val onClickListener: OnClickListener) :
+    ListAdapter<TypeProduct, HolderCatalogList>(TypeProductDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HolderCatalogList {
-        return HolderCatalogList(LayoutInflater.from(parent.context), parent, R.layout.item_catalog)
+        return HolderCatalogList.from(parent)
     }
 
     override fun onBindViewHolder(holder: HolderCatalogList, position: Int) {
-        holder.bindCatalog(typesProductList[position], position)
+        val item = getItem(position)
+        holder.itemView.setOnClickListener {
+            onClickListener.onClick(item)
+        }
+        holder.bindCatalog(item)
     }
 
-    override fun getItemCount(): Int = typesProductList.size
+    class HolderCatalogList(val binding: ItemCatalogBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-    inner class HolderCatalogList(inflater: LayoutInflater, parent: ViewGroup, resource: Int) :
-            RecyclerView.ViewHolder(inflater.inflate(resource, parent, false)) {
+        fun bindCatalog(typeProduct: TypeProduct) {
+            binding.typeProduct = typeProduct
+            binding.executePendingBindings()
+        }
 
-                fun bindCatalog(typeProduct: TypeProduct, position: Int) {
-                    itemView.tv_label_type_product.text = typeProduct.label
-                    if (position == 0) {
-                        Glide.with(itemView.context)
-                            .load(R.drawable.water)
-                            .into(itemView.iv_icon_product)
-                    }
-                    if (position == 1) {
-                        Glide.with(itemView.context)
-                            .load(R.drawable.other)
-                            .into(itemView.iv_icon_product)
-                    }
-                    if (position == 2) {
-                        Glide.with(itemView.context)
-                            .load(R.drawable.tableware)
-                            .into(itemView.iv_icon_product)
-                    }
-                    if (position == 3) {
-                        Glide.with(itemView.context)
-                            .load(R.drawable.pump)
-                            .into(itemView.iv_icon_product)
-                    }
-                    if (position == 4) {
-                        Glide.with(itemView.context)
-                            .load(R.drawable.cooler)
-                            .into(itemView.iv_icon_product)
-                    }
-                    if (position == 5) {
-                        Glide.with(itemView.context)
-                            .load(R.drawable.equipment)
-                            .into(itemView.iv_icon_product)
-                    }
-                }
+        companion object {
+            fun from(parent: ViewGroup): HolderCatalogList {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ItemCatalogBinding.inflate(layoutInflater, parent, false)
+                return HolderCatalogList(binding)
             }
+        }
+    }
+
+    companion object TypeProductDiffCallback : DiffUtil.ItemCallback<TypeProduct>() {
+        override fun areItemsTheSame(oldItem: TypeProduct, newItem: TypeProduct): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: TypeProduct, newItem: TypeProduct): Boolean {
+            return oldItem == newItem
+        }
+    }
+
+    class OnClickListener(val clickListener: (catalog: TypeProduct) -> Unit) {
+        fun onClick(catalog: TypeProduct) = clickListener(catalog)
+    }
 }

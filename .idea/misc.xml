@@ -8,14 +8,16 @@
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/basket_order_content.xml" value="0.16691995947315097" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_basket.xml" value="0.33" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_catalog.xml" value="0.16691995947315097" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_catalog_product.xml" value="0.25" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_home.xml" value="0.25" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_info.xml" value="0.1" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_profile.xml" value="0.3161231884057971" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_basket_product.xml" value="0.3161231884057971" />
-        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_card_product.xml" value="0.2115036231884058" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_card_product.xml" value="0.33" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_catalog.xml" value="0.15534420289855072" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_category_product.xml" value="0.2289855072463768" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/login_fragment.xml" value="0.15534420289855072" />
-        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/main_layout.xml" value="0.15534420289855072" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/main_layout.xml" value="0.2" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/nav_header_main.xml" value="0.15534420289855072" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/start_fragment.xml" value="0.15534420289855072" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/menu/menu_drawer.xml" value="0.18697916666666667" />

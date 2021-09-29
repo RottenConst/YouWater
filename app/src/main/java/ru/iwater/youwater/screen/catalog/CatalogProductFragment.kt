@@ -6,14 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.base.App
-import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.databinding.FragmentCatalogBinding
-import ru.iwater.youwater.data.CatalogListViewModel
-import ru.iwater.youwater.screen.adapters.AdapterCatalogList
+import ru.iwater.youwater.databinding.FragmentCatalogProductBinding
+import ru.iwater.youwater.data.ProductListViewModel
+import ru.iwater.youwater.screen.adapters.AdapterProductList
 import javax.inject.Inject
 
 // TODO: Rename parameter arguments, choose names that match
@@ -22,14 +19,14 @@ private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 /**
- * Фрагмент кататегорий товаров
+ * Фрагмент списка товаров определённой категории
  */
-class CatalogFragment : BaseFragment() {
-
+class CatalogProductFragment : Fragment() {
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     private val screenComponent = App().buildScreenComponent()
-    private val viewModel: CatalogListViewModel by viewModels { factory }
+    val viewModel: ProductListViewModel by viewModels { factory }
+    private val adapterProductList = AdapterProductList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,21 +37,16 @@ class CatalogFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentCatalogBinding.inflate(inflater)
+        val binding = FragmentCatalogProductBinding.inflate(inflater)
         binding.lifecycleOwner = this
-        binding.viewModel = viewModel
-        binding.rvCatalogList.adapter = AdapterCatalogList(AdapterCatalogList.OnClickListener {
-            viewModel.displayCatalogList(it)
+        val catalogId = CatalogProductFragmentArgs.fromBundle(arguments!!).typeId
+        val catalogTitle = CatalogProductFragmentArgs.fromBundle(arguments!!).typeString
+        viewModel.setCatalogItem(catalogId)
+        binding.tvLabelCatalog.text = catalogTitle
+        binding.rvProductList.adapter = adapterProductList
+        viewModel.productsList.observe(this.viewLifecycleOwner, {
+            adapterProductList.submitList(it)
         })
-
-        viewModel.navigateToSelectCategory.observe(this.viewLifecycleOwner, Observer{ if (null != it) {
-                this.findNavController().navigate(
-                    CatalogFragmentDirections.actionShowTypeCatalog(it.id, it.category)
-                )
-                viewModel.displayCatalogListComplete()
-            }
-        })
-
         return binding.root
     }
 
@@ -65,7 +57,7 @@ class CatalogFragment : BaseFragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment CatalogFragment.
+         * @return A new instance of fragment CatalogProductFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic

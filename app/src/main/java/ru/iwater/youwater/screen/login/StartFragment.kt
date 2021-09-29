@@ -5,25 +5,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.NavHostFragment
-import kotlinx.android.synthetic.main.start_fragment.view.*
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.BaseFragment
+import ru.iwater.youwater.databinding.StartFragmentBinding
 
 class StartFragment : BaseFragment() {
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val fragmentLayout =  inflater.inflate(R.layout.start_fragment, container, false)
+    ): View {
+        val binding = StartFragmentBinding.inflate(inflater)
 
         val navController = NavHostFragment.findNavController(this)
+        binding.btnStart.setOnClickListener {
+            navController.navigate(R.id.loginFragment)
+        }
 
-        fragmentLayout.btn_start.setOnClickListener { navController.navigate(R.id.loginFragment) }
-
-        return fragmentLayout
+        return binding.root
     }
 
     companion object {

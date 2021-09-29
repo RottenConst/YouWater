@@ -4,6 +4,9 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 
+/**
+ * пин код
+ */
 class PinCodeFormatter(val codeinput: EditText) : TextWatcher {
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 

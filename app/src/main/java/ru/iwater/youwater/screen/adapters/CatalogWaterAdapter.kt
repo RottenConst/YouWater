@@ -2,37 +2,55 @@ package ru.iwater.youwater.screen.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.item_card_product.view.*
-import ru.iwater.youwater.R
-import ru.iwater.youwater.domain.Product
+import ru.iwater.youwater.databinding.ItemCategoryProductBinding
+import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.data.TypeProduct
 
-class CatalogWaterAdapter(
-    val productsList: MutableList<Product> = mutableListOf()
-) : RecyclerView.Adapter<CatalogWaterAdapter.CatalogWaterHolder>() {
+/**
+ * адаптер для вывода списка товаров всех категорий
+ */
+class CatalogWaterAdapter :
+    ListAdapter<Pair<TypeProduct, List<Product>>, CatalogWaterAdapter.CatalogWaterHolder>(TypeProductDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CatalogWaterHolder {
-        return CatalogWaterHolder(LayoutInflater.from(parent.context), parent, R.layout.item_card_product)
+        return CatalogWaterHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: CatalogWaterHolder, position: Int) {
-        holder.bindCardProduct(productsList[position])
+        val item = getItem(position)
+        holder.bindCardProduct(item)
     }
 
-    override fun getItemCount(): Int = productsList.size
+    class CatalogWaterHolder(val binding: ItemCategoryProductBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-    inner class CatalogWaterHolder(inflater: LayoutInflater, parent: ViewGroup, resource: Int) :
-            RecyclerView.ViewHolder(inflater.inflate(resource, parent, false)) {
+        fun bindCardProduct(catalogItem: Pair<TypeProduct, List<Product>>) {
+            binding.category = catalogItem.first
+            binding.product = catalogItem.second
+            binding.rvProduct.adapter = AdapterProductList()
+            binding.executePendingBindings()
+        }
 
-                fun bindCardProduct(product: Product) {
-                    itemView.tv_name_product.text = product.name
-                    itemView.tv_cost_product.text = "от ${product.cost}р"
-
-                    Glide.with(itemView.context)
-                        .load(R.mipmap.product_image)
-                        .into(itemView.iv_product)
-                }
-
+        companion object {
+            fun from(parent: ViewGroup): CatalogWaterHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ItemCategoryProductBinding.inflate(layoutInflater, parent, false)
+                return CatalogWaterHolder(binding)
             }
+        }
+
+    }
+
+    companion object TypeProductDiffCallback : DiffUtil.ItemCallback <Pair<TypeProduct, List<Product>>>() {
+        override fun areItemsTheSame(oldItem: Pair<TypeProduct, List<Product>>, newItem: Pair<TypeProduct, List<Product>>): Boolean {
+            return  oldItem.first.id == newItem.first.id
+        }
+
+        override fun areContentsTheSame(oldItem: Pair<TypeProduct, List<Product>>, newItem: Pair<TypeProduct, List<Product>>): Boolean {
+            return oldItem == newItem
+        }
+    }
 }
