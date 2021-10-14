@@ -79,3 +79,13 @@ fun bindCatalogList(recyclerView: RecyclerView, data: List<TypeProduct>?) {
     val adapter = recyclerView.adapter as AdapterCatalogList
     adapter.submitList(data)
 }
+
+@BindingAdapter("setNameClient")
+fun TextView.bidingNameClient(clientName: String?) {
+    text = clientName
+}
+
+@BindingAdapter("setTanks")
+fun TextView.bindTanksClient(clientTank: Int?) {
+    "$clientTank шт.".also { text = it }
+}

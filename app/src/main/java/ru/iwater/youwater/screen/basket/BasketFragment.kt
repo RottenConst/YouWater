@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import ru.iwater.youwater.R
 import ru.iwater.youwater.databinding.FragmentBasketBinding
 
 // TODO: Rename parameter arguments, choose names that match

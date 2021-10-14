@@ -4,8 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -15,11 +18,21 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
+import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseActivity
 import ru.iwater.youwater.databinding.MainLayoutBinding
+import ru.iwater.youwater.repository.AuthorisationRepository
+import javax.inject.Inject
 
 class MainActivity : BaseActivity() {
+
+    @Inject
+    lateinit var authRepository: AuthorisationRepository
+    private val screenComponent = App().buildScreenComponent()
 
     private val appBarConfiguration by lazy {
         AppBarConfiguration(
@@ -37,6 +50,7 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        authRepository = AuthorisationRepository(screenComponent.clientStorage())
         val binding = DataBindingUtil.setContentView<MainLayoutBinding>(
             this,
             R.layout.main_layout
@@ -81,6 +95,34 @@ class MainActivity : BaseActivity() {
                 else -> false
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.login_out_menu -> {
+                AlertDialog.Builder(this)
+                    .setMessage(R.string.confirmLogout)
+                    .setPositiveButton(
+                        R.string.yes
+                    ) { _, _ ->
+                        val intent = Intent(applicationContext, StartActivity::class.java)
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+
+                        authRepository.deleteClient()
+                        startActivity(intent)
+                    }
+                    .setNegativeButton(R.string.no) { dialog, _ ->
+                        dialog.cancel()
+                    }.create().show()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {

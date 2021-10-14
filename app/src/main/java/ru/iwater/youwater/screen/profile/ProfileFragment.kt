@@ -5,8 +5,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import ru.iwater.youwater.R
+import ru.iwater.youwater.base.App
+import ru.iwater.youwater.data.ClientProfileViewModel
 import ru.iwater.youwater.databinding.FragmentProfileBinding
+import javax.inject.Inject
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -19,12 +24,19 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class ProfileFragment : Fragment() {
+
+    @Inject
+    lateinit var factory: ViewModelProvider.Factory
+    private val viewModel: ClientProfileViewModel by viewModels { factory }
+
+    private val screenComponent = App().buildScreenComponent()
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        screenComponent.inject(this)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -36,6 +48,8 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentProfileBinding.inflate(inflater)
+        binding.lifecycleOwner = this
+        binding.clientVM = viewModel
         return binding.root
     }
 
