@@ -1,5 +1,7 @@
 package ru.iwater.youwater.repository
 
+import ru.iwater.youwater.bd.ProductDao
+import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.TypeProduct
@@ -10,9 +12,32 @@ import java.lang.Exception
 import javax.inject.Inject
 
 @OnScreen
-class ProductRepository @Inject constructor() {
+class ProductRepository @Inject constructor(
+    youWaterDB: YouWaterDB
+) {
 
+    private val productDao: ProductDao = youWaterDB.productDao()
     private val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
+
+    suspend fun getProductList(): List<Product>? {
+        return productDao.getAllProduct()
+    }
+
+    suspend fun addProductInBasket(product: Product) {
+        productDao.save(product)
+    }
+
+    suspend fun getProductFromDB(id: Int): Product? {
+        return productDao.getProduct(id)
+    }
+
+    suspend fun updateProductInBasket(product: Product) {
+        productDao.updateProductInBasked(product)
+    }
+
+    suspend fun deleteProductFromBasket(product: Product) {
+        productDao.delete(product)
+    }
 
     /**
      * получить список товаров определённой категории
@@ -28,6 +53,17 @@ class ProductRepository @Inject constructor() {
             Timber.e(e)
         }
         return productList
+    }
+
+    suspend fun getProduct(productId: Int): Product? {
+        try {
+            val product = apiWater.getProductList()
+            if (!product.isNullOrEmpty())
+                return product.filter { it.id == productId }[0]
+        }catch (e: Exception) {
+            Timber.e("Exception get product $e")
+        }
+        return null
     }
 
     /**
