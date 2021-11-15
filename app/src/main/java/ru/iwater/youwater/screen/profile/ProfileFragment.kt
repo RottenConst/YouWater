@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.data.ClientProfileViewModel
@@ -50,6 +51,26 @@ class ProfileFragment : Fragment() {
         val binding = FragmentProfileBinding.inflate(inflater)
         binding.lifecycleOwner = this
         binding.clientVM = viewModel
+        binding.btnMyData.setOnClickListener {
+            this.findNavController().navigate(
+                ProfileFragmentDirections.actionProfileFragmentToUserDataFragment()
+            )
+        }
+        binding.btnAddress.setOnClickListener {
+            this.findNavController().navigate(
+                ProfileFragmentDirections.actionProfileFragmentToAddresessFragment()
+            )
+        }
+        binding.btnBankCard.setOnClickListener {
+            this.findNavController().navigate(
+                ProfileFragmentDirections.actionProfileFragmentToBankCardFragment()
+            )
+        }
+        binding.btnNotification.setOnClickListener {
+            this.findNavController().navigate(
+                ProfileFragmentDirections.actionProfileFragmentToNotificationFragment()
+            )
+        }
         return binding.root
     }
 

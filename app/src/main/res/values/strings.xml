@@ -41,6 +41,10 @@
 
     <!--    profile-->
     <string name="name">Имя Фамилия</string>
+    <string name="name_user">Имя</string>
+    <string name="last_name">Фамилия</string>
+    <string name="phone">Телефон</string>
+    <string name="email">Электронная почта</string>
     <string name="my_orders">Мои заказы</string>
     <string name="my_data">Мои данные</string>
     <string name="favorite">Избранное</string>
@@ -50,13 +54,26 @@
     <string name="balls">У вас </string>
     <string name="tanks">Бутелей к возврату:</string>
 
+    <!--    notification setting-->
+    <string name="sms_notification">Получать SMS-уведомления</string>
+    <string name="PUSH_notification">Получать Push-уведомления</string>
+    <string name="email_notification">Получать E-mail рассылки</string>
+
     <!--    other data-->
     <string name="btn_add_desc">Добавить продукт</string>
+    <string name="add_address">Добавить адрес</string>
+    <string name="add_bank_card">Добавить карту</string>
     <string name="btn_сlose">Удалить</string>
 
     <string name="confirmLogout">Вы уверены, что хотите выйти из своего аккаунта?</string>
     <string name="yes">Да</string>
     <string name="ok">Ок</string>
     <string name="no">Нет</string>
+
+    <string name="home">Главная</string>
+    <string name="catalog">Каталог</string>
+    <string name="basket">Карзина</string>
+    <string name="profile">Личный кабинет</string>
+    <string name="info_product">Информация о товаре</string>
 
 </resources>
