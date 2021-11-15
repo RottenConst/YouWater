@@ -5,9 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import ru.iwater.youwater.base.App
+import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.FragmentCatalogProductBinding
 import ru.iwater.youwater.data.ProductListViewModel
 import ru.iwater.youwater.screen.adapters.AdapterProductList
@@ -21,12 +23,12 @@ private const val ARG_PARAM2 = "param2"
 /**
  * Фрагмент списка товаров определённой категории
  */
-class CatalogProductFragment : Fragment() {
+class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClickListener {
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     private val screenComponent = App().buildScreenComponent()
     val viewModel: ProductListViewModel by viewModels { factory }
-    private val adapterProductList = AdapterProductList()
+//    private val adapterProductList = AdapterProductList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +43,9 @@ class CatalogProductFragment : Fragment() {
         binding.lifecycleOwner = this
         val catalogId = CatalogProductFragmentArgs.fromBundle(arguments!!).typeId
         val catalogTitle = CatalogProductFragmentArgs.fromBundle(arguments!!).typeString
+        val adapterProductList = AdapterProductList(AdapterProductList.OnClickListener {
+
+        }, this)
         viewModel.setCatalogItem(catalogId)
         binding.tvLabelCatalog.text = catalogTitle
         binding.rvProductList.adapter = adapterProductList
@@ -48,6 +53,11 @@ class CatalogProductFragment : Fragment() {
             adapterProductList.submitList(it)
         })
         return binding.root
+    }
+
+    override fun onProductItemClicked(product: Product) {
+        Toast.makeText(this.context, "Товар ${product.app_name} добавлн в корзину", Toast.LENGTH_LONG).show()
+        viewModel.addProductInBasket(product)
     }
 
     companion object {

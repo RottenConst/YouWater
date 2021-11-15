@@ -1,17 +1,16 @@
-package ru.iwater.youwater.screen.catalog
+package ru.iwater.youwater.screen.profile
 
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
+import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
-import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.databinding.FragmentCatalogBinding
-import ru.iwater.youwater.data.CatalogListViewModel
-import ru.iwater.youwater.screen.adapters.AdapterCatalogList
+import ru.iwater.youwater.data.ClientProfileViewModel
+import ru.iwater.youwater.databinding.FragmentUserDataBinding
 import javax.inject.Inject
 
 // TODO: Rename parameter arguments, choose names that match
@@ -20,39 +19,40 @@ private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 /**
- * Фрагмент кататегорий товаров
+ * A simple [Fragment] subclass.
+ * Use the [UserDataFragment.newInstance] factory method to
+ * create an instance of this fragment.
  */
-class CatalogFragment : BaseFragment() {
+class UserDataFragment : Fragment() {
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
+    private val viewModel: ClientProfileViewModel by viewModels { factory }
     private val screenComponent = App().buildScreenComponent()
-    private val viewModel: CatalogListViewModel by viewModels { factory }
+    // TODO: Rename and change types of parameters
+    private var param1: String? = null
+    private var param2: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         screenComponent.inject(this)
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentCatalogBinding.inflate(inflater)
-        binding.lifecycleOwner = this
-        binding.viewModel = viewModel
-        binding.rvCatalogList.adapter = AdapterCatalogList(AdapterCatalogList.OnClickListener {
-            viewModel.displayCatalogList(it)
+        val binding = FragmentUserDataBinding.inflate(inflater)
+        viewModel.client.observe(viewLifecycleOwner, {
+            binding.tvName.text = it.name
+            binding.tvLastname.text = ""
+            binding.tvPhone.text = it.contact
+            binding.tvEmail.text = ""
         })
-
-        viewModel.navigateToSelectCategory.observe(this.viewLifecycleOwner, { if (null != it) {
-                this.findNavController().navigate(
-                    CatalogFragmentDirections.actionShowTypeCatalog(it.id, it.category)
-                )
-                viewModel.displayCatalogListComplete()
-            }
-        })
-
         return binding.root
     }
 
@@ -63,12 +63,12 @@ class CatalogFragment : BaseFragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment CatalogFragment.
+         * @return A new instance of fragment UserDataFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            CatalogFragment().apply {
+            UserDataFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
