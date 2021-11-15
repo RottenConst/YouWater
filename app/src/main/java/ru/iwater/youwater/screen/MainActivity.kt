@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -18,9 +19,6 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseActivity
@@ -78,6 +76,8 @@ class MainActivity : BaseActivity() {
             true
         }
 
+        visibilityNavElements(navController, binding)
+
         binding.navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.delivery -> {
@@ -123,6 +123,19 @@ class MainActivity : BaseActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun visibilityNavElements(navController: NavController, binding: MainLayoutBinding) {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when(destination.id) {
+                R.id.aboutProductFragment,
+                R.id.userDataFragment,
+                R.id.addresessFragment,
+                R.id.notificationFragment,
+                R.id.bankCardFragment-> binding.bottomNavView.visibility = View.GONE
+                else -> binding.bottomNavView.visibility = View.VISIBLE
+            }
+        }
     }
 
     companion object {
