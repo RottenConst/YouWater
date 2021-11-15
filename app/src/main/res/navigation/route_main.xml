@@ -8,13 +8,17 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="ru.iwater.youwater.screen.home.HomeFragment"
-        android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        android:label="@string/home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_showAboutProductFragment"
+            app:destination="@id/aboutProductFragment" />
+    </fragment>
     <fragment
         android:id="@+id/catalogFragment"
         android:name="ru.iwater.youwater.screen.catalog.CatalogFragment"
-        android:label="fragment_catalog"
-        tools:layout="@layout/fragment_catalog" >
+        android:label="@string/catalog"
+        tools:layout="@layout/fragment_catalog">
         <action
             android:id="@+id/action_showTypeCatalog"
             app:destination="@id/catalogProductFragment" />
@@ -22,17 +26,30 @@
     <fragment
         android:id="@+id/basketFragment"
         android:name="ru.iwater.youwater.screen.basket.BasketFragment"
-        android:label="fragment_basket"
+        android:label="@string/basket"
         tools:layout="@layout/fragment_basket" />
     <fragment
         android:id="@+id/profileFragment"
         android:name="ru.iwater.youwater.screen.profile.ProfileFragment"
-        android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        android:label="@string/profile"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_userDataFragment"
+            app:destination="@id/userDataFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_addresessFragment"
+            app:destination="@id/addresessFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_bankCardFragment"
+            app:destination="@id/bankCardFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_notificationFragment"
+            app:destination="@id/notificationFragment" />
+    </fragment>
     <fragment
         android:id="@+id/catalogProductFragment"
         android:name="ru.iwater.youwater.screen.catalog.CatalogProductFragment"
-        android:label="CatalogProductFragment">
+        android:label="@string/catalog">
         <argument
             android:name="type_id"
             app:argType="integer" />
@@ -40,6 +57,31 @@
             android:name="type_string"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/aboutProductFragment"
+        android:name="ru.iwater.youwater.screen.home.AboutProductFragment"
+        android:label="@string/info_product">
+        <argument
+            android:name="order_id"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/userDataFragment"
+        android:name="ru.iwater.youwater.screen.profile.UserDataFragment"
+        android:label="@string/my_data"
+        tools:layout="@layout/fragment_user_data"></fragment>
+    <fragment
+        android:id="@+id/addresessFragment"
+        android:name="ru.iwater.youwater.screen.profile.AddresessFragment"
+        android:label="@string/address" />
+    <fragment
+        android:id="@+id/bankCardFragment"
+        android:name="ru.iwater.youwater.screen.profile.BankCardFragment"
+        android:label="@string/bank_card" />
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="ru.iwater.youwater.screen.profile.NotificationFragment"
+        android:label="@string/notifications" />
 
 
 </navigation>

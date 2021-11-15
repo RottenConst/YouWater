@@ -12,8 +12,10 @@ import ru.iwater.youwater.data.TypeProduct
 /**
  * адаптер для вывода списка товаров всех категорий
  */
-class CatalogWaterAdapter :
-    ListAdapter<Pair<TypeProduct, List<Product>>, CatalogWaterAdapter.CatalogWaterHolder>(TypeProductDiffCallback) {
+class CatalogWaterAdapter(
+    private val onClickListener: OnClickListener,
+    private val productItemClickListener: AdapterProductList.OnProductItemClickListener
+    ) : ListAdapter<Pair<TypeProduct, List<Product>>, CatalogWaterAdapter.CatalogWaterHolder>(TypeProductDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CatalogWaterHolder {
         return CatalogWaterHolder.from(parent)
@@ -21,20 +23,30 @@ class CatalogWaterAdapter :
 
     override fun onBindViewHolder(holder: CatalogWaterHolder, position: Int) {
         val item = getItem(position)
-        holder.bindCardProduct(item)
+        holder.bindCardProduct(item, onClickListener, productItemClickListener)
     }
 
     class CatalogWaterHolder(val binding: ItemCategoryProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bindCardProduct(catalogItem: Pair<TypeProduct, List<Product>>) {
+        fun bindCardProduct(
+            catalogItem: Pair<TypeProduct, List<Product>>,
+            onClick: OnClickListener,
+            productItemClickListener: AdapterProductList.OnProductItemClickListener
+        ) {
             binding.category = catalogItem.first
             binding.product = catalogItem.second
-            binding.rvProduct.adapter = AdapterProductList()
+            binding.rvProduct.adapter = AdapterProductList(
+                AdapterProductList.OnClickListener {
+                    onClick.onClick(it.id)
+                },
+                productItemClickListener
+            )
             binding.executePendingBindings()
         }
 
         companion object {
+
             fun from(parent: ViewGroup): CatalogWaterHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ItemCategoryProductBinding.inflate(layoutInflater, parent, false)
@@ -52,5 +64,13 @@ class CatalogWaterAdapter :
         override fun areContentsTheSame(oldItem: Pair<TypeProduct, List<Product>>, newItem: Pair<TypeProduct, List<Product>>): Boolean {
             return oldItem == newItem
         }
+    }
+
+    class OnClickListener(val clickListener: (products: Int) -> Unit) {
+        fun onClick(products: Int) = clickListener(products)
+    }
+
+    class OnClickTwo(val clickListener: (products: Int) -> Unit) {
+        fun onClick(products: Int) = clickListener(products)
     }
 }

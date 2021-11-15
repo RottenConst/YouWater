@@ -4,13 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.databinding.FragmentHomeBinding
 import ru.iwater.youwater.data.CatalogListViewModel
+import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.databinding.FragmentHomeBinding
+import ru.iwater.youwater.screen.adapters.AdapterProductList
 import ru.iwater.youwater.screen.adapters.CatalogWaterAdapter
 import javax.inject.Inject
 
@@ -22,13 +25,12 @@ private const val ARG_PARAM2 = "param2"
 /**
  * Фрагмент для домашнего экрана
  */
-class HomeFragment : BaseFragment() {
+class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListener {
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
 
     private val screenComponent = App().buildScreenComponent()
-    private val adapterWatter = CatalogWaterAdapter()
     private val viewModel: CatalogListViewModel by viewModels { factory }
 
 
@@ -43,11 +45,21 @@ class HomeFragment : BaseFragment() {
     ): View {
         val binding = FragmentHomeBinding.inflate(inflater)
         initRV(binding)
-        viewModel.catalogProductMap.observe(viewLifecycleOwner, Observer { catalogs ->
+        val adapterWatter = CatalogWaterAdapter(CatalogWaterAdapter.OnClickListener{
+            viewModel.displayProduct(it)
+        }, this)
+        binding.rvTypeProductList.adapter = adapterWatter
+        viewModel.catalogProductMap.observe(viewLifecycleOwner, { catalogs ->
             adapterWatter.submitList(catalogs.toList())
         })
 
-
+        viewModel.navigateToSelectProduct.observe(this.viewLifecycleOwner, { if (null != it) {
+                this.findNavController().navigate(
+                    HomeFragmentDirections.actionShowAboutProductFragment(it)
+                )
+                viewModel.displayProductComplete()
+            }
+        })
 
         viewModel.productLiveData.observe(viewLifecycleOwner, {
 
@@ -55,10 +67,15 @@ class HomeFragment : BaseFragment() {
         return binding.root
     }
 
+    override fun onProductItemClicked(product: Product) {
+        viewModel.addProductInBasket(product)
+        Toast.makeText(this.context, "Товар ${product.app_name} добавлн в корзину", Toast.LENGTH_LONG).show()
+    }
+
     private fun initRV(binding: FragmentHomeBinding) {
         binding.apply {
 //            rvCategoryList.adapter = adapterCategory
-            rvTypeProductList.adapter = adapterWatter
+
         }
     }
 

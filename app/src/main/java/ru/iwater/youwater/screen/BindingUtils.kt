@@ -17,21 +17,51 @@ import ru.iwater.youwater.screen.adapters.AdapterProductList
  * имя товара
  */
 @BindingAdapter("nameProduct")
-fun TextView.bindNameProduct(product: Product) {
-    text = product.name
+fun TextView.bindNameProduct(product: Product?) {
+    text = product?.name
 }
 
 /**
  * отображение стоимости товара
  */
 @BindingAdapter("costProduct")
-fun TextView.bindCostProduct(product: Product) {
-    if (product.price.isNullOrBlank()) {
+fun TextView.bindCostProduct(product: Product?) {
+    if (product == null) {
+        text = ""
+    } else {
+        if (product.price.isNotEmpty()) {
+            val price = product.price.split(";")[0].split(":")[1]
+            "от ${price}₽".also { text = it }
+        }
+    }
+}
+
+@BindingAdapter("setCostProduct")
+fun TextView.bindPriceProduct(product: Product?) {
+    if (!product?.price.isNullOrEmpty()) {
+        val price = product?.price?.split(";")?.get(0)?.split(":")?.get(1)
+        "${price}₽".also { text = it }
+    }
+}
+
+@BindingAdapter("setPriceProduct")
+fun TextView.bindBtnPriceProduct(product: Product?) {
+    if (product == null) {
         text = ""
     } else {
         val price = product.price.split(";")[0].split(":")[1]
-        "от ${price}р".also { text = it }
+        "Добавить за ${price}₽".also { text = it }
     }
+}
+
+@BindingAdapter("countProduct")
+fun TextView.bindCountProduct(product: Product?) {
+    text = product?.count.toString()
+}
+
+@BindingAdapter("setAboutProduct")
+fun TextView.bindAboutProduct(product: Product?) {
+    text = product?.about ?: ""
 }
 
 /**

@@ -16,10 +16,22 @@ class ClientProfileViewModel @Inject constructor(
     val client: LiveData<Client>
         get() = _client
 
+    private val _navigateToDataUser: MutableLiveData<Int> = MutableLiveData()
+    val navigateToDataUser: LiveData<Int>
+        get() = _navigateToDataUser
+
     private val authClient = authRepository.getAuthClient()
 
     init {
         getClientInfo()
+    }
+
+    fun displayDataUser(client: Client) {
+        _navigateToDataUser.value = client.client_id
+    }
+
+    fun displayDataUserComplete() {
+        _navigateToDataUser.value = null
     }
 
     private fun getClientInfo() {

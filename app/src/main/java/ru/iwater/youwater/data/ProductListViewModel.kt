@@ -25,4 +25,56 @@ class ProductListViewModel @Inject constructor(
             _productsList.value = productRepo.getProductList(catalogId)
         }
     }
+
+    fun getBasket() {
+        viewModelScope.launch {
+            _productsList.value = productRepo.getProductList()
+        }
+    }
+
+    fun deleteProductFromBasket(product: Product) {
+        viewModelScope.launch {
+            productRepo.deleteProductFromBasket(product)
+        }
+    }
+
+    fun addCountProduct(product: Product) {
+        viewModelScope.launch {
+            val productDB = productRepo.getProductFromDB(product.id)
+            if (productDB != null) {
+                productDB.count += 1
+                productRepo.updateProductInBasket(productDB)
+            }
+        }
+    }
+
+    fun addProductInBasket(product: Product) {
+        viewModelScope.launch {
+            val dbProduct = productRepo.getProductFromDB(product.id)
+            if (dbProduct != null) {
+                dbProduct.count += 1
+                productRepo.updateProductInBasket(dbProduct)
+            } else {
+                product.count += 1
+                productRepo.addProductInBasket(product)
+            }
+        }
+    }
+
+    fun minusCountProduct(product: Product) {
+        viewModelScope.launch {
+            val productDB = productRepo.getProductFromDB(product.id)
+            if (productDB != null) {
+                when {
+                    productDB.count > 1 -> {
+                        productDB.count -= 1
+                        productRepo.updateProductInBasket(productDB)
+                    }
+                    productDB.count == 1 -> {
+                        productRepo.deleteProductFromBasket(productDB)
+                    }
+                }
+            }
+        }
+    }
 }

@@ -5,13 +5,17 @@
 
 
     <data>
+        <import type="androidx.cardview.widget.CardView"/>
         <variable
             name="product"
             type="ru.iwater.youwater.data.Product" />
+        <variable
+            name="productItemClick"
+            type="ru.iwater.youwater.screen.adapters.AdapterProductList.OnProductItemClickListener" />
     </data>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/btn_add"
+        android:id="@+id/cv_product"
         android:layout_width="152dp"
         android:layout_height="201dp"
         android:layout_marginStart="16dp"
@@ -62,7 +66,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="4dp"
+                android:layout_marginBottom="2dp"
                 android:text="@string/str_name_product"
                 android:textColor="@color/black"
                 android:textSize="14sp"
@@ -76,8 +80,8 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="14dp"
-                android:layout_toStartOf="@+id/imageButton2"
+                android:layout_marginBottom="8dp"
+                android:layout_toStartOf="@+id/iv_btn_plus"
                 android:text="@string/str_cost_product"
                 android:textColor="@color/blue"
                 android:textSize="16sp"
@@ -85,16 +89,17 @@
                 app:costProduct="@{product}" />
 
             <ImageButton
-                android:id="@+id/imageButton2"
+                android:id="@+id/iv_btn_plus"
                 style="@android:style/Widget.DeviceDefault.Light.ImageButton"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="14dp"
+                android:layout_marginBottom="8dp"
                 android:background="@color/transparent"
                 android:contentDescription="@string/btn_add_desc"
+                android:onClick="@{() -> productItemClick.onProductItemClicked(product)}"
                 app:srcCompat="@drawable/ic_btn_plus" />
 
 

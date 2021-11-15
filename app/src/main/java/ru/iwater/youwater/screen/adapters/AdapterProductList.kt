@@ -11,7 +11,10 @@ import ru.iwater.youwater.data.Product
 /**
  * адаптер для списка продуктов товаров
  */
-class AdapterProductList : ListAdapter<Product, AdapterProductList.AdapterProductHolder>(ProductDiffCallback){
+class AdapterProductList(
+    private val onClickListener: OnClickListener,
+    private val onProductItemClickListener: OnProductItemClickListener
+                         ) : ListAdapter<Product, AdapterProductList.AdapterProductHolder>(ProductDiffCallback){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdapterProductHolder {
         return AdapterProductHolder.from(parent)
@@ -19,13 +22,17 @@ class AdapterProductList : ListAdapter<Product, AdapterProductList.AdapterProduc
 
     override fun onBindViewHolder(holder: AdapterProductHolder, position: Int) {
         val product = getItem(position)
-        holder.bindProductCard(product)
+        holder.binding.cvProduct.setOnClickListener {
+            onClickListener.onClick(product)
+        }
+        holder.bindProductCard(product, onProductItemClickListener)
     }
 
     class AdapterProductHolder(val binding: ItemCardProductBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bindProductCard(product: Product) {
+        fun bindProductCard(product: Product, onProductItemClickListener: OnProductItemClickListener) {
             binding.product = product
+            binding.productItemClick = onProductItemClickListener
             binding.executePendingBindings()
 
         }
@@ -47,5 +54,13 @@ class AdapterProductList : ListAdapter<Product, AdapterProductList.AdapterProduc
         override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
             return oldItem == newItem
         }
+    }
+
+    class OnClickListener(val clickListener: (product: Product) -> Unit) {
+        fun onClick(product: Product) = clickListener(product)
+    }
+
+    interface OnProductItemClickListener {
+        fun onProductItemClicked(product: Product)
     }
 }

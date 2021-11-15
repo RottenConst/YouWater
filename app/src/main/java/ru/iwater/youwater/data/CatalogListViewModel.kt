@@ -31,6 +31,10 @@ class CatalogListViewModel @Inject constructor(
     val navigateToSelectCategory: LiveData<TypeProduct>
         get() = _navigateToSelectCategory
 
+    private val _navigateToSelectProduct: MutableLiveData<Int> = MutableLiveData()
+    val navigateToSelectProduct: LiveData<Int>
+        get() = _navigateToSelectProduct
+
     init {
         viewModelScope.launch {
             catalogs.addAll(productRepo.getCategoryList())
@@ -46,6 +50,27 @@ class CatalogListViewModel @Inject constructor(
             catalogMap[it] = products
         }
         _catalogProductMap.value = catalogMap
+    }
+
+    fun addProductInBasket(product: Product) {
+        viewModelScope.launch {
+            val dbProduct = productRepo.getProductFromDB(product.id)
+            if (dbProduct != null) {
+                dbProduct.count += 1
+                productRepo.updateProductInBasket(dbProduct)
+            } else {
+                product.count += 1
+                productRepo.addProductInBasket(product)
+            }
+        }
+    }
+
+    fun displayProduct(productId: Int) {
+        _navigateToSelectProduct.value = productId
+    }
+
+    fun displayProductComplete() {
+        _navigateToSelectProduct.value = null
     }
 
     fun displayCatalogList(catalog: TypeProduct) {
