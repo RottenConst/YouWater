@@ -72,7 +72,7 @@
         tools:layout="@layout/fragment_user_data"></fragment>
     <fragment
         android:id="@+id/addresessFragment"
-        android:name="ru.iwater.youwater.screen.profile.AddresessFragment"
+        android:name="ru.iwater.youwater.screen.profile.AddressesFragment"
         android:label="@string/address" />
     <fragment
         android:id="@+id/bankCardFragment"

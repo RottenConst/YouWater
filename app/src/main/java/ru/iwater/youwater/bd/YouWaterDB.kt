@@ -4,14 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import ru.iwater.youwater.data.Address
 import ru.iwater.youwater.data.Product
 
-@Database(version = 1, entities = [Product::class])
+@Database(version = 1, entities = [Product::class, Address::class])
 abstract class YouWaterDB: RoomDatabase() {
     abstract fun productDao(): ProductDao
+    abstract fun addressDao(): AddressDao
 
     companion object {
-        var INSTANCE: YouWaterDB? = null
+        private var INSTANCE: YouWaterDB? = null
 
         fun getYouWaterDB(context: Context): YouWaterDB? {
             if (INSTANCE == null) {

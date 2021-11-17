@@ -62,6 +62,13 @@
     <!--    other data-->
     <string name="btn_add_desc">Добавить продукт</string>
     <string name="add_address">Добавить адрес</string>
+    <string name="address_home">Дом</string>
+    <string name="address_corp">Корпус</string>
+    <string name="address_structure">Строение</string>
+    <string name="address_entrance">Подьезд</string>
+    <string name="address_floor">Этаж</string>
+    <string name="address_apartment">Квартира</string>
+    <string name="address_note">Примечание для курьера</string>
     <string name="add_bank_card">Добавить карту</string>
     <string name="btn_сlose">Удалить</string>
 
@@ -75,5 +82,7 @@
     <string name="basket">Карзина</string>
     <string name="profile">Личный кабинет</string>
     <string name="info_product">Информация о товаре</string>
+    <string name="description_ic_address">Адрес</string>
+    <string name="description_ic_close">Удалить</string>
 
 </resources>

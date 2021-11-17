@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import ru.iwater.youwater.R
+import ru.iwater.youwater.data.Address
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.TypeProduct
 import ru.iwater.youwater.screen.adapters.AdapterCatalogList
@@ -80,6 +81,11 @@ fun bindImageProduct(imgView: ImageView, file: String?) {
             .into(imgView)
     }
 
+}
+
+@BindingAdapter("setAddress")
+fun TextView.bindingAddress(address: Address) {
+        text = address.fullAddress
 }
 
 /**
