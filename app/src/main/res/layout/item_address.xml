@@ -7,6 +7,9 @@
         <variable
             name="address"
             type="ru.iwater.youwater.data.Address" />
+        <variable
+            name="onAddressItemClick"
+            type="ru.iwater.youwater.screen.adapters.AdapterAddresses.OnAddressItemListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,7 +45,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@sample/sample_title[4]" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/iv_delete_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -50,6 +53,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
             android:contentDescription="@string/description_ic_close"
+            android:onClick="@{() -> onAddressItemClick.onDeleteAddressClick(address)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

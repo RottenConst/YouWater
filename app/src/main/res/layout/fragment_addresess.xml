@@ -8,46 +8,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".screen.profile.AddressesFragment">
-
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/add_address_info"
+        
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- TODO: Update blank fragment layout -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <Button
+                android:id="@+id/btn_add_address"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_profile"
+                android:text="@string/add_address"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:backgroundTint="@color/white"
+                app:icon="@drawable/ic_black_place"
+                app:iconTint="@color/brown"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <Button
-                    android:id="@+id/btn_add_address"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/btn_profile"
-                    android:text="@string/add_address"
-                    android:textAlignment="textStart"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    app:backgroundTint="@color/white"
-                    app:icon="@drawable/ic_black_place"
-                    app:iconTint="@color/brown"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_addresses"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_add_address" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <include
-                android:id="@+id/add_address_item"
-                layout="@layout/item_add_address" />
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_addresses"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_add_address"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_address"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 </layout>
