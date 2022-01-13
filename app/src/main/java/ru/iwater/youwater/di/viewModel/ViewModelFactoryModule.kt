@@ -44,4 +44,19 @@ abstract class ViewModelFactoryModule {
     @IntoMap
     @ViewModelKey(AddressViewModel::class)
     abstract fun bindingAddressViewModel(addressViewModel: AddressViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(FavoriteViewModel::class)
+    abstract fun bindingFavoriteViewModel(favoriteViewModel: FavoriteViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(OrderViewModel::class)
+    abstract fun bindingOrderViewModel(orderViewModel: OrderViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(BankCardViewModel::class)
+    abstract fun bindingBankCardViewModel(bankCardViewModel: BankCardViewModel): ViewModel
 }

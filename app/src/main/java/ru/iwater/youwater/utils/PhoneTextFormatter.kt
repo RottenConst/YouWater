@@ -23,7 +23,7 @@ class PhoneTextFormatter(
         val phone = StringBuilder(s)
         Timber.d("join")
         if (count > 0 && !isValid(phone.toString())) {
-            for (i in 0 until phone.length) {
+            for (i in phone.indices) {
                 Timber.d(String.format("%s", phone))
                 val c = mPattern[i]
                 if (c != '#' && c != phone[i]) {

@@ -2,10 +2,7 @@ package ru.iwater.youwater.network
 
 import com.google.gson.JsonObject
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.*
 import ru.iwater.youwater.data.*
 
 interface ApiWater {
@@ -35,4 +32,10 @@ interface ApiWater {
     suspend fun getClientDetail(
         @Path("client_id") clientId: Int
     ): Client?
+
+
+    @POST("OrderCreate/")
+    suspend fun createOrder(
+        @Body order: Order
+    ): Response<JsonObject>
 }

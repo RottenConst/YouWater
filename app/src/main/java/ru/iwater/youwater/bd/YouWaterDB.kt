@@ -4,13 +4,18 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import ru.iwater.youwater.data.Address
-import ru.iwater.youwater.data.Product
+import androidx.room.TypeConverters
+import ru.iwater.youwater.data.*
+import ru.iwater.youwater.utils.ProductConverter
 
-@Database(version = 1, entities = [Product::class, Address::class])
+@Database(version = 1, entities = [Product::class, Address::class, FavoriteProduct::class, MyOrder::class, BankCard::class])
+@TypeConverters(ProductConverter::class )
 abstract class YouWaterDB: RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun addressDao(): AddressDao
+    abstract fun favoriteProductDao(): FavoriteProductDao
+    abstract fun myOrderDao(): MyOrderDao
+    abstract fun bankCard(): BankCardDao
 
     companion object {
         private var INSTANCE: YouWaterDB? = null

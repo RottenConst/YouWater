@@ -15,6 +15,7 @@ class CatalogListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val catalogs = mutableListOf<TypeProduct>()
+    private val favoriteProducts = mutableListOf<FavoriteProduct>()
 
     private val _catalogProductMap: MutableLiveData<Map<TypeProduct, List<Product>>> =
         MutableLiveData()
@@ -39,6 +40,7 @@ class CatalogListViewModel @Inject constructor(
         viewModelScope.launch {
             catalogs.addAll(productRepo.getCategoryList())
             _catalogList.value = catalogs
+            getFavoriteProduct()
             getAllProducts(catalogs)
         }
     }
@@ -47,6 +49,13 @@ class CatalogListViewModel @Inject constructor(
         val catalogMap = mutableMapOf<TypeProduct, List<Product>>()
         catalogs.forEach {
             val products = productRepo.getProductList(it.id)
+            products.forEach { product ->
+                for (favoriteProduct in favoriteProducts) {
+                    if (favoriteProduct.id == product.id) {
+                        product.onFavoriteClick = true
+                    }
+                }
+            }
             catalogMap[it] = products
         }
         _catalogProductMap.value = catalogMap
@@ -62,6 +71,48 @@ class CatalogListViewModel @Inject constructor(
                 product.count += 1
                 productRepo.addProductInBasket(product)
             }
+        }
+    }
+
+    private fun getFavoriteProduct() {
+        viewModelScope.launch {
+            productRepo.getAllFavoriteProducts()?.let { favoriteProducts.addAll(it) }
+        }
+    }
+
+
+    fun addProductInFavorite(product: Product) {
+        viewModelScope.launch {
+            productRepo.addToFavoriteProduct(
+                FavoriteProduct(product.about,
+                                product.app,
+                                product.app_name,
+                                product.category,
+                                product.company_id,
+                                product.gallery,
+                                product.id,
+                                product.name,
+                                product.price)
+            )
+        }
+
+    }
+
+    fun deleteFavoriteProduct(product: Product) {
+        viewModelScope.launch {
+            productRepo.deleteFavoriteProduct(
+                FavoriteProduct(
+                    product.about,
+                    product.app,
+                    product.app_name,
+                    product.category,
+                    product.company_id,
+                    product.gallery,
+                    product.id,
+                    product.name,
+                    product.price
+                )
+            )
         }
     }
 

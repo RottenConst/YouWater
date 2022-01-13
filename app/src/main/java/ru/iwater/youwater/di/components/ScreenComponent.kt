@@ -4,15 +4,14 @@ import dagger.Component
 import ru.iwater.youwater.di.viewModel.ViewModelFactoryModule
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.screen.basket.BasketFragment
+import ru.iwater.youwater.screen.basket.CreateOrderFragment
 import ru.iwater.youwater.screen.catalog.CatalogFragment
 import ru.iwater.youwater.screen.catalog.CatalogProductFragment
 import ru.iwater.youwater.screen.home.AboutProductFragment
 import ru.iwater.youwater.screen.home.HomeFragment
 import ru.iwater.youwater.screen.login.LoginFragment
 import ru.iwater.youwater.screen.login.StartFragment
-import ru.iwater.youwater.screen.profile.AddressesFragment
-import ru.iwater.youwater.screen.profile.ProfileFragment
-import ru.iwater.youwater.screen.profile.UserDataFragment
+import ru.iwater.youwater.screen.profile.*
 
 @OnScreen
 @Component(dependencies = [AppComponent::class], modules = [ViewModelFactoryModule::class])

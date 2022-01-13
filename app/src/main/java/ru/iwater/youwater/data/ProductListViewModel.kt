@@ -58,6 +58,7 @@ class ProductListViewModel @Inject constructor(
                 product.count += 1
                 productRepo.addProductInBasket(product)
             }
+            _productsList.value = productRepo.getProductList()
         }
     }
 
@@ -74,6 +75,7 @@ class ProductListViewModel @Inject constructor(
                         productRepo.deleteProductFromBasket(productDB)
                     }
                 }
+                _productsList.value = productRepo.getProductList()
             }
         }
     }

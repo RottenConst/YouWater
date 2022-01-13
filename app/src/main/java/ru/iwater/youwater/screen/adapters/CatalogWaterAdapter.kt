@@ -38,7 +38,7 @@ class CatalogWaterAdapter(
             binding.product = catalogItem.second
             binding.rvProduct.adapter = AdapterProductList(
                 AdapterProductList.OnClickListener {
-                    onClick.onClick(it.id)
+                    onClick.onClick(it)
                 },
                 productItemClickListener
             )
@@ -66,11 +66,7 @@ class CatalogWaterAdapter(
         }
     }
 
-    class OnClickListener(val clickListener: (products: Int) -> Unit) {
-        fun onClick(products: Int) = clickListener(products)
-    }
-
-    class OnClickTwo(val clickListener: (products: Int) -> Unit) {
-        fun onClick(products: Int) = clickListener(products)
+    class OnClickListener(val clickListener: (products: Product) -> Unit) {
+        fun onClick(products: Product) = clickListener(products)
     }
 }

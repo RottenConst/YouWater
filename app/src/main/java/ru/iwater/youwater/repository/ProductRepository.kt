@@ -1,7 +1,9 @@
 package ru.iwater.youwater.repository
 
+import ru.iwater.youwater.bd.FavoriteProductDao
 import ru.iwater.youwater.bd.ProductDao
 import ru.iwater.youwater.bd.YouWaterDB
+import ru.iwater.youwater.data.FavoriteProduct
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.TypeProduct
@@ -17,6 +19,7 @@ class ProductRepository @Inject constructor(
 ) {
 
     private val productDao: ProductDao = youWaterDB.productDao()
+    private val favoriteDao: FavoriteProductDao = youWaterDB.favoriteProductDao()
     private val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
 
     suspend fun getProductList(): List<Product>? {
@@ -38,6 +41,17 @@ class ProductRepository @Inject constructor(
     suspend fun deleteProductFromBasket(product: Product) {
         productDao.delete(product)
     }
+
+    suspend fun addToFavoriteProduct(favoriteProduct: FavoriteProduct) {
+        favoriteDao.save(favoriteProduct)
+    }
+
+    suspend fun deleteFavoriteProduct(favoriteProduct: FavoriteProduct) {
+        favoriteDao.delete(favoriteProduct)
+    }
+
+    suspend fun getAllFavoriteProducts(): List<FavoriteProduct>? = favoriteDao.getAllProduct()
+
 
     /**
      * получить список товаров определённой категории

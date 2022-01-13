@@ -48,10 +48,15 @@ class AboutProductViewModel @Inject constructor(
 
     fun initProduct(productId: Int) {
         viewModelScope.launch {
-            val product = productRepo.getProduct(productId)
+            var product = productRepo.getProductFromDB(productId)
             if (product != null) {
-                product.count = 1
                 _product.value = product
+            } else {
+                product = productRepo.getProduct(productId)
+                if (product != null) {
+                    product.count = 1
+                    _product.value = product
+                }
             }
         }
     }

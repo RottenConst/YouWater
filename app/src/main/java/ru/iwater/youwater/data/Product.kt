@@ -20,5 +20,6 @@ data class Product(
     val price: String,
     val shname: String?,
     val site: Int,
-    var count: Int = 0
+    var count: Int = 0,
+    var onFavoriteClick: Boolean = false
 )
