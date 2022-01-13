@@ -13,7 +13,6 @@ import ru.iwater.youwater.data.AuthViewModel
 import ru.iwater.youwater.data.StatusPhone
 import ru.iwater.youwater.data.StatusPinCode
 import ru.iwater.youwater.databinding.LoginFragmentBinding
-import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.utils.PhoneTextFormatter
 import timber.log.Timber
 import javax.inject.Inject
@@ -67,6 +66,7 @@ class LoginFragment : BaseFragment() {
                             etTelNum.visibility = View.GONE
                             tilTelNum.visibility = View.GONE
                             btnEnter.visibility = View.GONE
+                            etPinCode.isFocusable = true
                         }
                         StatusPhone.ERROR -> {
                             Timber.d("EROOR")

@@ -28,4 +28,9 @@ interface ScreenComponent {
     fun inject(aboutProductFragment: AboutProductFragment)
     fun inject(basketFragment: BasketFragment)
     fun inject(addressesFragment: AddressesFragment)
+    fun inject(addAddressFragment: AddAddressFragment)
+    fun inject(favoriteFragment: FavoriteFragment)
+    fun inject(createOrderFragment: CreateOrderFragment)
+    fun inject(myOrdersFragment: MyOrdersFragment)
+    fun inject(bankCardFragment: BankCardFragment)
 }
