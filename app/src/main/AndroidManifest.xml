@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="ru.iwater.youwater">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -10,15 +9,14 @@
     <application
         android:name=".base.App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_youwater"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher_youwater_round"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/Theme.YouWater"
-        android:fullBackupContent=""
-        tools:targetApi="m">
+        android:theme="@style/Theme.YouWater">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

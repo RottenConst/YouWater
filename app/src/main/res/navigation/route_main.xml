@@ -13,6 +13,12 @@
         <action
             android:id="@+id/action_showAboutProductFragment"
             app:destination="@id/aboutProductFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_basketFragment"
+            app:destination="@id/basketFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_favoriteFragment"
+            app:destination="@id/favoriteFragment" />
     </fragment>
     <fragment
         android:id="@+id/catalogFragment"
@@ -27,7 +33,11 @@
         android:id="@+id/basketFragment"
         android:name="ru.iwater.youwater.screen.basket.BasketFragment"
         android:label="@string/basket"
-        tools:layout="@layout/fragment_basket" />
+        tools:layout="@layout/fragment_basket" >
+        <action
+            android:id="@+id/action_basketFragment_to_createOrderFragment"
+            app:destination="@id/createOrderFragment" />
+    </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="ru.iwater.youwater.screen.profile.ProfileFragment"
@@ -45,6 +55,12 @@
         <action
             android:id="@+id/action_profileFragment_to_notificationFragment"
             app:destination="@id/notificationFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_favoriteFragment"
+            app:destination="@id/favoriteFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_myOrdersFragment"
+            app:destination="@id/myOrdersFragment" />
     </fragment>
     <fragment
         android:id="@+id/catalogProductFragment"
@@ -56,6 +72,9 @@
         <argument
             android:name="type_string"
             app:argType="string" />
+        <action
+            android:id="@+id/action_catalogProductFragment_to_basketFragment"
+            app:destination="@id/basketFragment" />
     </fragment>
     <fragment
         android:id="@+id/aboutProductFragment"
@@ -64,6 +83,9 @@
         <argument
             android:name="order_id"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_aboutProductFragment_to_basketFragment"
+            app:destination="@id/basketFragment" />
     </fragment>
     <fragment
         android:id="@+id/userDataFragment"
@@ -73,7 +95,11 @@
     <fragment
         android:id="@+id/addresessFragment"
         android:name="ru.iwater.youwater.screen.profile.AddressesFragment"
-        android:label="@string/address" />
+        android:label="@string/address" >
+        <action
+            android:id="@+id/action_addresessFragment_to_addAddressFragment"
+            app:destination="@id/addAddressFragment" />
+    </fragment>
     <fragment
         android:id="@+id/bankCardFragment"
         android:name="ru.iwater.youwater.screen.profile.BankCardFragment"
@@ -82,6 +108,40 @@
         android:id="@+id/notificationFragment"
         android:name="ru.iwater.youwater.screen.profile.NotificationFragment"
         android:label="@string/notifications" />
+    <fragment
+        android:id="@+id/favoriteFragment"
+        android:name="ru.iwater.youwater.screen.profile.FavoriteFragment"
+        android:label="@string/favorite" >
+        <action
+            android:id="@+id/action_favoriteFragment_to_basketFragment"
+            app:destination="@id/basketFragment" />
+        <action
+            android:id="@+id/action_favoriteFragment_to_aboutProductFragment"
+            app:destination="@id/aboutProductFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addAddressFragment"
+        android:name="ru.iwater.youwater.screen.profile.AddAddressFragment"
+        android:label="@string/add_address" >
+        <action
+            android:id="@+id/action_addAddressFragment_to_addresessFragment"
+            app:destination="@id/addresessFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createOrderFragment"
+        android:name="ru.iwater.youwater.screen.basket.CreateOrderFragment"
+        android:label="@string/complete_order">
+        <action
+            android:id="@+id/action_createOrderFragment_to_addAddressFragment"
+            app:destination="@id/addAddressFragment" />
+        <action
+            android:id="@+id/action_createOrderFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/myOrdersFragment"
+        android:name="ru.iwater.youwater.screen.profile.MyOrdersFragment"
+        android:label="@string/my_orders" />
 
 
 </navigation>

@@ -10,7 +10,7 @@
         <ImageView
             android:id="@+id/img_top_splash"
             android:layout_width="0dp"
-            android:layout_height="240dp"
+            android:layout_height="224dp"
             android:foregroundGravity="top"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -20,7 +20,7 @@
         <ImageView
             android:id="@+id/img_bottom_splash"
             android:layout_width="0dp"
-            android:layout_height="290dp"
+            android:layout_height="270dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

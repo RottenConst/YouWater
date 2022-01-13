@@ -33,6 +33,7 @@
     <!--    basket names-->
     <string name="ball_per_order">Количество баллов за заказ:</string>
     <string name="total_sum_order">Общая сумма заказа:</string>
+    <string name="total_cost_order">Итого с учётом скидок:</string>
     <string name="total_sum">Итого:</string>
     <string name="checkout_order">Оформить заказ</string>
     <string name="sample_sum">3020 ₽</string>
@@ -53,6 +54,8 @@
     <string name="notifications">Уведомления</string>
     <string name="balls">У вас </string>
     <string name="tanks">Бутелей к возврату:</string>
+    <string name="nothing_favorite_text">Избранных товаров пока нет.</string>
+    <string name="nothing_order_text">У вас пока не было заказов</string>
 
     <!--    notification setting-->
     <string name="sms_notification">Получать SMS-уведомления</string>
@@ -61,6 +64,7 @@
 
     <!--    other data-->
     <string name="btn_add_desc">Добавить продукт</string>
+    <!--    add address-->
     <string name="add_address">Добавить адрес</string>
     <string name="address_home">Дом</string>
     <string name="address_corp">Корпус</string>
@@ -69,7 +73,12 @@
     <string name="address_floor">Этаж</string>
     <string name="address_apartment">Квартира</string>
     <string name="address_note">Примечание для курьера</string>
+    <!-- add card-->
     <string name="add_bank_card">Добавить карту</string>
+    <string name="number_bank_card">Номер банковской карты</string>
+    <string name="validity">Срок действия</string>
+    <string name="CVV">CVV</string>
+    <string name="this_card_use_next">Я хочу использовать эту карту для будущих заказов</string>
     <string name="btn_сlose">Удалить</string>
 
     <string name="confirmLogout">Вы уверены, что хотите выйти из своего аккаунта?</string>
@@ -84,5 +93,16 @@
     <string name="info_product">Информация о товаре</string>
     <string name="description_ic_address">Адрес</string>
     <string name="description_ic_close">Удалить</string>
+    <string name="info_order">Детали заказа:</string>
+    <string name="complete_order_label">Оформление заказа</string>
+    <string name="complete_order">Оформить заявку</string>
+    <string name="label_pay">Оплата</string>
+    <string name="cancel">Отмена</string>
+    <string name="Search">Искать</string>
+
+    <string-array name="order_pay">
+        <item>Оплата по карте курьеру</item>
+        <item>Оплата наличными</item>
+    </string-array>
 
 </resources>

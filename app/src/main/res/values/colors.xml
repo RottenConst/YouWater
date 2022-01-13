@@ -12,4 +12,5 @@
     <color name="lightGrey">#DCC1BEBE</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="brown">#333333</color>
+    <color name="red">#D50000</color>
 </resources>
