@@ -4,7 +4,6 @@ import com.google.gson.JsonObject
 import ru.iwater.youwater.data.AuthClient
 import ru.iwater.youwater.data.Client
 import ru.iwater.youwater.data.PhoneStatusClient
-import ru.iwater.youwater.iteractor.ClientStorage
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.RetrofitFactory
@@ -51,15 +50,17 @@ class AuthorisationRepository @Inject constructor(
 
     suspend fun checkSession(clientAuth: AuthClient): Boolean? {
         val client = JsonObject()
-        if (clientAuth.clientId == 0) clientAuth.clientId += 1119
-        client.addProperty("client_id", clientAuth.clientId)
-        client.addProperty("session", clientAuth.session)
-        try {
-            return apiAuth.checkSession(client)?.get("check")?.asBoolean
-        } catch (e: Exception) {
-            Timber.e("error check session")
+        if (clientAuth.clientId > 0) {
+            clientAuth.clientId
+            client.addProperty("client_id", clientAuth.clientId)
+            client.addProperty("session", clientAuth.session)
+            try {
+                return apiAuth.checkSession(client)?.get("check")?.asBoolean
+            } catch (e: Exception) {
+                Timber.e("error check session")
+            }
         }
-        return null
+        return false
     }
 
     suspend fun getClientInfo(clientId: Int): Client? {

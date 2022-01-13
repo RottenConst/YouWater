@@ -1,5 +1,7 @@
 package ru.iwater.youwater.screen
 
+import android.graphics.Paint
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
@@ -9,10 +11,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.Address
+import ru.iwater.youwater.data.BankCard
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.TypeProduct
 import ru.iwater.youwater.screen.adapters.AdapterCatalogList
 import ru.iwater.youwater.screen.adapters.AdapterProductList
+import ru.iwater.youwater.screen.adapters.OrderProductAdapter
+import timber.log.Timber
+import java.text.SimpleDateFormat
 
 /**
  * имя товара
@@ -27,12 +33,57 @@ fun TextView.bindNameProduct(product: Product?) {
  */
 @BindingAdapter("costProduct")
 fun TextView.bindCostProduct(product: Product?) {
-    if (product == null) {
-        text = ""
-    } else {
-        if (product.price.isNotEmpty()) {
-            val price = product.price.split(";")[0].split(":")[1]
-            "от ${price}₽".also { text = it }
+    if (product != null) {
+        if (product.category == 1) {
+            if (product.price.isNotEmpty()) {
+                val price = product.price.split(";")[0].split(":")[1]
+                "от ${price.toInt() - 15}₽".also { text = it }
+            }
+        } else {
+            if (product.price.isNotEmpty()) {
+                val price = product.price.split(";")[0].split(":")[1]
+                "от ${price}₽".also { text = it }
+            }
+        }
+    }
+}
+
+@BindingAdapter("costProductNoDiscount")
+fun TextView.bindCostNoDiscount(product: Product?) {
+    if (product != null) {
+        if (product.category == 1) {
+            visibility = View.VISIBLE
+            paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+            if (product.price.isNotEmpty()) {
+                val price = product.price.split(";")[0].split(":")[1]
+                "от ${price.toInt()}₽".also { text = it }
+            }
+        } else {
+            visibility = View.GONE
+        }
+    }
+}
+
+@BindingAdapter("setCostNoDiscount")
+fun TextView.bindNoDiscount(product: Product?) {
+    if (product != null) {
+        if (product.category == 1) {
+            visibility = View.VISIBLE
+            val prices = product.price.removeSuffix(";")
+            val priceList = prices.split(";")
+            val count = product.count
+            var price = 0
+            priceList.forEach {
+                Timber.d("COUNT = $count")
+                val priceCount = it.split(":")
+                if (priceCount[0].toInt() <= count) {
+                    Timber.d("Place = ${priceCount[1].toInt()}")
+                    price = priceCount[1].toInt() * count
+                }
+            }
+            "$price₽".also { text = it }
+        } else {
+            visibility = View.GONE
         }
     }
 }
@@ -40,8 +91,30 @@ fun TextView.bindCostProduct(product: Product?) {
 @BindingAdapter("setCostProduct")
 fun TextView.bindPriceProduct(product: Product?) {
     if (!product?.price.isNullOrEmpty()) {
-        val price = product?.price?.split(";")?.get(0)?.split(":")?.get(1)
-        "${price}₽".also { text = it }
+        val prices = product?.price?.removeSuffix(";")
+        val priceList = prices?.split(";")
+        val count = product?.count ?: 0
+        var price = 0
+        if (product?.category == 1) {
+            priceList?.forEach {
+                Timber.d("COUNT = $count")
+                val priceCount = it.split(":")
+                if (priceCount[0].toInt() <= count) {
+                    Timber.d("Place = ${priceCount[1].toInt()}")
+                    price = (priceCount[1].toInt() - 15) * count
+                }
+            }
+        } else {
+            priceList?.forEach {
+                Timber.d("COUNT = $count")
+                val priceCount = it.split(":")
+                if (priceCount[0].toInt() <= count) {
+                    Timber.d("Place = ${priceCount[1].toInt()}")
+                    price = priceCount[1].toInt() * count
+                }
+            }
+        }
+        "$price₽".also { text = it }
     }
 }
 
@@ -50,7 +123,29 @@ fun TextView.bindBtnPriceProduct(product: Product?) {
     if (product == null) {
         text = ""
     } else {
-        val price = product.price.split(";")[0].split(":")[1]
+        val prices = product.price.removeSuffix(";")
+        val priceList = prices.split(";")
+        val count = product.count
+        var price = 0
+        if (product.category == 1) {
+            priceList.forEach {
+                Timber.d("COUNT = $count")
+                val priceCount = it.split(":")
+                if (priceCount[0].toInt() <= count) {
+                    Timber.d("Place = ${priceCount[1].toInt()}")
+                    price = (priceCount[1].toInt() - 15) * count
+                }
+            }
+        } else {
+            priceList.forEach {
+                Timber.d("COUNT = $count")
+                val priceCount = it.split(":")
+                if (priceCount[0].toInt() <= count) {
+                    Timber.d("Place = ${priceCount[1].toInt()}")
+                    price = priceCount[1].toInt() * count
+                }
+            }
+        }
         "Добавить за ${price}₽".also { text = it }
     }
 }
@@ -58,6 +153,11 @@ fun TextView.bindBtnPriceProduct(product: Product?) {
 @BindingAdapter("countProduct")
 fun TextView.bindCountProduct(product: Product?) {
     text = product?.count.toString()
+}
+
+@BindingAdapter("setCountProduct")
+fun TextView.bindCount(product: Product?) {
+    "${product?.count}шт.".also { text = it }
 }
 
 @BindingAdapter("setAboutProduct")
@@ -84,8 +184,36 @@ fun bindImageProduct(imgView: ImageView, file: String?) {
 }
 
 @BindingAdapter("setAddress")
-fun TextView.bindingAddress(address: Address) {
-        text = address.fullAddress
+fun TextView.bindingAddress(address: Address?) {
+    if (address != null) {
+        when {
+            address.building == null -> {
+                "${address.region}, ул.${address.street}, д.${address.house} ".also {
+                    text = it
+                }
+            }
+            address.entrance == null -> {
+                "${address.region}, ул.${address.street}, д.${address.house} ".also {
+                    text = it
+                }
+            }
+            address.floor == null -> {
+                "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}".also {
+                    text = it
+                }
+            }
+            address.flat == null -> {
+                "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}, этаж ${address.floor}".also {
+                    text = it
+                }
+            }
+            else -> {
+                "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}, этаж ${address.floor}, кв.${address.flat} ".also {
+                    text = it
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -93,7 +221,7 @@ fun TextView.bindingAddress(address: Address) {
  */
 @BindingAdapter("labelType")
 fun TextView.bindLabelType(category: TypeProduct) {
-        text = category.category
+    text = category.category
 }
 
 /**
@@ -124,4 +252,53 @@ fun TextView.bidingNameClient(clientName: String?) {
 @BindingAdapter("setTanks")
 fun TextView.bindTanksClient(clientTank: Int?) {
     "$clientTank шт.".also { text = it }
+}
+
+@BindingAdapter("setDateMyOrder")
+fun TextView.bindDateMyOrder(dateOrder: String?) {
+    if (dateOrder != null) {
+        val date = dateOrder.split(";")[0]
+        val period = dateOrder.split(";")[1]
+        val format = SimpleDateFormat("dd.MM.yyyy")
+        val unixDate = date.toLong() * 1000
+        text = "${format.format(unixDate)}, $period"
+    }
+
+
+}
+
+@BindingAdapter("setTypeCash")
+fun TextView.bindTypeCash(typeCash: String?) {
+    "$typeCash".also { text = it }
+}
+
+@BindingAdapter("setIdOrder")
+fun TextView.bindIdOrder(id: Int?) {
+    if (id != null) text = id.toString()
+}
+
+@BindingAdapter("setAddress")
+fun TextView.bindAddressOrder(address: String?) {
+    if (address != null) text = address
+}
+
+@BindingAdapter("setTotalCost")
+fun TextView.bindTotalCost(totalCost: String?) {
+    if (totalCost != null) text = totalCost
+}
+
+@BindingAdapter("setListMyOrdersProduct")
+fun bindListMyOrders(recyclerView: RecyclerView, products: List<Product>?) {
+    if (products != null) {
+        val adapter = recyclerView.adapter as OrderProductAdapter
+        adapter.submitList(products)
+    }
+}
+
+@BindingAdapter("setNameBankCard")
+fun TextView.bindNameBankCard(bankCard: BankCard?) {
+    if (bankCard != null) {
+        val nameCard = bankCard.numberCard.toString().removeRange(0, 12)
+        "Банковская карта $nameCard".also { text = it }
+    }
 }

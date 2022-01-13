@@ -19,9 +19,13 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseActivity
+import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.databinding.MainLayoutBinding
 import ru.iwater.youwater.repository.AuthorisationRepository
 import javax.inject.Inject
@@ -113,7 +117,9 @@ class MainActivity : BaseActivity() {
                         val intent = Intent(applicationContext, StartActivity::class.java)
                         intent.flags =
                             Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-
+                        CoroutineScope(Dispatchers.Default).launch {
+                            YouWaterDB.getYouWaterDB(applicationContext)?.clearAllTables()
+                        }
                         authRepository.deleteClient()
                         startActivity(intent)
                     }
@@ -132,6 +138,9 @@ class MainActivity : BaseActivity() {
                 R.id.userDataFragment,
                 R.id.addresessFragment,
                 R.id.notificationFragment,
+                R.id.addAddressFragment,
+                R.id.createOrderFragment,
+                R.id.myOrdersFragment,
                 R.id.bankCardFragment-> binding.bottomNavView.visibility = View.GONE
                 else -> binding.bottomNavView.visibility = View.VISIBLE
             }

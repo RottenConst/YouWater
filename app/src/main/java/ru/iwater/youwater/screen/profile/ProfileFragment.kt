@@ -71,6 +71,16 @@ class ProfileFragment : Fragment() {
                 ProfileFragmentDirections.actionProfileFragmentToNotificationFragment()
             )
         }
+        binding.btnMyFavorite.setOnClickListener {
+            this.findNavController().navigate(
+                ProfileFragmentDirections.actionProfileFragmentToFavoriteFragment()
+            )
+        }
+        binding.btnMyOrder.setOnClickListener {
+            this.findNavController().navigate(
+                ProfileFragmentDirections.actionProfileFragmentToMyOrdersFragment()
+            )
+        }
         return binding.root
     }
 

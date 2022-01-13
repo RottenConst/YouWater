@@ -3,36 +3,65 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.3734375" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/bg_button.xml" value="0.37864583333333335" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/btn_cancel_red.xml" value="0.3728205128205128" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/btn_disabled.xml" value="0.37864583333333335" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/btn_profile.xml" value="0.2375" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/btn_rounded_corner.xml" value="0.37864583333333335" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/btn_transparent.xml" value="0.3734375" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/card_address.xml" value="0.3734375" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/circle.xml" value="0.37864583333333335" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/ic_address.xml" value="0.3728205128205128" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/ic_basket_icon.xml" value="0.3728205128205128" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/ic_black_place.xml" value="0.3728205128205128" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/ic_btn_minus.xml" value="0.3728205128205128" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/ic_like.xml" value="0.17685185185185184" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/ic_like_true.xml" value="0.20729166666666668" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/ic_payment.xml" value="0.3734375" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/ic_send.xml" value="0.3734375" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/drawable/ic_youwater_logo.xml" value="0.3734375" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/activity_main.xml" value="0.16691995947315097" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/app_bar_with_fragment.xml" value="0.1" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/basket_order_content.xml" value="0.16691995947315097" />
-        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_about_product.xml" value="0.203125" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_about_product.xml" value="0.5" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_about_proguct.xml" value="0.2740740740740741" />
-        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_addresess.xml" value="0.22135416666666666" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_add_address.xml" value="0.19114583333333332" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_addresess.xml" value="0.18" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_bank_card.xml" value="0.1890625" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_basket.xml" value="0.27247191011235955" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_catalog.xml" value="0.16691995947315097" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_catalog_product.xml" value="0.25" />
-        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_home.xml" value="0.25" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_create_order.xml" value="0.33" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_favorite.xml" value="0.19114583333333332" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_home.xml" value="0.1" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_info.xml" value="0.1" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_my_orders.xml" value="0.3625" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_notification.xml" value="0.1890625" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_profile.xml" value="0.3161231884057971" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/fragment_user_data.xml" value="0.22135416666666666" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_add_address.xml" value="0.26851851851851855" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_add_card.xml" value="0.3572916666666667" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_address.xml" value="0.3625" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_bank_card.xml" value="0.3625" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_basket_product.xml" value="0.3161231884057971" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_card_product.xml" value="0.33" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_catalog.xml" value="0.15534420289855072" />
-        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_category_product.xml" value="0.2289855072463768" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_category_product.xml" value="0.1" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_favorite_product.xml" value="0.5" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_order.xml" value="0.3625" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/item_order_product.xml" value="0.67" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/login_fragment.xml" value="0.15534420289855072" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/main_layout.xml" value="0.2" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/nav_header_main.xml" value="0.15534420289855072" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/spinner_item_layout_resource.xml" value="0.3625" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/layout/start_fragment.xml" value="0.15534420289855072" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/menu/main_menu.xml" value="0.3625" />
         <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/menu/menu_drawer.xml" value="0.18697916666666667" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3728205128205128" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/mipmap-anydpi-v26/ic_launcher_youwater.xml" value="0.23958333333333334" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/mipmap-anydpi-v26/ic_launcher_youwater_round.xml" value="0.23958333333333334" />
+        <entry key="..\:/Users/Satan/AndroidStudioProjects/YouWater/app/src/main/res/xml/network_security_config.xml" value="0.2375" />
       </map>
     </option>
   </component>
