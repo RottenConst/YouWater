@@ -12,22 +12,14 @@
             type="ru.iwater.youwater.screen.adapters.AdapterBasketList.OnProductItemListener" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
         <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            app:cardCornerRadius="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:cardCornerRadius="8dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -89,8 +81,8 @@
                     android:id="@+id/btn_close"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginEnd="14dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
                     android:backgroundTint="@color/white"
                     android:contentDescription="@string/btn_сlose"
                     android:onClick="@{() -> productItemClick.deleteProductClick(product)}"
@@ -103,12 +95,12 @@
                     app:srcCompat="@drawable/ic_btn_close"
                     tools:targetApi="lollipop" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/btn_minus"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="16dp"
                     android:background="@drawable/ic_btn_minus"
                     android:onClick="@{() -> productItemClick.minusProduct(product)}"
                     app:backgroundTint="@color/lightGrey"
@@ -123,12 +115,12 @@
                     android:id="@+id/tv_sum_product"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="16dp"
                     android:text="1"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:countProduct="@{product}"
+
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btn_plus_product"
                     app:layout_constraintHorizontal_bias="1.0"
@@ -136,12 +128,12 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="1.0" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/btn_plus_product"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:layout_marginEnd="14dp"
-                    android:layout_marginBottom="14dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
                     android:background="@drawable/ic_btn_plus"
                     android:onClick="@{() -> productItemClick.addProduct(product)}"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -151,8 +143,20 @@
                     app:layout_constraintTop_toBottomOf="@+id/btn_close"
                     app:layout_constraintVertical_bias="1.0" />
 
+                <TextView
+                    android:id="@+id/tv_sum_discount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text=""
+                    android:visibility="gone"
+                    app:setCostNoDiscount="@{product}"
+                    app:layout_constraintBottom_toTopOf="@+id/tv_cost_prd"
+                    app:layout_constraintStart_toEndOf="@+id/img_small_product"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_product_name"
+                    app:layout_constraintVertical_bias="1.0" />
+
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

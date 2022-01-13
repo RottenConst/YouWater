@@ -6,12 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.ProductListViewModel
 import ru.iwater.youwater.databinding.FragmentBasketBinding
 import ru.iwater.youwater.screen.adapters.AdapterBasketList
+import timber.log.Timber
 import javax.inject.Inject
 
 // TODO: Rename parameter arguments, choose names that match
@@ -51,9 +53,51 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
         val adapterBasketList = AdapterBasketList(this)
         binding.rvBasketList.adapter = adapterBasketList
         viewModel.getBasket()
-        viewModel.productsList.observe(viewLifecycleOwner, {
-            adapterBasketList.submitList(it)
+//        binding.btnCheckoutOrder.isEnabled = false
+        viewModel.productsList.observe(viewLifecycleOwner, { products ->
+            adapterBasketList.submitList(products)
+            binding.btnCheckoutOrder.isEnabled = products.isNotEmpty() && products != null
+            var priceTotal = 0
+            var priceCompleteDiscount = 0
+            var priceComplete = 0
+            var priceDiscountTotal = 0
+            var discount = 0
+            var price = 0
+            products.forEach { product ->
+                val prices = product.price.removeSuffix(";") //тут я убираю последнюю точку с запятой что б null'a не было
+                val priceList = prices.split(";") //делю на массив по ;
+                val count = product.count //количество товара узнаю
+                if (product.category == 1) {
+                    priceList.forEach {
+                        val priceCount = it.split(":") //дальше уже узнаю цены и сравниваю с количеством
+                        if (priceCount[0].toInt() <= count) {
+                            discount = (priceCount[1].toInt() - 15) * count
+                            price = priceCount[1].toInt() * count
+                        }
+                    }
+                    priceCompleteDiscount += discount
+                } else {
+                    priceList.forEach {
+                        val priceCount = it.split(":") //дальше уже узнаю цены и сравниваю с количеством
+                        if (priceCount[0].toInt() <= count) {
+                            price = priceCount[1].toInt() * count
+                        }
+                    }
+                    priceComplete += price
+                }
+                priceTotal += price
+                priceDiscountTotal = (priceComplete + priceCompleteDiscount)
+                Timber.d("DISCOUNT $priceComplete $priceCompleteDiscount")
+            }
+            "${priceDiscountTotal}₽".also { binding.tvSumComplete.text = it }
+            "${priceTotal}₽".also { binding.tvSumOrder.text = it }
+
         })
+        binding.btnCheckoutOrder.setOnClickListener {
+            this.findNavController().navigate(
+                BasketFragmentDirections.actionBasketFragmentToCreateOrderFragment()
+            )
+        }
         return binding.root
     }
 

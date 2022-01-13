@@ -1,10 +1,14 @@
 package ru.iwater.youwater.screen.adapters
 
+import android.graphics.Color
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import ru.iwater.youwater.R
 import ru.iwater.youwater.databinding.ItemCardProductBinding
 import ru.iwater.youwater.data.Product
 
@@ -22,7 +26,9 @@ class AdapterProductList(
 
     override fun onBindViewHolder(holder: AdapterProductHolder, position: Int) {
         val product = getItem(position)
-        holder.binding.cvProduct.setOnClickListener {
+        holder.binding.ivLike.setOnClickListener {
+            product.onFavoriteClick = !product.onFavoriteClick
+            holder.setLikeIcon(product.onFavoriteClick)
             onClickListener.onClick(product)
         }
         holder.bindProductCard(product, onProductItemClickListener)
@@ -33,8 +39,22 @@ class AdapterProductList(
         fun bindProductCard(product: Product, onProductItemClickListener: OnProductItemClickListener) {
             binding.product = product
             binding.productItemClick = onProductItemClickListener
+            binding.tvSumNoDiscount.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+            binding.ivLike.setBackgroundColor(Color.TRANSPARENT)
+            if (product.onFavoriteClick) {
+                binding.ivLike.setImageResource(R.drawable.ic_like_true)
+            } else {
+                binding.ivLike.setImageResource(R.drawable.ic_like)
+            }
             binding.executePendingBindings()
+        }
 
+        fun setLikeIcon(favorite: Boolean) {
+            if (favorite) {
+                binding.ivLike.setImageResource(R.drawable.ic_like_true)
+            } else {
+                binding.ivLike.setImageResource(R.drawable.ic_like)
+            }
         }
 
         companion object {
@@ -62,5 +82,6 @@ class AdapterProductList(
 
     interface OnProductItemClickListener {
         fun onProductItemClicked(product: Product)
+        fun aboutProductClick(product: Product)
     }
 }

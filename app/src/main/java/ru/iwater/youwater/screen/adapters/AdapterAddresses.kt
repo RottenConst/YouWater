@@ -1,5 +1,6 @@
 package ru.iwater.youwater.screen.adapters
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -9,7 +10,7 @@ import ru.iwater.youwater.data.Address
 import ru.iwater.youwater.databinding.ItemAddressBinding
 import ru.iwater.youwater.screen.adapters.AdapterAddresses.*
 
-class AdapterAddresses : ListAdapter<Address, AddressHolder>(AddressDiffUtilCallback) {
+class AdapterAddresses(private val onAddressItemListener: OnAddressItemListener) : ListAdapter<Address, AddressHolder>(AddressDiffUtilCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AddressHolder {
         return AddressHolder.from(parent)
@@ -17,15 +18,17 @@ class AdapterAddresses : ListAdapter<Address, AddressHolder>(AddressDiffUtilCall
 
     override fun onBindViewHolder(holder: AddressHolder, position: Int) {
         val address = getItem(position)
-        holder.bindingAddress(address)
+        holder.bindingAddress(address, onAddressItemListener)
 
     }
 
 
     class AddressHolder(val binding: ItemAddressBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bindingAddress(address: Address) {
+        fun bindingAddress(address: Address, onAddressItemListener: OnAddressItemListener) {
             binding.address = address
+            binding.onAddressItemClick = onAddressItemListener
+            binding.ivDeleteAddress.setBackgroundColor(Color.TRANSPARENT)
             binding.executePendingBindings()
         }
 
@@ -47,5 +50,9 @@ class AdapterAddresses : ListAdapter<Address, AddressHolder>(AddressDiffUtilCall
         override fun areContentsTheSame(oldItem: Address, newItem: Address): Boolean {
             return oldItem == newItem
         }
+    }
+
+    interface OnAddressItemListener {
+        fun onDeleteAddressClick(address: Address)
     }
 }

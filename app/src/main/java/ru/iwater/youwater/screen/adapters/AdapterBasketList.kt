@@ -1,5 +1,6 @@
 package ru.iwater.youwater.screen.adapters
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -9,6 +10,7 @@ import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.ItemBasketProductBinding
 
 class AdapterBasketList(
+//    private val onClickListener: OnClickItemProduct,
     private val onProductItemListener: OnProductItemListener
 ) :
     ListAdapter<Product, AdapterBasketList.BasketHolder>(BasketProductDiffUtilCallback) {
@@ -29,6 +31,8 @@ class AdapterBasketList(
             fun bindingProduct(product: Product, onProductItemListener: OnProductItemListener) {
                 binding.product = product
                 binding.productItemClick = onProductItemListener
+                binding.tvSumProduct.text = product.count.toString()
+                binding.tvSumDiscount.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
                 binding.executePendingBindings()
             }
 
@@ -50,6 +54,10 @@ class AdapterBasketList(
             return oldItem == newItem
         }
     }
+//
+//    class OnClickItemProduct(val clickListener: (product: Product) -> Unit) {
+//        fun onClick(product: Product) = clickListener(product)
+//    }
 
     interface OnProductItemListener {
         fun deleteProductClick(product: Product)
