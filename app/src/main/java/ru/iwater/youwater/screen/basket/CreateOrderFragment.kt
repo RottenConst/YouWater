@@ -1,24 +1,19 @@
 package ru.iwater.youwater.screen.basket
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.DatePicker
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import okhttp3.internal.notify
-import org.json.JSONObject
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.data.Order
@@ -39,7 +34,8 @@ private const val ARG_PARAM2 = "param2"
  * Use the [CreateOrderFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class CreateOrderFragment : Fragment() {
+class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
+    DatePickerDialog.OnDateSetListener {
     private var param1: String? = null
     private var param2: String? = null
 
@@ -52,7 +48,8 @@ class CreateOrderFragment : Fragment() {
     private var periodOne = ""
     private var periodTwo = ""
     private var addressString = ""
-    private var order = Order(0, 0, "", mutableListOf(), "", 0, "", "", 0, "", "", "", JsonObject(), "")
+    private var order =
+        Order(0, 0, "", mutableListOf(), "", 0, "", "", 0, "", "", "", JsonObject(), "")
 
     private val binding: FragmentCreateOrderBinding by lazy {
         FragmentCreateOrderBinding.inflate(
@@ -72,7 +69,7 @@ class CreateOrderFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding.lifecycleOwner = this
         viewModel.client.observe(viewLifecycleOwner, {
@@ -136,65 +133,25 @@ class CreateOrderFragment : Fragment() {
         })
         binding.tvTimeOrder.text = "Укажите дату и время"
         binding.tvTimeOrder.setOnClickListener {
-            val c = Calendar.getInstance()
-            val yr = c.get(Calendar.YEAR)
-            val month = c.get(Calendar.MONTH)
-            val day = c.get(Calendar.DAY_OF_MONTH)
-            val hours = c.get(Calendar.HOUR_OF_DAY)
-            val minutes = c.get(Calendar.MINUTE)
-            val context = this.context
-            if (context != null) {
-                var date = ""
-                val timePicker = TimePickerDialog(context, { view, hour, minute ->
-                    if (minute < 10) {
-                        periodOne = "$hour:0$minute"
-                        periodTwo = when {
-                            hour + 2 == 24 -> {
-                                "0:0$minute"
-                            }
-                            hour + 2 == 25 -> {
-                                "1:0$minute"
-                            }
-                            else -> {
-                                "${hour + 2}:0$minute"
-                            }
-                        }
-                    } else {
-                        periodOne = "$hour:$minute"
-                        periodTwo = when {
-                            hour + 2 == 24 -> {
-                                "0:$minute"
-                            }
-                            hour + 2 == 25 -> {
-                                "1:$minute"
-                            }
-                            else -> {
-                                "${hour + 2}:$minute"
-                            }
-                        }
-                    }
-                    c.set(Calendar.HOUR_OF_DAY, hour)
-                    c.set(Calendar.MINUTE, minute)
-                    binding.tvTimeOrder.append(", $periodOne - $periodTwo")
-                }, hours, minutes, true)
-              val datePicker = DatePickerDialog(
-                    context,
-                    { _, year, month, dayOfMonth ->
-                        date = "$dayOfMonth.${month + 1}.$year"
-                        c.set(Calendar.YEAR, year)
-                        c.set(Calendar.MONTH, month,)
-                        c.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                        binding.tvTimeOrder.text = date
-                        timePicker.setTitle("Укажите время заказа")
-                        timePicker.show()
-                    },
-                    yr, month, day
-                )
-                datePicker.setTitle("Укажите дату заказа")
-                datePicker.show()
-                datePicker.setButton(DatePickerDialog.BUTTON_POSITIVE, "Ok", datePicker)
-            }
-            order.date = "${c.timeInMillis / 1000}"
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+            val hours = calendar.get(Calendar.HOUR_OF_DAY)
+            val minutes = calendar.get(Calendar.MINUTE)
+            //Установить время
+            val timePickerDialog = TimePickerDialog.newInstance(this, hours, minutes, true)
+            timePickerDialog.title = "Укажите время заказа"
+            timePickerDialog.setMinTime(9, 0, 0)
+            timePickerDialog.setMaxTime(20, 0, 0)
+            timePickerDialog.show(parentFragmentManager, "SetTimeDialog")
+            //Установить дату
+            val datePickerDialog = DatePickerDialog.newInstance(this, year, month, day)
+            datePickerDialog.setTitle("Укажите время заказа")
+            datePickerDialog.minDate = calendar
+            datePickerDialog.show(parentFragmentManager, "SetDateDialog")
+
+            order.date = "${calendar.timeInMillis / 1000}"
         }
         val adapterOrder = OrderProductAdapter()
         val product = mutableListOf<Product>()
@@ -256,7 +213,10 @@ class CreateOrderFragment : Fragment() {
                 "Выберите способ оплаты",
             )
             val spinnerAdapter =
-                ArrayAdapter(context,R.layout.spinner_item_layout_resource,R.id.TextView, typesOfPay)
+                ArrayAdapter(context,
+                    R.layout.spinner_item_layout_resource,
+                    R.id.TextView,
+                    typesOfPay)
             binding.spinnerPaymentType.adapter = spinnerAdapter
             binding.spinnerPaymentType.setSelection(2)
             val itemSelectedListener: AdapterView.OnItemSelectedListener =
@@ -265,7 +225,7 @@ class CreateOrderFragment : Fragment() {
                         parent: AdapterView<*>?,
                         view: View?,
                         position: Int,
-                        id: Long
+                        id: Long,
                     ) {
                         order.paymentType = parent?.getItemAtPosition(position).toString()
                         typesOfPay.remove("Выберите способ оплаты")
@@ -281,9 +241,9 @@ class CreateOrderFragment : Fragment() {
         }
         binding.btnCreateOrder.setOnClickListener {
             order.period = "$periodOne - $periodTwo"
-            if(binding.tvTimeOrder.text != "Укажите дату и время" && order.paymentType != "Выберите способ оплаты" && addressString.isNotEmpty()) {
+            if (binding.tvTimeOrder.text != "Укажите дату и время" && order.paymentType != "Выберите способ оплаты" && addressString.isNotEmpty()) {
 //                viewModel.orderCreate(order)
-                viewModel.sendAndSaveOrder(order,product,addressString)
+                viewModel.sendAndSaveOrder(order, product, addressString)
                 viewModel.clearProduct(productClear)
                 Toast.makeText(this.context, "Заявка отправлена", Toast.LENGTH_LONG).show()
                 this.findNavController().navigate(
@@ -314,5 +274,24 @@ class CreateOrderFragment : Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    //Калбэк для устовки времени
+    override fun onTimeSet(view: TimePickerDialog?, hourOfDay: Int, minute: Int, second: Int) {
+        if (minute < 10) {
+            periodOne = "$hourOfDay:0$minute"
+            periodTwo = "${hourOfDay + 2}:0${minute}"
+        } else {
+            periodOne = "$hourOfDay:$minute"
+            periodTwo = "${hourOfDay + 2}:${minute}"
+        }
+        binding.tvTimeOrder.append(", $periodOne - $periodTwo")
+    }
+
+    //Калбэк для устовки даты
+    override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int) {
+        if (monthOfYear + 1 > 10) "$dayOfMonth.${monthOfYear + 1}.$year".also {
+            binding.tvTimeOrder.text = it
+        } else "$dayOfMonth.0${monthOfYear + 1}.$year".also { binding.tvTimeOrder.text = it }
     }
 }
