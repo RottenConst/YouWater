@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
+import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.ClientProfileViewModel
 import ru.iwater.youwater.databinding.FragmentProfileBinding
 import javax.inject.Inject
@@ -24,7 +24,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [ProfileFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ProfileFragment : Fragment() {
+class ProfileFragment : BaseFragment() {
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
@@ -53,7 +53,7 @@ class ProfileFragment : Fragment() {
         binding.clientVM = viewModel
         binding.btnMyData.setOnClickListener {
             this.findNavController().navigate(
-                ProfileFragmentDirections.actionProfileFragmentToUserDataFragment()
+                ProfileFragmentDirections.actionProfileFragmentToUserDataFragment(false)
             )
         }
         binding.btnAddress.setOnClickListener {

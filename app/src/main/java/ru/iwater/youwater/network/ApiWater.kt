@@ -38,4 +38,19 @@ interface ApiWater {
     suspend fun createOrder(
         @Body order: Order
     ): Response<JsonObject>
+
+    @GET("return_of_applications_client_id/{client_id}/")
+    suspend fun getOrderClient(
+        @Path("client_id") clientId: Int
+    ): List<OrderFromCRM>?
+
+    @POST("creating_auto_task")
+    suspend fun sendUserData(
+        @Body editClientData: ClientUserData
+    ): AutoTaskData?
+
+    @GET("all_adresses/{client_id}/")
+    suspend fun getAllAddresses(
+        @Path("client_id") clientId: Int
+    ):Response<List<JsonObject>>
 }
