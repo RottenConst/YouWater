@@ -61,3 +61,31 @@ object RetrofitGoogleService {
 
     }
 }
+
+object RetrofitSberApi {
+    const val BASE_URL = "https://3dsec.sberbank.ru/payment/rest/"
+
+    fun makeRetrofit(): SberPaymentApi {
+        val httpLoggingInterceptor = HttpLoggingInterceptor()
+        httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor{chain ->
+                val request = chain.request().newBuilder()
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .addHeader("Connection", "keep-alive")
+                    .build()
+                return@addInterceptor chain.proceed(request)
+            }
+            .addInterceptor(httpLoggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build().create(SberPaymentApi::class.java)
+    }
+}

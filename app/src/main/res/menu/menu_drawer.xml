@@ -13,6 +13,10 @@
             android:icon="@drawable/ic_information"
             android:title="@string/information_text"/>
         <item
+            android:id="@+id/faq"
+            android:icon="@drawable/ic_faq"
+            android:title="@string/faq_label"/>
+        <item
             android:id="@+id/send"
             android:icon="@drawable/ic_send"
             android:title="@string/send_text"/>

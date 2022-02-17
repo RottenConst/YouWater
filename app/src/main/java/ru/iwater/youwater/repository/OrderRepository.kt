@@ -8,14 +8,17 @@ import ru.iwater.youwater.data.*
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.RetrofitFactory
+import ru.iwater.youwater.network.RetrofitSberApi
+import ru.iwater.youwater.network.SberPaymentApi
 import timber.log.Timber
 import javax.inject.Inject
 
 class OrderRepository @Inject constructor(
     youWaterDB: YouWaterDB,
-    private val authClient: StorageStateAuthClient
+    private val authClient: StorageStateAuthClient,
 ) {
     private val apiAuth: ApiWater = RetrofitFactory.makeRetrofit()
+    private val sberApi: SberPaymentApi = RetrofitSberApi.makeRetrofit()
     private val addressDao: AddressDao = youWaterDB.addressDao()
     private val productDao: ProductDao = youWaterDB.productDao()
     private val myOrderDao: MyOrderDao = youWaterDB.myOrderDao()
@@ -63,8 +66,27 @@ class OrderRepository @Inject constructor(
             return if (orderCreate.isSuccessful) {
                 orderCreate.body().toString()
             } else "error"
-        }catch (e: Exception) {
-            Timber.e("error create order")
+        } catch (e: Exception) {
+            Timber.e("error create order: $e")
+        }
+        return "error"
+    }
+
+    suspend fun payCard(paymentCard: PaymentCard): String {
+        try {
+            val answer = sberApi.registerOrder(
+                userName = paymentCard.userName,
+                password = paymentCard.password,
+                orderNumber = paymentCard.orderNumber,
+                amount = paymentCard.amount,
+                returnUrl = paymentCard.returnUrl,
+                pageView = "MOBILE"
+            )
+            return if (answer != null) {
+                answer["formUrl"].toString()
+            } else "qwerty"
+        } catch (e: Exception) {
+            Timber.e("error pay: $e")
         }
         return "error"
     }

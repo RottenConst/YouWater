@@ -9,4 +9,20 @@
         android:title="Выход"
         app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/edit_profile"
+        android:icon="@drawable/ic_mode_edit_24"
+        android:orderInCategory="1"
+        android:title="Редактировать"
+        android:visible="false"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/send_edit"
+        android:icon="@drawable/ic_check_24"
+        android:orderInCategory="1"
+        android:title="Отправить"
+        android:visible="false"
+        app:showAsAction="ifRoom"/>
+
 </menu>

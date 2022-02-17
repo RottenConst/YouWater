@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">YouWater</string>
+    <string name="app_name">YourWater</string>
     <!--    экран входа-->
     <string name="begin">Начать</string>
     <string name="tel_number">Номер мобильного телефона</string>
@@ -86,6 +86,8 @@
     <string name="ok">Ок</string>
     <string name="no">Нет</string>
 
+    <string name="payment_on_card">Оплата по карте</string>
+
     <string name="home">Главная</string>
     <string name="catalog">Каталог</string>
     <string name="basket">Карзина</string>
@@ -99,6 +101,76 @@
     <string name="label_pay">Оплата</string>
     <string name="cancel">Отмена</string>
     <string name="Search">Искать</string>
+
+    <!-- more data-->
+    <string name="about_company">На современном российском оборудовании мы добываем и разливаем свежую питьевую воду – «Plesca». Наша продукция имеет все необходимые сертификаты и технические документы. «Plesca» подходит для ежедневного потребления, ее полезно пить детям и взрослым.
+</string>
+    <string name="why_choose_us">Почему нужно выбирать нас?</string>
+    <string name="heal">Здоровье: </string>
+    <string name="heal_text">«Plesca» содержит полезные микроэлементы, поддерживающие энергию  и бодрость организма. Подходит для повседневного употребления в любом виде</string>
+    <string name="quality">Качество: </string>
+    <string name="quality_text">добыча и розлив воды (производство питьевой воды) происходит  с помощью новейшего российского оборудования. Вся продукция имеет сертификаты качества и соответствия</string>
+    <string name="taste">Вкус: </string>
+    <string name="taste_text">прохладу и свежесть воды обеспечивают методы добычи и многоступенчатая очистка</string>
+    <string name="confidence">Доверие: </string>
+    <string name="confidence_text">в Санкт-Петербурге воду «Plesca» выбрали РЖД, АТС Смольного, СПБГУ, магазин «Купишуз», ОборонЭнерго СПб, МУП Гатчина, Дом Ветеранов СПб и другие жители Санкт-Петербурга и области</string>
+    <string name="benefit">Польза: </string>
+    <string name="benefit_text">благодаря бережной очистке воды в ней сохраняется оптимальный уровень солей и микроэлементов</string>
+
+    <string name="delivery_two_hour_logo">Доставка воды за 2 часа:</string>
+    <string name="delivery_two_hour_text">Доставляем воду за 2 часа по Санкт-Петербургу  в пределах КАДа, либо в удобное для вас время</string>
+    <string name="time_order">Время заказа</string>
+    <string name="time_delivery">Время доставки</string>
+    <string name="time_two_hour"> 9:00-20:00 \nПн-Пт</string>
+    <string name="time_two_hour_sat"> 9:00-20:00\nCб</string>
+    <string name="time_delivery_two_hour">11:00-22:00\n в тот же день</string>
+    <string name="time_delivery_sat_two_hour">10:00-18:00\nв тот же день</string>
+
+    <string name="delivery_logo_stg">Доставка воды стандартная:</string>
+    <string name="delivery_text_std">Доставляем воду по Санкт-Петербургу \nв пределах КАДа</string>
+    <string name="time_std_1_4">9:00-19:00\nПн-Чт</string>
+    <string name="time_std_5">9:00-19:00\nПт</string>
+    <string name="time_std_6">после 19:00\nПн-Сб</string>
+    <string name="delivery_std_1_4">9:00-21:00 \n на следующий будний день</string>
+    <string name="delivery_std_5">10:00-18:00 \nСб</string>
+    <string name="delivery_std_6">9:00-21:00 \nчерез день</string>
+
+    <string name="to_suburbs">В пригороды</string>
+    <string name="delivery_suburbs">Доставка воды в пригороды  Санкт-Петербурга</string>
+    <string name="pushkin">Славянка, Пушкин, Коммунар, Павловск</string>
+    <string name="pushkin_text">Доставка воды в Павловск, Пушкин, Коммунар и Славянку на дом и в офисы по расписанию:
+С Пн по Пт с 9 ч до 21 ч, мин. интервал 3 часа.
+В Субботу с 9 ч до 18 ч, мин. интервал 3 часа.
+</string>
+    <string name="kolino">Колпино</string>
+    <string name="krondshtat">Кронштадт</string>
+    <string name="metalstroy">пос. Металлострой </string>
+    <string name="krasnoe_selo">Красное село и окрестные пункты</string>
+    <string name="petergof">Петергоф, Ломоносов, Стрельна </string>
+
+    <string name="faq_label">Часто задаваемые вопросы </string>
+    <string name="one_quest">1. У вас 2 вида воды, в чём отличие и какую лучше взять?</string>
+    <string name="one_quest_answer_1">Нашим клиентам мы предлагаем 2 вида воды:  Plesca Классическая и Plesca Натуральная. Каждая из них подходит под разные нужды. Поэтому вы можете выбрать ту, которая отвечает вашему запросу:</string>
+    <string name="one_quest_answer_2">Plesca Натуральная – это вода из артезианской скважины из Псковской области Печерского района. Этот вид воды отлично подходит для питья в сыром виде. В воде Plesca Натуральная много природных минералов полезных для здоровья, она обладает хорошими вкусовые качествами и безопасна для употребления взрослыми и детьми.</string>
+    <string name="one_quest_answer_3">Plesca Классическая – это вода из поверхностных источников Санкт-Петербурга, доочищенная  и ионизированная серебром. Она хорошо подходит  для горячих напитков, использования в кулерах, не оставляет накипи и осадка.</string>
+    <string name="two_quest">2. Кто производитель воды?  Есть сертификат?</string>
+    <string name="tree_quest">3. Есть ли залог за тару и нужно ли её возвращать?</string>
+    <string name="four_quest">4. Режим доставки: (когда и в какое время)?</string>
+    <string name="five_quest">5. Какие способы оплаты есть?</string>
+    <string name="six_quest">6</string>
+    <string name="seven_quest">7. Какие есть акции для новых  и постоянных клиентов?</string>
+    <string name="eight_quest">8. Как нужно обслуживать кулер?</string>
+    <string name="nine_quest">9</string>
+    <string name="ten_quest">10. У меня есть старая помпа, можно её поменять на новую?</string>
+
+    <string name="call_me">Позвонить оператору</string>
+    <string name="send_mail">Написать на почту</string>
+    <string name="phone_bos">Связаться с руководством</string>
+    <string name="telegram">Связаться c помощью Telegram</string>
+    <string name="vk">Связаться c помощью VK</string>
+    <string name="whatsApp">Связаться c помощью WhatsApp</string>
+    <string name="instagram">Связаться c помощью Instagram</string>
+    <string name="user_data_sent_for_moderation">Ваши данные отправлены на модерацию.  Мы проверим их корректность и внесём изменения. Спасибо вам за то, что предупреждаете нас.</string>
 
     <string-array name="order_pay">
         <item>Оплата по карте курьеру</item>
