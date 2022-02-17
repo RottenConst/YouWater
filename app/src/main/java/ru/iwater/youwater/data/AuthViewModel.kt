@@ -12,7 +12,7 @@ import ru.iwater.youwater.screen.MainActivity
 import timber.log.Timber
 import javax.inject.Inject
 
-enum class StatusPhone {LOAD, ERROR, DONE}
+enum class StatusPhone {LOAD, ERROR, NET_ERROR, DONE}
 enum class StatusPinCode{LOAD, ERROR, DONE}
 enum class StatusSession{TRY, FALSE, ERROR}
 
@@ -42,7 +42,7 @@ class AuthViewModel @Inject constructor(
             val authPhone = authorisationRepository.authPhone(phone)
             when {
                 authPhone == null -> {
-                    _statusPhone.value = StatusPhone.ERROR
+                    _statusPhone.value = StatusPhone.NET_ERROR
                 }
                 authPhone.status -> {
                     _statusPhone.value = StatusPhone.DONE
@@ -88,7 +88,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun saveClient(clientAuth: AuthClient) {
+    private fun saveClient(clientAuth: AuthClient) {
         viewModelScope.launch {
             authorisationRepository.saveAuthClient(clientAuth)
         }

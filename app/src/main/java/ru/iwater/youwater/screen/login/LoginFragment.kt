@@ -14,7 +14,6 @@ import ru.iwater.youwater.data.StatusPhone
 import ru.iwater.youwater.data.StatusPinCode
 import ru.iwater.youwater.databinding.LoginFragmentBinding
 import ru.iwater.youwater.utils.PhoneTextFormatter
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -52,8 +51,8 @@ class LoginFragment : BaseFragment() {
                 val tel = etTelNum.text.toString()
                 viewModel.authPhone(tel)
                 "Код отправлен на номер: $tel".also { tvInfoCode.text = it }
-                viewModel.statusPhone.observe(viewLifecycleOwner, { status ->
-                    when(status) {
+                viewModel.statusPhone.observe(viewLifecycleOwner) { status ->
+                    when (status) {
                         StatusPhone.LOAD -> {
 
                         }
@@ -62,21 +61,23 @@ class LoginFragment : BaseFragment() {
                             tvInfoCode.visibility = View.VISIBLE
                             btnEnterHome.visibility = View.VISIBLE
                             etPinCode.visibility = View.VISIBLE
-                            etPinCode.isSelected = true
                             etTelNum.visibility = View.GONE
                             tilTelNum.visibility = View.GONE
                             btnEnter.visibility = View.GONE
-                            etPinCode.isFocusable = true
+                            etPinCode.requestFocus()
                         }
                         StatusPhone.ERROR -> {
-                            Timber.d("EROOR")
+                            Toast.makeText(context, "Данный номер не привязан ни к одному пользователю", Toast.LENGTH_LONG).show()
+                        }
+                        StatusPhone.NET_ERROR -> {
+                            Toast.makeText(context, "ошибка соединения", Toast.LENGTH_LONG).show()
                         }
                     }
-                })
+                }
             }
             btnEnterHome.setOnClickListener {
                 viewModel.checkPin(context, etPinCode.text.toString())
-                viewModel.statusPinCode.observe(viewLifecycleOwner, { status->
+                viewModel.statusPinCode.observe(viewLifecycleOwner) { status ->
                     when (status) {
                         StatusPinCode.DONE -> {
                             Toast.makeText(context, "Успешно", Toast.LENGTH_LONG).show()
@@ -88,7 +89,7 @@ class LoginFragment : BaseFragment() {
 
                         }
                     }
-                })
+                }
 
             }
         }

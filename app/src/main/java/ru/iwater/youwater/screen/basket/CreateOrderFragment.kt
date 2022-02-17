@@ -1,5 +1,6 @@
 package ru.iwater.youwater.screen.basket
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -16,28 +16,19 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
-import ru.iwater.youwater.data.Order
-import ru.iwater.youwater.data.OrderViewModel
-import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.base.BaseFragment
+import ru.iwater.youwater.data.*
 import ru.iwater.youwater.databinding.FragmentCreateOrderBinding
 import ru.iwater.youwater.screen.adapters.OrderProductAdapter
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
 /**
- * A simple [Fragment] subclass.
- * Use the [CreateOrderFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * Фрагмент оформления заказа
  */
-class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
+class CreateOrderFragment : BaseFragment(), TimePickerDialog.OnTimeSetListener,
     DatePickerDialog.OnDateSetListener {
-    private var param1: String? = null
-    private var param2: String? = null
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
@@ -57,13 +48,8 @@ class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
         )
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
         screenComponent.inject(this)
     }
 
@@ -72,55 +58,42 @@ class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
         savedInstanceState: Bundle?,
     ): View {
         binding.lifecycleOwner = this
-        viewModel.client.observe(viewLifecycleOwner, {
+        viewModel.client.observe(viewLifecycleOwner) {
             binding.tvNameClient.text = it.name
             binding.tvTelNumber.text = it.contact
             order.clientId = it.id
             order.name = it.name
             order.contact = it.contact
-        })
-        viewModel.address.observe(viewLifecycleOwner, {
-            if (it != null) {
-                when {
-                    it.building == null -> {
-                        "${it.region}, ул.${it.street}, д.${it.house} ".also {
-                            binding.tvAddressOrder.text = it
-                            addressString = it
-                        }
-                    }
-                    it.entrance == null -> {
-                        "${it.region}, ул.${it.street}, д.${it.house} ".also {
-                            binding.tvAddressOrder.text = it
-                            addressString = it
-                        }
-                    }
-                    it.floor == null -> {
-                        "${it.region}, ул.${it.street}, д.${it.house}, подьезд ${it.entrance}".also {
-                            binding.tvAddressOrder.text = it
-                            addressString = it
-                        }
-                    }
-                    it.flat == null -> {
-                        "${it.region}, ул.${it.street}, д.${it.house}, подьезд ${it.entrance}, этаж ${it.floor}".also {
-                            binding.tvAddressOrder.text = it
-                            addressString = it
-                        }
-                    }
-                    else -> {
-                        "${it.region}, ул.${it.street}, д.${it.house}, подьезд ${it.entrance}, этаж ${it.floor}, кв.${it.flat} ".also {
-                            binding.tvAddressOrder.text = it
-                            addressString = it
-                        }
+        }
+        viewModel.address.observe(viewLifecycleOwner) { listAddress ->
+            if (listAddress != null) {
+                binding.tvAddressOrder.text = "Выбрать адрес доставки"
+                val addresses = mutableListOf<String>()
+                listAddress.forEach { address ->
+                    when {
+                        address.entrance == null -> addresses.add("${address.region} ул.${address.street} д.${address.house}")
+                        address.floor == null -> addresses.add("${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance}")
+                        address.flat == null -> addresses.add("${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} этаж${address.floor}")
+                        else -> addresses.add("${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} этаж${address.floor} кв.${address.flat}")
                     }
                 }
-                order.addressJson.apply {
-                    addProperty("region", it.region)
-                    addProperty("street", it.street)
-                    addProperty("house", it.house)
-                    addProperty("building", it.building)
-                    addProperty("entrance", it.entrance)
-                    addProperty("floor", it.floor)
-                    addProperty("flat", it.flat)
+                binding.tvAddressOrder.setOnClickListener {
+                    AlertDialog.Builder(this.requireContext())
+                        .setSingleChoiceItems(addresses.toTypedArray(), -1) { dialog, witch ->
+                            binding.tvAddressOrder.text = addresses[witch]
+                            order.addressJson.apply {
+                                addProperty("region", listAddress[witch].region)
+                                addProperty("street", listAddress[witch].street)
+                                addProperty("house", listAddress[witch].house)
+                                addProperty("building", listAddress[witch].building)
+                                addProperty("entrance", listAddress[witch].entrance)
+                                addProperty("floor", listAddress[witch].floor)
+                                addProperty("flat", listAddress[witch].flat)
+                            }
+                            addressString = addresses[witch]
+                            dialog.cancel()
+                        }
+                        .create().show()
                 }
             } else {
                 binding.tvAddressOrder.text = "Добавить адрес"
@@ -130,7 +103,7 @@ class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
                     )
                 }
             }
-        })
+        }
         binding.tvTimeOrder.text = "Укажите дату и время"
         binding.tvTimeOrder.setOnClickListener {
             val calendar = Calendar.getInstance()
@@ -156,7 +129,7 @@ class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
         val adapterOrder = OrderProductAdapter()
         val product = mutableListOf<Product>()
         binding.rvOrderProduct.adapter = adapterOrder
-        viewModel.products.observe(viewLifecycleOwner, { products ->
+        viewModel.products.observe(viewLifecycleOwner) { products ->
             adapterOrder.submitList(products)
             productClear.addAll(products)
             var priceTotal = 0
@@ -203,14 +176,16 @@ class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
             }
             "${priceTotal}₽".also { binding.tvCostOrder.text = it }
             "${priceTotalDiscount}₽".also { binding.tvTotalSumCost.text = it }
-            order.orderCost = priceTotal
-        })
+            order.orderCost = priceTotalDiscount
+        }
         val context = this.context
         if (context != null) {
             val typesOfPay = mutableListOf(
                 "Оплата по карте курьеру",
                 "Оплата наличными",
+                "Оплата по карте",
                 "Выберите способ оплаты",
+
             )
             val spinnerAdapter =
                 ArrayAdapter(context,
@@ -218,7 +193,7 @@ class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
                     R.id.TextView,
                     typesOfPay)
             binding.spinnerPaymentType.adapter = spinnerAdapter
-            binding.spinnerPaymentType.setSelection(2)
+            binding.spinnerPaymentType.setSelection(3)
             val itemSelectedListener: AdapterView.OnItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(
@@ -228,6 +203,7 @@ class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
                         id: Long,
                     ) {
                         order.paymentType = parent?.getItemAtPosition(position).toString()
+                        if (order.paymentType == "Оплата по карте") binding.btnCreateOrder.text = "Перейти к оплате"
                         typesOfPay.remove("Выберите способ оплаты")
                     }
 
@@ -241,14 +217,34 @@ class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
         }
         binding.btnCreateOrder.setOnClickListener {
             order.period = "$periodOne - $periodTwo"
-            if (binding.tvTimeOrder.text != "Укажите дату и время" && order.paymentType != "Выберите способ оплаты" && addressString.isNotEmpty()) {
-//                viewModel.orderCreate(order)
+            if (binding.tvTimeOrder.text != "Укажите дату и время" && order.paymentType == "Оплата по карте курьеру" && order.paymentType == "Оплата наличными" && addressString.isNotEmpty()) {
                 viewModel.sendAndSaveOrder(order, product, addressString)
-                viewModel.clearProduct(productClear)
-                Toast.makeText(this.context, "Заявка отправлена", Toast.LENGTH_LONG).show()
-                this.findNavController().navigate(
-                    CreateOrderFragmentDirections.actionCreateOrderFragmentToHomeFragment()
-                )
+                viewModel.statusOrder.observe(this.viewLifecycleOwner) { status ->
+                    when (status) {
+                        Status.SEND -> {
+                            viewModel.clearProduct(productClear)
+                            Toast.makeText(this.context, "Заявка отправлена", Toast.LENGTH_LONG)
+                                .show()
+                            this.findNavController().navigate(
+                                CreateOrderFragmentDirections.actionCreateOrderFragmentToHomeFragment()
+                            )
+                        }
+                        else -> {
+                            Toast.makeText(this.context,
+                                "Ошибка, возвожно проблемы с интернетом",
+                                Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+
+
+            } else if ( order.paymentType == "Оплата по карте") {
+                viewModel.payToCard(orderId = "36", amount = order.orderCost * 100)
+                viewModel.linkHTTP.observe(this.viewLifecycleOwner) { formUrl ->
+                    Timber.d("SBER LINK: $formUrl")
+                    val url = formUrl.removePrefix("\"").removeSuffix("\"")
+                    this.findNavController().navigate(CreateOrderFragmentDirections.actionCreateOrderFragmentToCardPaymentFragment(url))
+                }
             } else {
                 Timber.d("${order.period}, ${order.paymentType}")
                 Toast.makeText(this.context, "Укажите время и тип оплаты", Toast.LENGTH_LONG).show()
@@ -258,22 +254,8 @@ class CreateOrderFragment : Fragment(), TimePickerDialog.OnTimeSetListener,
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CreateOrderFragment.
-         */
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CreateOrderFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        fun newInstance() = CreateOrderFragment()
     }
 
     //Калбэк для устовки времени

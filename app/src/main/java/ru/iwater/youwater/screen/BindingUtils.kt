@@ -186,30 +186,60 @@ fun bindImageProduct(imgView: ImageView, file: String?) {
 @BindingAdapter("setAddress")
 fun TextView.bindingAddress(address: Address?) {
     if (address != null) {
-        when {
-            address.building == null -> {
-                "${address.region}, ул.${address.street}, д.${address.house} ".also {
-                    text = it
+        if (address.note.isNullOrEmpty()) {
+            when {
+                address.building == null -> {
+                    "${address.region}, ул.${address.street}, д.${address.house} ".also {
+                        text = it
+                    }
+                }
+                address.entrance == null -> {
+                    "${address.region}, ул.${address.street}, д.${address.house} ".also {
+                        text = it
+                    }
+                }
+                address.floor == null -> {
+                    "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}".also {
+                        text = it
+                    }
+                }
+                address.flat == null -> {
+                    "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}, этаж ${address.floor}".also {
+                        text = it
+                    }
+                }
+                else -> {
+                    "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}, этаж ${address.floor}, кв.${address.flat} ".also {
+                        text = it
+                    }
                 }
             }
-            address.entrance == null -> {
-                "${address.region}, ул.${address.street}, д.${address.house} ".also {
-                    text = it
+        } else {
+            when {
+                address.building == null -> {
+                    "${address.region}, ул.${address.street}, д.${address.house} Примичание: ${address.note}".also {
+                        text = it
+                    }
                 }
-            }
-            address.floor == null -> {
-                "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}".also {
-                    text = it
+                address.entrance == null -> {
+                    "${address.region}, ул.${address.street}, д.${address.house} Примичание: ${address.note}".also {
+                        text = it
+                    }
                 }
-            }
-            address.flat == null -> {
-                "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}, этаж ${address.floor}".also {
-                    text = it
+                address.floor == null -> {
+                    "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance} Примичание: ${address.note}".also {
+                        text = it
+                    }
                 }
-            }
-            else -> {
-                "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}, этаж ${address.floor}, кв.${address.flat} ".also {
-                    text = it
+                address.flat == null -> {
+                    "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}, этаж ${address.floor} Примичание: ${address.note}".also {
+                        text = it
+                    }
+                }
+                else -> {
+                    "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}, этаж ${address.floor}, кв.${address.flat} Примичание: ${address.note}".also {
+                        text = it
+                    }
                 }
             }
         }

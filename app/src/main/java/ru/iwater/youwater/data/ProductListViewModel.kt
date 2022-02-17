@@ -20,6 +20,10 @@ class ProductListViewModel @Inject constructor(
     private val _productsList: MutableLiveData<List<Product>> = MutableLiveData()
     val productsList: LiveData<List<Product>> get() = _productsList
 
+    private val _navigateToSelectProduct: MutableLiveData<Int> = MutableLiveData()
+    val navigateToSelectProduct: LiveData<Int>
+        get() = _navigateToSelectProduct
+
     fun setCatalogItem(catalogId: Int) {
         viewModelScope.launch {
             _productsList.value = productRepo.getProductList(catalogId)
@@ -78,5 +82,13 @@ class ProductListViewModel @Inject constructor(
                 _productsList.value = productRepo.getProductList()
             }
         }
+    }
+
+    fun displayProduct(productId: Int) {
+        _navigateToSelectProduct.value = productId
+    }
+
+    fun displayProductComplete() {
+        _navigateToSelectProduct.value = null
     }
 }

@@ -100,7 +100,8 @@ class AddAddressFragment : BaseFragment(), GoogleMap.OnPoiClickListener {
         viewModel.addressResult.observe(this.viewLifecycleOwner, {
             if (it != null) {
                 val addressList = it.results[0].formatted_address.split(", ")
-                val address = "${addressList[2]}, ${addressList[0]}, ${addressList[1]}"
+                val district = if (it.results[0].address_components[3].long_name != "город") "район ${it.results[0].address_components[3].long_name}" else ""
+                val address = "${addressList[2]}, $district ${addressList[0]}, ${addressList[1]}"
                 binding.searchAddress.text.clear()
                 binding.searchAddress.text.insert(0, address)
                 binding.etHome.text?.clear()

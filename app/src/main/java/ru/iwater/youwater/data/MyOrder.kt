@@ -1,10 +1,12 @@
 package ru.iwater.youwater.data
 
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import ru.iwater.youwater.utils.ProductConverter
 
+@Keep
 @Entity
 data class MyOrder(
     val address: String,

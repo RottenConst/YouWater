@@ -1,10 +1,12 @@
 package ru.iwater.youwater.data
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
 /**
  * Дате класс модель клиента
  */
+@Keep
 data class Client(
     @SerializedName("id")
     val id: Int,
@@ -39,5 +41,7 @@ data class Client(
     @SerializedName("avg_difference")
     val avgDifference: String?,
     @SerializedName("last_date")
-    val lastDate: String
+    val lastDate: String,
+    @SerializedName("email")
+    val email: String
 )

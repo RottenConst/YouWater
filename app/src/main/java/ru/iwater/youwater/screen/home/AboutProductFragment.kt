@@ -1,6 +1,5 @@
 package ru.iwater.youwater.screen.home
 
-import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +8,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.AboutProductViewModel
 import ru.iwater.youwater.databinding.FragmentAboutProductBinding
-import ru.iwater.youwater.screen.bindCostProduct
 import javax.inject.Inject
 
 class AboutProductFragment : BaseFragment() {
@@ -33,7 +32,7 @@ class AboutProductFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentAboutProductBinding.inflate(inflater)
-        val productId = AboutProductFragmentArgs.fromBundle(arguments!!).orderId
+        val productId = AboutProductFragmentArgs.fromBundle(requireArguments()).orderId
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         viewModel.initProduct(productId)
@@ -57,14 +56,16 @@ class AboutProductFragment : BaseFragment() {
 //            }
 //        })
         binding.btnBuyProduct.setOnClickListener {
-            viewModel.product.observe(this.viewLifecycleOwner, {
+            viewModel.product.observe(this.viewLifecycleOwner) {
                 viewModel.addProductToBasket(it)
-                Snackbar.make(binding.constraintAboutProduct, "Товар ${it.app_name} добавлн в корзину", Snackbar.LENGTH_LONG)
+                Snackbar.make(binding.constraintAboutProduct,
+                    "Товар ${it.app_name} добавлен в корзину",
+                    Snackbar.LENGTH_LONG)
                     .setAction("Перейти в корзину") {
                         this.findNavController()
                             .navigate(AboutProductFragmentDirections.actionAboutProductFragmentToBasketFragment())
                     }.show()
-            })
+            }
         }
         return binding.root
     }

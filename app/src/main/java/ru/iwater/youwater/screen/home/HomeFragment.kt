@@ -57,20 +57,21 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
             }
         }, this)
         binding.rvTypeProductList.adapter = adapterWatter
-        viewModel.catalogProductMap.observe(viewLifecycleOwner, { catalogs ->
+        viewModel.catalogProductMap.observe(viewLifecycleOwner) { catalogs ->
             adapterWatter.submitList(catalogs.toList())
-        })
+        }
 
-        viewModel.navigateToSelectProduct.observe(this.viewLifecycleOwner, { if (null != it) {
+        viewModel.navigateToSelectProduct.observe(this.viewLifecycleOwner) {
+            if (null != it) {
                 this.findNavController().navigate(
                     HomeFragmentDirections.actionShowAboutProductFragment(it)
                 )
                 viewModel.displayProductComplete()
             }
-        })
+        }
 
-        viewModel.productLiveData.observe(viewLifecycleOwner, {
-        })
+        viewModel.productLiveData.observe(viewLifecycleOwner) {
+        }
         return binding.root
     }
 

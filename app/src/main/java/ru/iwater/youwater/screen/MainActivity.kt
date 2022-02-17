@@ -16,6 +16,8 @@ import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
@@ -28,6 +30,8 @@ import ru.iwater.youwater.base.BaseActivity
 import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.databinding.MainLayoutBinding
 import ru.iwater.youwater.repository.AuthorisationRepository
+import ru.iwater.youwater.screen.home.HomeFragmentDirections
+import ru.iwater.youwater.screen.profile.UserDataFragment
 import javax.inject.Inject
 
 class MainActivity : BaseActivity() {
@@ -85,15 +89,23 @@ class MainActivity : BaseActivity() {
         binding.navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.delivery -> {
-                    Toast.makeText(this, "delivery", Toast.LENGTH_LONG).show()
+                    navController.navigate(R.id.deliveryInfoFragment)
+                    binding.drawerLayout.closeDrawers()
                     true
                 }
                 R.id.information -> {
-                    Toast.makeText(this, "information", Toast.LENGTH_LONG).show()
+                    navController.navigate(R.id.aboutCompanyFragment)
+                    binding.drawerLayout.closeDrawers()
+                    true
+                }
+                R.id.faq -> {
+                    navController.navigate(R.id.faqFragment)
+                    binding.drawerLayout.closeDrawers()
                     true
                 }
                 R.id.send -> {
-                    Toast.makeText(this, "send", Toast.LENGTH_LONG).show()
+                    navController.navigate(R.id.contactFragment)
+                    binding.drawerLayout.closeDrawers()
                     true
                 }
                 else -> false
@@ -141,7 +153,12 @@ class MainActivity : BaseActivity() {
                 R.id.addAddressFragment,
                 R.id.createOrderFragment,
                 R.id.myOrdersFragment,
-                R.id.bankCardFragment-> binding.bottomNavView.visibility = View.GONE
+                R.id.bankCardFragment,
+                R.id.aboutCompanyFragment,
+                R.id.contactFragment,
+                R.id.deliveryInfoFragment,
+                R.id.faqFragment,
+                R.id.favoriteFragment-> binding.bottomNavView.visibility = View.GONE
                 else -> binding.bottomNavView.visibility = View.VISIBLE
             }
         }

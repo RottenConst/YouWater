@@ -29,7 +29,7 @@ class OrderRepository @Inject constructor(
             if (client != null) {
                 return client
             }
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             Timber.e("error get client: $e")
         }
         return null
@@ -37,19 +37,42 @@ class OrderRepository @Inject constructor(
 
     fun getAuthClient(): AuthClient = authClient.get()
 
-    suspend fun getAllAddress(): Address? {
-        val address = addressDao.getAllAddresses()
-        return if (address.isNullOrEmpty()) {
+    suspend fun getAllAddress(): List<Address>? {
+        val listAddress = addressDao.getAllAddresses()
+        return if (listAddress.isNullOrEmpty()) {
             null
-        } else address.last()
+        } else listAddress
     }
 
     suspend fun getAllProduct(): List<Product> {
         return productDao.getAllProduct() ?: emptyList()
     }
 
+    suspend fun getProduct(productId: Int): Product? {
+        try {
+            val product = apiAuth.getProductList()
+            if (!product.isNullOrEmpty())
+                return product.filter { it.id == productId }[0]
+        } catch (e: java.lang.Exception) {
+            Timber.e("Exception get product $e")
+        }
+        return null
+    }
+
     suspend fun deleteProduct(product: Product) {
         productDao.delete(product)
+    }
+
+    suspend fun getAllOrder(clientId: Int): List<OrderFromCRM> {
+        try {
+            val listOrder = apiAuth.getOrderClient(clientId)
+            return if (listOrder.isNullOrEmpty()) {
+                emptyList()
+            } else listOrder
+        } catch (e: Exception) {
+            Timber.e("error get order: $e")
+        }
+        return emptyList()
     }
 
     suspend fun saveMyOrder(myOrder: MyOrder) {

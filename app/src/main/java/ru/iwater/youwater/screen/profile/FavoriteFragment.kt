@@ -55,21 +55,22 @@ class FavoriteFragment : BaseFragment(), FavoriteProductAdapter.OnFavoriteProduc
         binding.lifecycleOwner = this
         val adapter = FavoriteProductAdapter(this)
         binding.rvFavoriteProduct.adapter = adapter
-        viewModel.favoriteList.observe(viewLifecycleOwner, {
+        viewModel.favoriteList.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             if (it.isEmpty()) {
                 binding.tvNothingFavorite.visibility = View.VISIBLE
             } else {
                 binding.tvNothingFavorite.visibility = View.GONE
             }
-        })
-        viewModel.navigateToSelectFavorite.observe(viewLifecycleOwner, { if (null != it) {
-            this.findNavController().navigate(
-                FavoriteFragmentDirections.actionFavoriteFragmentToAboutProductFragment(it)
-            )
-            viewModel.displayFavoriteComplete()
+        }
+        viewModel.navigateToSelectFavorite.observe(viewLifecycleOwner) {
+            if (null != it) {
+                this.findNavController().navigate(
+                    FavoriteFragmentDirections.actionFavoriteFragmentToAboutProductFragment(it)
+                )
+                viewModel.displayFavoriteComplete()
             }
-        })
+        }
         return binding.root
     }
 

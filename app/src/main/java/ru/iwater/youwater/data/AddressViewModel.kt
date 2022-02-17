@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.BuildConfig
 import ru.iwater.youwater.repository.AddressRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 class AddressViewModel @Inject constructor(
@@ -32,6 +33,13 @@ class AddressViewModel @Inject constructor(
             if (addressResult?.status == "OK") {
                 _addressResult.value = addressResult
             }
+        }
+    }
+
+    fun getAllFactAddress() {
+        viewModelScope.launch {
+            val listAddress = addressRepo.getAllFactAddress()
+            Timber.d("Addresses === $listAddress")
         }
     }
 

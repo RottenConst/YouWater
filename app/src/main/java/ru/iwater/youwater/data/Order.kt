@@ -1,9 +1,10 @@
 package ru.iwater.youwater.data
 
-import com.google.gson.JsonArray
+import androidx.annotation.Keep
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class Order(
     @SerializedName("client_id")
     var clientId: Int,

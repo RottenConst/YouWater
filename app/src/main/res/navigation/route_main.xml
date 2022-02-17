@@ -12,10 +12,14 @@
         tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_showAboutProductFragment"
-            app:destination="@id/aboutProductFragment" />
+            app:destination="@id/aboutProductFragment"
+            app:popUpTo="@id/homeFragment" />
         <action
             android:id="@+id/action_homeFragment_to_basketFragment"
-            app:destination="@id/basketFragment" />
+            app:destination="@id/basketFragment"
+            app:launchSingleTop="false"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_homeFragment_to_favoriteFragment"
             app:destination="@id/favoriteFragment" />
@@ -57,7 +61,8 @@
             app:destination="@id/notificationFragment" />
         <action
             android:id="@+id/action_profileFragment_to_favoriteFragment"
-            app:destination="@id/favoriteFragment" />
+            app:destination="@id/favoriteFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_profileFragment_to_myOrdersFragment"
             app:destination="@id/myOrdersFragment" />
@@ -75,6 +80,9 @@
         <action
             android:id="@+id/action_catalogProductFragment_to_basketFragment"
             app:destination="@id/basketFragment" />
+        <action
+            android:id="@+id/action_catalogProductFragment_to_aboutProductFragment"
+            app:destination="@id/aboutProductFragment" />
     </fragment>
     <fragment
         android:id="@+id/aboutProductFragment"
@@ -85,7 +93,9 @@
             app:argType="integer" />
         <action
             android:id="@+id/action_aboutProductFragment_to_basketFragment"
-            app:destination="@id/basketFragment" />
+            app:destination="@id/basketFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/userDataFragment"
@@ -132,7 +142,9 @@
         android:label="@string/add_address" >
         <action
             android:id="@+id/action_addAddressFragment_to_addresessFragment"
-            app:destination="@id/addresessFragment" />
+            app:destination="@id/addresessFragment"
+            app:popUpTo="@id/addresessFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/createOrderFragment"
@@ -143,7 +155,14 @@
             app:destination="@id/addAddressFragment" />
         <action
             android:id="@+id/action_createOrderFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_createOrderFragment_to_cardPaymentFragment"
+            app:destination="@id/cardPaymentFragment"
+            app:popUpTo="@id/cardPaymentFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/myOrdersFragment"

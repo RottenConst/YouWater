@@ -14,6 +14,7 @@ import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.FragmentCatalogProductBinding
 import ru.iwater.youwater.data.ProductListViewModel
 import ru.iwater.youwater.screen.adapters.AdapterProductList
+import ru.iwater.youwater.screen.home.HomeFragmentDirections
 import javax.inject.Inject
 
 
@@ -38,17 +39,27 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
         savedInstanceState: Bundle?
     ): View {
         binding.lifecycleOwner = this
-        val catalogId = CatalogProductFragmentArgs.fromBundle(arguments!!).typeId
-        val catalogTitle = CatalogProductFragmentArgs.fromBundle(arguments!!).typeString
+        val catalogId = CatalogProductFragmentArgs.fromBundle(requireArguments()).typeId
+        val catalogTitle = CatalogProductFragmentArgs.fromBundle(requireArguments()).typeString
         val adapterProductList = AdapterProductList(AdapterProductList.OnClickListener {
 
         }, this)
         viewModel.setCatalogItem(catalogId)
         binding.tvLabelCatalog.text = catalogTitle
         binding.rvProductList.adapter = adapterProductList
-        viewModel.productsList.observe(this.viewLifecycleOwner, {
+        viewModel.productsList.observe(this.viewLifecycleOwner) {
             adapterProductList.submitList(it)
-        })
+        }
+
+        viewModel.navigateToSelectProduct.observe(this.viewLifecycleOwner) {
+            if (null != it) {
+                this.findNavController().navigate(
+                    CatalogProductFragmentDirections.actionCatalogProductFragmentToAboutProductFragment(it)
+                )
+                viewModel.displayProductComplete()
+            }
+        }
+
         return binding.root
     }
 
@@ -61,7 +72,7 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
     }
 
     override fun aboutProductClick(product: Product) {
-        TODO("Not yet implemented")
+        viewModel.displayProduct(product.id)
     }
 
     companion object {

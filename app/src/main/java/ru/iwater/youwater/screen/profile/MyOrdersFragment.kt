@@ -49,7 +49,7 @@ class MyOrdersFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding.lifecycleOwner = this
-        viewModel.getMyOrder()
+        viewModel.getOrderFromCrm()
         val myOrderAdapter = MyOrderAdapter()
         binding.rvOrders.adapter = myOrderAdapter
         viewModel.myOrder.observe(this.viewLifecycleOwner, { myOrders ->

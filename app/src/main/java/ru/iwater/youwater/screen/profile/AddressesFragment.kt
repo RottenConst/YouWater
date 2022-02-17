@@ -57,15 +57,16 @@ class AddressesFragment : BaseFragment(), AdapterAddresses.OnAddressItemListener
         binding.lifecycleOwner = this
         val adapter = AdapterAddresses(this)
         binding.rvAddresses.adapter = adapter
-        viewModel.addressList.observe(this.viewLifecycleOwner, {
+        viewModel.addressList.observe(this.viewLifecycleOwner) {
             adapter.submitList(it)
-        })
+        }
+//        viewModel.getAllFactAddress()
         binding.btnAddAddress.setOnClickListener {
             this.findNavController().navigate(
                 AddressesFragmentDirections.actionAddresessFragmentToAddAddressFragment()
             )
-        }
 
+        }
         return binding.root
     }
 
