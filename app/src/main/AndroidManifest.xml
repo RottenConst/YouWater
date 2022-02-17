@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:name=".base.App"
@@ -12,7 +13,6 @@
         android:icon="@mipmap/ic_launcher_youwater"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_youwater_round"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
