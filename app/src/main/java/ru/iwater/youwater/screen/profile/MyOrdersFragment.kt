@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
-import ru.iwater.youwater.data.FavoriteViewModel
 import ru.iwater.youwater.data.OrderViewModel
 import ru.iwater.youwater.databinding.FragmentMyOrdersBinding
 import ru.iwater.youwater.screen.adapters.MyOrderAdapter
@@ -52,11 +50,11 @@ class MyOrdersFragment : Fragment() {
         viewModel.getOrderFromCrm()
         val myOrderAdapter = MyOrderAdapter()
         binding.rvOrders.adapter = myOrderAdapter
-        viewModel.myOrder.observe(this.viewLifecycleOwner, { myOrders ->
+        viewModel.listMyOrder.observe(this.viewLifecycleOwner) { myOrders ->
             myOrderAdapter.submitList(myOrders)
             if (myOrders.isNullOrEmpty()) binding.tvNothingOrderText.visibility = View.VISIBLE
             else binding.tvNothingOrderText.visibility = View.GONE
-        })
+        }
         return binding.root
     }
 

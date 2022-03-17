@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.gson.JsonObject
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
-import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
@@ -27,7 +26,7 @@ import javax.inject.Inject
 /**
  * Фрагмент оформления заказа
  */
-class CreateOrderFragment : BaseFragment(), TimePickerDialog.OnTimeSetListener,
+class CreateOrderFragment : BaseFragment(),
     DatePickerDialog.OnDateSetListener {
 
     @Inject
@@ -66,7 +65,7 @@ class CreateOrderFragment : BaseFragment(), TimePickerDialog.OnTimeSetListener,
             order.contact = it.contact
         }
         viewModel.address.observe(viewLifecycleOwner) { listAddress ->
-            if (listAddress != null) {
+            if (!listAddress.isNullOrEmpty()) {
                 binding.tvAddressOrder.text = "Выбрать адрес доставки"
                 val addresses = mutableListOf<String>()
                 listAddress.forEach { address ->
@@ -98,33 +97,21 @@ class CreateOrderFragment : BaseFragment(), TimePickerDialog.OnTimeSetListener,
             } else {
                 binding.tvAddressOrder.text = "Добавить адрес"
                 binding.tvAddressOrder.setOnClickListener {
-                    this.findNavController().navigate(
-                        CreateOrderFragmentDirections.actionCreateOrderFragmentToAddAddressFragment()
-                    )
+                    viewModel.getAllFactAddress(this.context)
                 }
             }
         }
-        binding.tvTimeOrder.text = "Укажите дату и время"
+        binding.tvTimeOrder.text = "Укажите дату"
         binding.tvTimeOrder.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
             val month = calendar.get(Calendar.MONTH)
             val day = calendar.get(Calendar.DAY_OF_MONTH)
-            val hours = calendar.get(Calendar.HOUR_OF_DAY)
-            val minutes = calendar.get(Calendar.MINUTE)
-            //Установить время
-            val timePickerDialog = TimePickerDialog.newInstance(this, hours, minutes, true)
-            timePickerDialog.title = "Укажите время заказа"
-            timePickerDialog.setMinTime(9, 0, 0)
-            timePickerDialog.setMaxTime(20, 0, 0)
-            timePickerDialog.show(parentFragmentManager, "SetTimeDialog")
             //Установить дату
             val datePickerDialog = DatePickerDialog.newInstance(this, year, month, day)
             datePickerDialog.setTitle("Укажите время заказа")
             datePickerDialog.minDate = calendar
             datePickerDialog.show(parentFragmentManager, "SetDateDialog")
-
-            order.date = "${calendar.timeInMillis / 1000}"
         }
         val adapterOrder = OrderProductAdapter()
         val product = mutableListOf<Product>()
@@ -187,14 +174,85 @@ class CreateOrderFragment : BaseFragment(), TimePickerDialog.OnTimeSetListener,
                 "Выберите способ оплаты",
 
             )
+            val beforeTimeArray = mutableListOf(
+                "9:00",
+                "10:00",
+                "11:00",
+                "17:00",
+                "19:00",
+                "--:--",
+            )
+            val afterTimeArray = mutableListOf(
+                "15:00",
+                "16:00",
+                "17:00",
+                "22:00",
+                "--:--",
+            )
             val spinnerAdapter =
                 ArrayAdapter(context,
                     R.layout.spinner_item_layout_resource,
                     R.id.TextView,
                     typesOfPay)
+            val spinnerBeforeTimeAdapter = ArrayAdapter(context,
+                R.layout.spinner_item_layout_resource,
+                R.id.TextView,
+                beforeTimeArray
+                )
+            val spinnerAfterTimeAdapter = ArrayAdapter(context,
+                R.layout.spinner_item_layout_resource,
+                R.id.TextView,
+                afterTimeArray
+                )
+            //установить время до
+            binding.beforeTimeSpinner.adapter = spinnerBeforeTimeAdapter
+            binding.beforeTimeSpinner.setSelection(5)
+            val itemTimeBeforeSelectListener: AdapterView.OnItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        periodOne = parent?.getItemAtPosition(position).toString()
+                        beforeTimeArray.remove("--:--")
+
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                    }
+                }
+            binding.beforeTimeSpinner.onItemSelectedListener = itemTimeBeforeSelectListener
+            if (binding.beforeTimeSpinner.isFocused) spinnerBeforeTimeAdapter.notifyDataSetChanged()
+
+            //установить время посде
+            binding.afterTimeSpinner.adapter = spinnerAfterTimeAdapter
+            binding.afterTimeSpinner.setSelection(4)
+            val itemAfterSelectedListener: AdapterView.OnItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long,
+                    ) {
+                        periodTwo = parent?.getItemAtPosition(position).toString()
+                        afterTimeArray.remove("--:--")
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                    }
+                }
+            binding.afterTimeSpinner.onItemSelectedListener = itemAfterSelectedListener
+            if (binding.afterTimeSpinner.isFocused) {
+                spinnerAfterTimeAdapter.notifyDataSetChanged()
+            }
+
             binding.spinnerPaymentType.adapter = spinnerAdapter
             binding.spinnerPaymentType.setSelection(3)
-            val itemSelectedListener: AdapterView.OnItemSelectedListener =
+            //выбор способа оплаты
+            val itemTypePeySelectedListener: AdapterView.OnItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(
                         parent: AdapterView<*>?,
@@ -210,14 +268,20 @@ class CreateOrderFragment : BaseFragment(), TimePickerDialog.OnTimeSetListener,
                     override fun onNothingSelected(parent: AdapterView<*>?) {
                     }
                 }
-            binding.spinnerPaymentType.onItemSelectedListener = itemSelectedListener
+            binding.spinnerPaymentType.onItemSelectedListener = itemTypePeySelectedListener
             if (binding.spinnerPaymentType.isFocused) {
                 spinnerAdapter.notifyDataSetChanged()
             }
         }
         binding.btnCreateOrder.setOnClickListener {
             order.period = "$periodOne - $periodTwo"
-            if (binding.tvTimeOrder.text != "Укажите дату и время" && order.paymentType == "Оплата по карте курьеру" && order.paymentType == "Оплата наличными" && addressString.isNotEmpty()) {
+            Timber.d("PERIOD ${order.period}")
+            if (binding.tvAddressOrder.text != "Выбрать адрес доставки" &&
+                binding.tvTimeOrder.text != "Укажите дату и время" &&
+                periodOne != "--:--" &&
+                periodTwo != "--:--" &&
+                order.paymentType == "Оплата по карте курьеру" ||
+                order.paymentType == "Оплата наличными") {
                 viewModel.sendAndSaveOrder(order, product, addressString)
                 viewModel.statusOrder.observe(this.viewLifecycleOwner) { status ->
                     when (status) {
@@ -238,12 +302,32 @@ class CreateOrderFragment : BaseFragment(), TimePickerDialog.OnTimeSetListener,
                 }
 
 
-            } else if ( order.paymentType == "Оплата по карте") {
-                viewModel.payToCard(orderId = "36", amount = order.orderCost * 100)
-                viewModel.linkHTTP.observe(this.viewLifecycleOwner) { formUrl ->
-                    Timber.d("SBER LINK: $formUrl")
-                    val url = formUrl.removePrefix("\"").removeSuffix("\"")
-                    this.findNavController().navigate(CreateOrderFragmentDirections.actionCreateOrderFragmentToCardPaymentFragment(url))
+            } else if (binding.tvAddressOrder.text != "Выбрать адрес доставки" &&
+                binding.tvTimeOrder.text != "Укажите дату и время" &&
+                periodOne != "--:--" &&
+                periodTwo != "--:--" &&
+                order.paymentType == "Оплата по карте") {
+                viewModel.sendAndSaveOrder(order, product, addressString)
+                viewModel.statusOrder.observe(this.viewLifecycleOwner) { status ->
+                    when(status) {
+                        Status.SEND -> {
+                            viewModel.numberOrder.observe(this.viewLifecycleOwner) { numberOrder ->
+                                viewModel.payToCard(numberOrder, amount = order.orderCost * 100, order.contact)
+                                viewModel.clearProduct(productClear)
+                                viewModel.dataPayment.observe(this.viewLifecycleOwner) { dataPayment ->
+                                    Timber.d("SBER LINK: ${dataPayment[0]}; ${dataPayment[1]}")
+                                    val orderId = dataPayment[0].removePrefix("\"").removeSuffix("\"")
+                                    val url = dataPayment[1].removePrefix("\"").removeSuffix("\"")
+                                    this.findNavController().navigate(CreateOrderFragmentDirections.actionCreateOrderFragmentToCardPaymentFragment(url, orderId))
+                                }
+                            }
+                        }
+                        else -> {
+                            Toast.makeText(this.context,
+                                "Ошибка, возвожно проблемы с интернетом",
+                                Toast.LENGTH_LONG).show()
+                        }
+                    }
                 }
             } else {
                 Timber.d("${order.period}, ${order.paymentType}")
@@ -258,22 +342,18 @@ class CreateOrderFragment : BaseFragment(), TimePickerDialog.OnTimeSetListener,
         fun newInstance() = CreateOrderFragment()
     }
 
-    //Калбэк для устовки времени
-    override fun onTimeSet(view: TimePickerDialog?, hourOfDay: Int, minute: Int, second: Int) {
-        if (minute < 10) {
-            periodOne = "$hourOfDay:0$minute"
-            periodTwo = "${hourOfDay + 2}:0${minute}"
-        } else {
-            periodOne = "$hourOfDay:$minute"
-            periodTwo = "${hourOfDay + 2}:${minute}"
-        }
-        binding.tvTimeOrder.append(", $periodOne - $periodTwo")
-    }
-
     //Калбэк для устовки даты
     override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int) {
         if (monthOfYear + 1 > 10) "$dayOfMonth.${monthOfYear + 1}.$year".also {
+            val calendar = Calendar.getInstance()
+            calendar.set(year, monthOfYear, dayOfMonth)
+            order.date = "${calendar.timeInMillis / 1000}"
             binding.tvTimeOrder.text = it
-        } else "$dayOfMonth.0${monthOfYear + 1}.$year".also { binding.tvTimeOrder.text = it }
+        } else "$dayOfMonth.0${monthOfYear + 1}.$year".also {
+            val calendar = Calendar.getInstance()
+            calendar.set(year, monthOfYear, dayOfMonth)
+            order.date = "${calendar.timeInMillis / 1000}"
+            binding.tvTimeOrder.text = it
+        }
     }
 }

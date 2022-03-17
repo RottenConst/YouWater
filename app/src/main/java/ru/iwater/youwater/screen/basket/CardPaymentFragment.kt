@@ -2,7 +2,6 @@ package ru.iwater.youwater.screen.basket
 
 import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +9,13 @@ import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.OrderViewModel
+import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.FragmentCardPaymentBinding
 import timber.log.Timber
 import javax.inject.Inject
@@ -41,7 +39,12 @@ class CardPaymentFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ): View {
         val formUrl = CardPaymentFragmentArgs.fromBundle(this.requireArguments()).formUrl
-        Timber.d("SBERLINK $formUrl")
+        val orderId = CardPaymentFragmentArgs.fromBundle(this.requireArguments()).orderId
+        val productClear = mutableListOf<Product>()
+        viewModel.products.observe(this.viewLifecycleOwner) {
+            productClear.addAll(it)
+        }
+        Timber.d("SBERLINK $formUrl, $orderId")
         binding.wvCardPayment.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 Timber.d("FINISH $url")
@@ -53,8 +56,10 @@ class CardPaymentFragment : BaseFragment() {
                 val endLink = "http://605d3ea8e59a.ngrok.io"
                 val endUrl = url?.removeRange(endLink.lastIndex + 2, url.lastIndex + 1)
                 Timber.d(endUrl)
-                if (endUrl.contentEquals("https://605d3ea8e59a.ngrok.io")){
-                    findNavController().navigate(CardPaymentFragmentDirections.actionCardPaymentFragmentToHomeFragment())
+                if (endUrl.contentEquals("http://605d3ea8e59a.ngrok.io/") || endUrl.contentEquals("https://605d3ea8e59a.ngrok.io")){
+                    viewModel.getPaymentStatus(orderId)
+                    binding.wvCardPayment.visibility = View.GONE
+                    findNavController().navigate(CardPaymentFragmentDirections.actionCardPaymentFragmentToCompleteOrderFragment(orderId))
                 }
                 super.onPageStarted(view, url, favicon)
             }
@@ -66,9 +71,8 @@ class CardPaymentFragment : BaseFragment() {
             }
         }
         binding.wvCardPayment.settings.javaScriptEnabled = true
-        Timber.d("Link do ${viewModel.linkHTTP.value}")
         viewModel.setLinkHttp(formUrl)
-        viewModel.linkHTTP.observe(this.viewLifecycleOwner) {
+        viewModel.linkPayment.observe(this.viewLifecycleOwner) {
             binding.wvCardPayment.loadUrl(it)
         }
         return binding.root

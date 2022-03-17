@@ -158,7 +158,9 @@ class MainActivity : BaseActivity() {
                 R.id.contactFragment,
                 R.id.deliveryInfoFragment,
                 R.id.faqFragment,
-                R.id.favoriteFragment-> binding.bottomNavView.visibility = View.GONE
+                R.id.favoriteFragment,
+                R.id.cardPaymentFragment,
+                R.id.completeOrderFragment-> binding.bottomNavView.visibility = View.GONE
                 else -> binding.bottomNavView.visibility = View.VISIBLE
             }
         }

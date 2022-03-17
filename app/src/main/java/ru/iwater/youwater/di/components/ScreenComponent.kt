@@ -5,6 +5,7 @@ import ru.iwater.youwater.di.viewModel.ViewModelFactoryModule
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.screen.basket.BasketFragment
 import ru.iwater.youwater.screen.basket.CardPaymentFragment
+import ru.iwater.youwater.screen.basket.CompleteOrderFragment
 import ru.iwater.youwater.screen.basket.CreateOrderFragment
 import ru.iwater.youwater.screen.catalog.CatalogFragment
 import ru.iwater.youwater.screen.catalog.CatalogProductFragment
@@ -35,4 +36,5 @@ interface ScreenComponent {
     fun inject(bankCardFragment: BankCardFragment)
     fun inject(editUserDataFragment: EditUserDataFragment)
     fun inject(cardPaymentFragment: CardPaymentFragment)
+    fun inject(completeOrderFragment: CompleteOrderFragment)
 }

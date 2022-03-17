@@ -53,4 +53,10 @@ interface ApiWater {
     suspend fun getAllAddresses(
         @Path("client_id") clientId: Int
     ):Response<List<JsonObject>>
+
+    @POST("OrdersInfo/{orderNumber}")
+    suspend fun setStatusPayment(
+        @Path("orderNumber") orderNumber: Int,
+        @Body parameters: JsonObject,
+    ): Response<JsonObject>
 }

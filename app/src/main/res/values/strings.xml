@@ -39,6 +39,9 @@
     <string name="sample_sum">3020 ₽</string>
     <string name="sample_balls">0</string>
     <string name="sample_total_sum">3220 ₽</string>
+    <string name="after_string">До</string>
+    <string name="before_time_string">Время C</string>
+    <string name="set_time_order_string">Укажите время доставки:</string>
 
     <!--    profile-->
     <string name="name">Имя Фамилия</string>
@@ -171,6 +174,9 @@
     <string name="whatsApp">Связаться c помощью WhatsApp</string>
     <string name="instagram">Связаться c помощью Instagram</string>
     <string name="user_data_sent_for_moderation">Ваши данные отправлены на модерацию.  Мы проверим их корректность и внесём изменения. Спасибо вам за то, что предупреждаете нас.</string>
+    <string name="complete_order_pay">Оформление прошло успешно</string>
+    <string name="comment_order_pay">Мы сообщим вам, когда заказ будет передан  в доставку</string>
+    <string name="go_to_home_text">Перейти на главную</string>
 
     <string-array name="order_pay">
         <item>Оплата по карте курьеру</item>

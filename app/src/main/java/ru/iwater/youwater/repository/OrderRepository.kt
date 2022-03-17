@@ -1,5 +1,6 @@
 package ru.iwater.youwater.repository
 
+import com.google.gson.JsonObject
 import ru.iwater.youwater.bd.AddressDao
 import ru.iwater.youwater.bd.MyOrderDao
 import ru.iwater.youwater.bd.ProductDao
@@ -44,6 +45,27 @@ class OrderRepository @Inject constructor(
         } else listAddress
     }
 
+    suspend fun saveAddress(address: Address) {
+        addressDao.save(address)
+    }
+
+    suspend fun getAllFactAddress(): List<String> {
+        return try {
+            val jsonAddress = apiAuth.getAllAddresses(authClient.get().clientId)
+            if (jsonAddress.isSuccessful) {
+                val listAddress = mutableListOf<String>()
+                jsonAddress.body()?.forEach {
+                    listAddress.add(it["full_address"].toString())
+                    listAddress.add(it["fact_address"].toString())
+                }
+                listAddress.toList()
+            } else emptyList()
+        } catch (e: Exception) {
+            Timber.e("Error get address $e")
+            emptyList()
+        }
+    }
+
     suspend fun getAllProduct(): List<Product> {
         return productDao.getAllProduct() ?: emptyList()
     }
@@ -79,8 +101,26 @@ class OrderRepository @Inject constructor(
         myOrderDao.save(myOrder)
     }
 
-    suspend fun getMyOrder(): List<MyOrder>? {
+    suspend fun getOrder(clientId: Int, orderId: Int): List<OrderFromCRM> {
+        try {
+            val listOrder = apiAuth.getOrderClient(clientId)
+            return if (listOrder.isNullOrEmpty()) {
+                emptyList()
+            } else {
+                listOrder.filter { it.id == orderId }
+            }
+        } catch (e: Exception) {
+            Timber.e("error get order: $e")
+        }
+        return emptyList()
+    }
+
+    suspend fun getMyAllOrder(): List<MyOrder>? {
         return myOrderDao.getAllMyOrder()
+    }
+
+    suspend fun getMyOrder(id: Int): List<MyOrder?> {
+        return listOf(myOrderDao.getMyOrder(id))
     }
 
     suspend fun createOrder(order: Order): String {
@@ -95,7 +135,7 @@ class OrderRepository @Inject constructor(
         return "error"
     }
 
-    suspend fun payCard(paymentCard: PaymentCard): String {
+    suspend fun payCard(paymentCard: PaymentCard): List<String> {
         try {
             val answer = sberApi.registerOrder(
                 userName = paymentCard.userName,
@@ -103,14 +143,46 @@ class OrderRepository @Inject constructor(
                 orderNumber = paymentCard.orderNumber,
                 amount = paymentCard.amount,
                 returnUrl = paymentCard.returnUrl,
-                pageView = "MOBILE"
+                pageView = "MOBILE",
+                phone = paymentCard.phone
             )
+            val dataPayment = mutableListOf<String>()
             return if (answer != null) {
-                answer["formUrl"].toString()
-            } else "qwerty"
+                dataPayment.add(answer["orderId"].toString())
+                dataPayment.add(answer["formUrl"].toString())
+                dataPayment
+            } else emptyList()
         } catch (e: Exception) {
             Timber.e("error pay: $e")
         }
-        return "error"
+        return emptyList()
+    }
+
+    suspend fun getPaymentStatus(orderId: String): Pair<Int, Int> {
+        try {
+            val answer = sberApi.getOrderStatus("T602720481107-api", "T602720481107", orderId)
+            if (answer != null) {
+                return Pair(
+                    answer["orderNumber"].toString().removePrefix("\"").removeSuffix("\"").toInt(),
+                    answer["orderStatus"].toString().toInt()
+                )
+            }
+        }catch (e: Exception) {
+            Timber.e("error get status pay: $e")
+        }
+        return Pair(0, 0)
+    }
+
+    suspend fun setStatusPayment(orderId: Int, parameters: JsonObject): Boolean {
+        try {
+            val answer = apiAuth.setStatusPayment(orderId, parameters)
+            if (answer.isSuccessful) {
+                Timber.d(answer.body()?.get("ready").toString())
+                return true
+            }
+        }catch (e: Exception) {
+            Timber.e("error set payment status: $e")
+        }
+        return false
     }
 }

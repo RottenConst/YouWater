@@ -161,8 +161,9 @@
         <action
             android:id="@+id/action_createOrderFragment_to_cardPaymentFragment"
             app:destination="@id/cardPaymentFragment"
-            app:popUpTo="@id/cardPaymentFragment"
-            app:popUpToInclusive="true" />
+            app:launchSingleTop="true"
+            app:popUpTo="@id/route_main"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/myOrdersFragment"
@@ -203,8 +204,24 @@
         <argument
             android:name="formUrl"
             app:argType="string" />
+        <argument
+            android:name="orderId"
+            app:argType="string" />
         <action
-            android:id="@+id/action_cardPaymentFragment_to_homeFragment"
+            android:id="@+id/action_cardPaymentFragment_to_completeOrderFragment"
+            app:destination="@id/completeOrderFragment"
+            app:popUpTo="@id/completeOrderFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/completeOrderFragment"
+        android:name="ru.iwater.youwater.screen.basket.CompleteOrderFragment"
+        android:label="CompleteOrderFragment" >
+        <argument
+            android:name="orderId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_completeOrderFragment_to_homeFragment"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />

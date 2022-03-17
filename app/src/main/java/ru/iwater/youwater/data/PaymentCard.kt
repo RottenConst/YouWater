@@ -14,5 +14,7 @@ data class PaymentCard(
     @SerializedName("amount")
     val amount: Int,
     @SerializedName("returnUrl")
-    val returnUrl: String = "http://605d3ea8e59a.ngrok.io"
+    val returnUrl: String = "http://605d3ea8e59a.ngrok.io",
+    @SerializedName("phone")
+    val phone: String
 )
