@@ -61,7 +61,7 @@ class ProductRepository @Inject constructor(
         try {
             productList = apiWater.getProductList()
             if (!productList.isNullOrEmpty()) {
-                return productList.filter { it.category == category && it.app == 1 }
+                return productList.filter { it.app == 1 && it.category == category }
             }
         }catch (e: Exception) {
             Timber.e(e)

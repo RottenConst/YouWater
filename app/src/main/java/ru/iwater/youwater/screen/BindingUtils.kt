@@ -40,7 +40,7 @@ fun TextView.bindCostProduct(product: Product?) {
                 "от ${price.toInt() - 15}₽".also { text = it }
             }
         } else {
-            if (product.price.isNotEmpty()) {
+            if (product.price.isNotEmpty() && product.price.length > 4) {
                 val price = product.price.split(";")[0].split(":")[1]
                 "от ${price}₽".also { text = it }
             }
@@ -170,14 +170,14 @@ fun TextView.bindAboutProduct(product: Product?) {
  */
 @BindingAdapter("imageUrl")
 fun bindImageProduct(imgView: ImageView, file: String?) {
-    val imgUrl = "http://dev.iwatercrm.ru/images/$file"
+    val imgUrl = "https://dev.new.iwatercrm.ru/iwatercrm/images/$file"
     imgUrl.let {
         val imgUrl = imgUrl.toUri().buildUpon().build()
         Glide.with(imgView.context)
             .load(imgUrl)
             .apply(RequestOptions()
                 .placeholder(R.drawable.ic_youwater_logo)
-                .error(R.mipmap.product_image))
+                .error(R.drawable.ic_youwater_logo))
             .into(imgView)
     }
 
