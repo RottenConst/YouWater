@@ -1,6 +1,5 @@
 package ru.iwater.youwater.data
 
-import android.Manifest
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.BuildConfig
 import ru.iwater.youwater.repository.AddressRepository
-import timber.log.Timber
 import javax.inject.Inject
 
 class AddressViewModel @Inject constructor(
@@ -24,7 +22,7 @@ class AddressViewModel @Inject constructor(
         get() = _addressResult
 
     init {
-        getAddAddress()
+//        getAddAddress()
     }
 
     fun getPlace(place: String) {
@@ -39,7 +37,30 @@ class AddressViewModel @Inject constructor(
     fun getAllFactAddress() {
         viewModelScope.launch {
             val listAddress = addressRepo.getAllFactAddress()
-            Timber.d("Addresses === $listAddress")
+            if (!listAddress.isNullOrEmpty()) {
+                val region = listAddress[0].split(",")[0].removePrefix("\"")
+                val street = listAddress[1].split(" ")[0].removePrefix("\"").removeSuffix(",")
+                val house = listAddress[1].split(" ")[2].removeSuffix(",").toInt()
+                val building = listAddress[1].split(" ")[4].removeSuffix(",")
+                val entrance = listAddress[1].split(" ")[6].removeSuffix(",").toInt()
+                val floor = listAddress[1].split(" ")[8].removeSuffix(",").toInt()
+                val flat =
+                    listAddress[1].split(" ")[10].removeSuffix(",").removeSuffix("\"").toInt()
+                val address = Address(region, street, house, building, entrance, floor, flat, "")
+                val savedAddress = addressRepo.getAddressList()
+                if (savedAddress.isNullOrEmpty()) {
+                    saveAddress(address)
+                } else {
+                    savedAddress.forEach {
+                        if (it.street != address.street && it.flat != address.flat) {
+                            saveAddress(address)
+                        }
+                    }
+                }
+                _addressList.value = listOf(address)
+            } else {
+                getAddAddress()
+            }
         }
     }
 

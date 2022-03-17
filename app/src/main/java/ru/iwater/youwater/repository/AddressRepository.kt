@@ -64,6 +64,7 @@ class AddressRepository @Inject constructor(
                 val listAddress = mutableListOf<String>()
                 jsonAddress.body()?.forEach {
                     listAddress.add(it["full_address"].toString())
+                    listAddress.add(it["fact_address"].toString())
                 }
                 listAddress.toList()
             } else emptyList()

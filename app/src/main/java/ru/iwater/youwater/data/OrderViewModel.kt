@@ -61,6 +61,42 @@ class OrderViewModel @Inject constructor(
         }
     }
 
+    fun getAllFactAddress(context: Context?) {
+        viewModelScope.launch {
+            val listAddress = orderRepo.getAllFactAddress()
+            if (!listAddress.isNullOrEmpty()) {
+                val region = listAddress[0].split(",")[0].removePrefix("\"")
+                val street = listAddress[1].split(" ")[0].removePrefix("\"").removeSuffix(",")
+                val house = listAddress[1].split(" ")[2].removeSuffix(",").toInt()
+                val building = listAddress[1].split(" ")[4].removeSuffix(",")
+                val entrance = listAddress[1].split(" ")[6].removeSuffix(",").toInt()
+                val floor = listAddress[1].split(" ")[8].removeSuffix(",").toInt()
+                val flat =
+                    listAddress[1].split(" ")[10].removeSuffix(",").removeSuffix("\"").toInt()
+                val address = Address(region, street, house, building, entrance, floor, flat, "")
+                val savedAddress = orderRepo.getAllAddress()
+                if (savedAddress.isNullOrEmpty()) {
+                    saveAddress(address)
+                } else {
+                    savedAddress.forEach {
+                        if (it.street != address.street && it.flat != address.flat) {
+                            saveAddress(address)
+                        }
+                    }
+                }
+                _address.value = listOf(address)
+            } else {
+                Toast.makeText(context, "Ошибка, неудается добавить адрес", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun saveAddress(address: Address) {
+        viewModelScope.launch {
+            orderRepo.saveAddress(address)
+        }
+    }
+
     private fun getProducts() {
         viewModelScope.launch {
             _products.value = orderRepo.getAllProduct()

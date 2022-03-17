@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -57,10 +58,14 @@ class AddressesFragment : BaseFragment(), AdapterAddresses.OnAddressItemListener
         binding.lifecycleOwner = this
         val adapter = AdapterAddresses(this)
         binding.rvAddresses.adapter = adapter
+        viewModel.getAllFactAddress()
         viewModel.addressList.observe(this.viewLifecycleOwner) {
-            adapter.submitList(it)
+            if (it.isNullOrEmpty()) {
+                Toast.makeText(context, "Ошибка, не удаётся загрузить адреса", Toast.LENGTH_SHORT).show()
+            } else {
+                adapter.submitList(it)
+            }
         }
-//        viewModel.getAllFactAddress()
         binding.btnAddAddress.setOnClickListener {
             this.findNavController().navigate(
                 AddressesFragmentDirections.actionAddresessFragmentToAddAddressFragment()
