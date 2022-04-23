@@ -5,6 +5,7 @@ import ru.iwater.youwater.bd.AddressDao
 import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.data.Address
 import ru.iwater.youwater.data.AddressResult
+import ru.iwater.youwater.data.ClientUserData
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.GoogleMapApi
@@ -55,6 +56,16 @@ class AddressRepository @Inject constructor(
             Timber.e(e)
         }
         return null
+    }
+
+    suspend fun createAutoTask(addressData: ClientUserData): String {
+        try {
+            val answer = waterApi.sendUserData(addressData)
+            if (answer?.id != null) return "address sent for moderation"
+        } catch (e: Exception) {
+            Timber.e("error send address $e")
+        }
+        return "address not send"
     }
 
     suspend fun getAllFactAddress(): List<String> {

@@ -13,6 +13,7 @@ import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.AboutProductViewModel
 import ru.iwater.youwater.databinding.FragmentAboutProductBinding
+import timber.log.Timber
 import javax.inject.Inject
 
 class AboutProductFragment : BaseFragment() {

@@ -188,19 +188,45 @@ fun TextView.bindingAddress(address: Address?) {
     if (address != null) {
         if (address.note.isNullOrEmpty()) {
             when {
-                address.building == null -> {
-                    "${address.region}, ул.${address.street}, д.${address.house} ".also {
-                        text = it
+                address.building == "" -> {
+                    if (address.entrance == null && address.floor == null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house}".also { text = it }
+                    } else if (address.entrance == null && address.floor == null && address.flat != null) {
+                        "${address.region} ул.${address.street} д.${address.house} кв.${address.flat}".also { text = it }
+                    } else if (address.entrance == null && address.floor != null && address.flat == null){
+                        "${address.region} ул.${address.street} д.${address.house} этаж${address.floor}".also { text = it }
+                    } else if (address.entrance != null && address.floor == null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance}".also { text = it }
+                    } else if (address.entrance == null && address.floor != null && address.flat != null) {
+                        "${address.region} ул.${address.street} д.${address.house} этаж${address.floor} кв.${address.flat}".also { text = it }
+                    } else if (address.entrance != null && address.floor == null && address.flat != null) {
+                        "${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} кв.${address.flat}"
                     }
                 }
                 address.entrance == null -> {
-                    "${address.region}, ул.${address.street}, д.${address.house} ".also {
-                        text = it
+                    if (address.building.isNullOrEmpty() && address.floor == null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house}".also { text = it }
+                    } else if (address.building.isNullOrEmpty() && address.floor == null && address.flat != null) {
+                        "${address.region} ул.${address.street} д.${address.house} кв.${address.flat}".also { text = it }
+                    } else if (address.building.isNullOrEmpty() && address.floor != null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house} этаж${address.floor}".also { text = it }
+                    } else if (!address.building.isNullOrEmpty() && address.floor == null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house} ст. ${address.building}".also { text = it }
+                    } else if (!address.building.isNullOrEmpty() && address.floor != null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house} ст. ${address.building} этаж${address.floor}".also { text = it }
+                    } else if (!address.building.isNullOrEmpty() && address.floor == null && address.flat != null) {
+                        "${address.region} ул.${address.street} д.${address.house} ст. ${address.building} кв. ${address.flat}".also { text = it }
                     }
                 }
                 address.floor == null -> {
-                    "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance}".also {
-                        text = it
+                    if (address.flat == null && address.building.isNullOrEmpty()) {
+                        "${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance}".also { text = it }
+                    } else if (address.flat == null && !address.building.isNullOrEmpty()){
+                        "${address.region} ул.${address.street} д.${address.house} ст. ${address.building} подьезд ${address.entrance}".also { text = it }
+                    } else if (address.flat != null && address.building.isNullOrEmpty()) {
+                        "${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} кв.${address.flat}".also { text = it }
+                    } else if (address.flat != null && !address.building.isNullOrEmpty()) {
+                        "${address.region} ул.${address.street} д.${address.house} ст. ${address.building} подьезд ${address.entrance} кв.${address.flat}".also { text = it }
                     }
                 }
                 address.flat == null -> {
@@ -217,18 +243,44 @@ fun TextView.bindingAddress(address: Address?) {
         } else {
             when {
                 address.building == null -> {
-                    "${address.region}, ул.${address.street}, д.${address.house} Примичание: ${address.note}".also {
-                        text = it
+                    if (address.entrance == null && address.floor == null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house} Примичание: ${address.note}".also { text = it }
+                    } else if (address.entrance == null && address.floor == null && address.flat != null) {
+                        "${address.region} ул.${address.street} д.${address.house} кв.${address.flat} Примичание: ${address.note}".also { text = it }
+                    } else if (address.entrance == null && address.floor != null && address.flat == null){
+                        "${address.region} ул.${address.street} д.${address.house} этаж${address.floor} Примичание: ${address.note}".also { text = it }
+                    } else if (address.entrance != null && address.floor == null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} Примичание: ${address.note}".also { text = it }
+                    } else if (address.entrance == null && address.floor != null && address.flat != null) {
+                        "${address.region} ул.${address.street} д.${address.house} этаж${address.floor} кв.${address.flat} Примичание: ${address.note}".also { text = it }
+                    } else if (address.entrance != null && address.floor == null && address.flat != null) {
+                        "${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} кв.${address.flat} Примичание: ${address.note}"
                     }
                 }
                 address.entrance == null -> {
-                    "${address.region}, ул.${address.street}, д.${address.house} Примичание: ${address.note}".also {
-                        text = it
+                    if (address.building.isNullOrEmpty() && address.floor == null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house} Примичание: ${address.note}".also { text = it }
+                    } else if (address.building.isNullOrEmpty() && address.floor == null && address.flat != null) {
+                        "${address.region} ул.${address.street} д.${address.house} кв.${address.flat} Примичание: ${address.note}".also { text = it }
+                    } else if (address.building.isNullOrEmpty() && address.floor != null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house} этаж${address.floor} Примичание: ${address.note}".also { text = it }
+                    } else if (!address.building.isNullOrEmpty() && address.floor == null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house} ст. ${address.building} Примичание: ${address.note}".also { text = it }
+                    } else if (!address.building.isNullOrEmpty() && address.floor != null && address.flat == null) {
+                        "${address.region} ул.${address.street} д.${address.house} ст. ${address.building} этаж${address.floor} Примичание: ${address.note}".also { text = it }
+                    } else if (!address.building.isNullOrEmpty() && address.floor == null && address.flat != null) {
+                        "${address.region} ул.${address.street} д.${address.house} ст. ${address.building} кв. ${address.flat} Примичание: ${address.note}".also { text = it }
                     }
                 }
                 address.floor == null -> {
-                    "${address.region}, ул.${address.street}, д.${address.house}, подьезд ${address.entrance} Примичание: ${address.note}".also {
-                        text = it
+                    if (address.flat == null && address.building.isNullOrEmpty()) {
+                        "${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} Примичание: ${address.note}".also { text = it }
+                    } else if (address.flat == null && !address.building.isNullOrEmpty()){
+                        "${address.region} ул.${address.street} д.${address.house} ст. ${address.building} подьезд ${address.entrance} Примичание: ${address.note}".also { text = it }
+                    } else if (address.flat != null && address.building.isNullOrEmpty()) {
+                        "${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} кв.${address.flat} Примичание: ${address.note}".also { text = it }
+                    } else if (address.flat != null && !address.building.isNullOrEmpty()) {
+                        "${address.region} ул.${address.street} д.${address.house} ст. ${address.building} подьезд ${address.entrance} кв.${address.flat} Примичание: ${address.note}".also { text = it }
                     }
                 }
                 address.flat == null -> {

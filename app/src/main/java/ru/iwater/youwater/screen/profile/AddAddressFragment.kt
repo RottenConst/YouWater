@@ -35,15 +35,6 @@ import ru.iwater.youwater.databinding.FragmentAddAddressBinding
 import timber.log.Timber
 import javax.inject.Inject
 
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [AddAddressFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class AddAddressFragment : BaseFragment(), GoogleMap.OnPoiClickListener {
 
     private var param1: String? = null
@@ -67,10 +58,6 @@ class AddAddressFragment : BaseFragment(), GoogleMap.OnPoiClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
         screenComponent.inject(this)
     }
 
@@ -97,20 +84,23 @@ class AddAddressFragment : BaseFragment(), GoogleMap.OnPoiClickListener {
             }
             return@setOnKeyListener false
         }
-        viewModel.addressResult.observe(this.viewLifecycleOwner, {
+        viewModel.addressResult.observe(this.viewLifecycleOwner) {
             if (it != null) {
                 val addressList = it.results[0].formatted_address.split(", ")
-                val district = if (it.results[0].address_components[3].long_name != "город") "район ${it.results[0].address_components[3].long_name}" else ""
+                val district =
+                    if (it.results[0].address_components[3].long_name != "город") "район ${it.results[0].address_components[3].long_name}" else ""
                 val address = "${addressList[2]}, $district ${addressList[0]}, ${addressList[1]}"
                 binding.searchAddress.text.clear()
                 binding.searchAddress.text.insert(0, address)
                 binding.etHome.text?.clear()
                 binding.etHome.text?.insert(0, addressList[1])
-                marker?.position = LatLng(it.results[0].geometry.location.lat, it.results[0].geometry.location.lng)
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.results[0].geometry.location.lat, it.results[0].geometry.location.lng), 17.0f))
+                marker?.position =
+                    LatLng(it.results[0].geometry.location.lat, it.results[0].geometry.location.lng)
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.results[0].geometry.location.lat,
+                    it.results[0].geometry.location.lng), 17.0f))
                 addressSave = it
             }
-        })
+        }
         binding.btnSaveAddress.setOnClickListener {
             if (!binding.etHome.text.isNullOrEmpty()) {
                 if (addressSave != null) {
@@ -129,7 +119,6 @@ class AddAddressFragment : BaseFragment(), GoogleMap.OnPoiClickListener {
                             binding.etApartment.text.toString().toInt()
                         } else null,
                         binding.etNote.text.toString())
-//                    Timber.d("${address.street}")
                     viewModel.saveAddress(address)
                     this.findNavController().navigate(
                         AddAddressFragmentDirections.actionAddAddressFragmentToAddresessFragment()
@@ -225,21 +214,7 @@ class AddAddressFragment : BaseFragment(), GoogleMap.OnPoiClickListener {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AddAddressFragment.
-         */
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AddAddressFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        fun newInstance() = AddAddressFragment()
     }
 }

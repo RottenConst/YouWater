@@ -205,7 +205,6 @@
                             android:layout_marginBottom="16dp"
                             android:layout_weight="1"
                             android:text="@string/sample_balls"
-                            app:setTanks="@{clientVM.client.tanks}"
                             android:textColor="@color/blue"
                             android:textSize="16sp"
                             android:textStyle="bold"
