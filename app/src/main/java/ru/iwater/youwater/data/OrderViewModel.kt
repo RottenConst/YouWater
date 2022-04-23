@@ -14,6 +14,7 @@ import javax.inject.Inject
 
 enum class Status{ SEND, ERROR }
 enum class PaymentStatus {SUCCESSFULLY, ERROR}
+enum class OrderLoadStatus { LOADING, DONE, ERROR }
 
 class OrderViewModel @Inject constructor(
     private val orderRepo: OrderRepository
@@ -70,6 +71,11 @@ class OrderViewModel @Inject constructor(
     val paymentStatus: LiveData<PaymentStatus>
         get() = _paymentStatus
 
+    //статус загрузки заказов
+    private val _statusLoad: MutableLiveData<OrderLoadStatus> = MutableLiveData()
+    val statusLoad: LiveData<OrderLoadStatus>
+        get() = _statusLoad
+
     init {
         getClient()
         getAddress()
@@ -79,7 +85,7 @@ class OrderViewModel @Inject constructor(
     private fun getClient() {
         viewModelScope.launch {
             val client = orderRepo.getClientInfo(authClient.clientId)
-            if (client != null) _client.value = client
+             if (client != null) _client.value = client
         }
     }
 
@@ -93,31 +99,87 @@ class OrderViewModel @Inject constructor(
     fun getAllFactAddress(context: Context?) {
         viewModelScope.launch {
             val listAddress = orderRepo.getAllFactAddress()
+            Timber.d("ADDRESS SIZE = $listAddress")
+            val addresses = mutableListOf<Address>()
             if (!listAddress.isNullOrEmpty()) {
-                val region = listAddress[0].split(",")[0].removePrefix("\"")
-                val street = listAddress[1].split(" ")[0].removePrefix("\"").removeSuffix(",")
-                val house = listAddress[1].split(" ")[2].removeSuffix(",").toInt()
-                val building = listAddress[1].split(" ")[4].removeSuffix(",")
-                val entrance = listAddress[1].split(" ")[6].removeSuffix(",").toInt()
-                val floor = listAddress[1].split(" ")[8].removeSuffix(",").toInt()
-                val flat =
-                    listAddress[1].split(" ")[10].removeSuffix(",").removeSuffix("\"").toInt()
-                val address = Address(region, street, house, building, entrance, floor, flat, "")
-                val savedAddress = orderRepo.getAllAddress()
-                if (savedAddress.isNullOrEmpty()) {
-                    saveAddress(address)
-                } else {
-                    savedAddress.forEach {
-                        if (it.street != address.street && it.flat != address.flat) {
+                for (index in listAddress.indices) {
+                    if (index % 2 != 0) {
+                        val region = listAddress[index - 1].split(",")[0].removePrefix("\"")
+                        val address = getAddressFromString(listAddress[index].split(","), region)
+                        addresses.add(address)
+                        val savedAddress = orderRepo.getAllAddress()
+                        if (savedAddress.isNullOrEmpty()) {
                             saveAddress(address)
+                        } else {
+                            savedAddress.forEach {
+                                if (it.street != address.street && it.house != address.house && it.flat != address.flat) {
+                                    saveAddress(address)
+                                }
+                            }
                         }
                     }
                 }
-                _address.value = listOf(address)
+                _address.value = addresses
             } else {
-                Toast.makeText(context, "Ошибка, неудается добавить адрес", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Ошибка не удалось загрузить адреса", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun getAddressFromString(rawAddress: List<String>, region: String): Address {
+        var street = ""
+        var house = 0
+        var building = ""
+        var entrance: Int? = null
+        var floor: Int? = null
+        var flat: Int? = null
+        rawAddress.forEachIndexed { index, s ->
+            if (index == 0) street = s.removePrefix("\"").removeSuffix(",")
+            if (index > 0) {
+                house = parseHouse(s, house)
+                building = parseBuilding(s, building)
+                entrance = parseEntrance(s, entrance)
+                floor = parseFloor(s, floor)
+                flat = parseFlat(s, flat)
+            }
+        }
+        Timber.d("$region $street $house $building $entrance $floor $flat")
+        return Address(region, street, house, building, entrance, floor, flat, "")
+    }
+
+    private fun parseHouse(string: String, house: Int): Int{
+        val houseList = string.split(" ")
+        return if (houseList[1] == "д." && house == 0) {
+            houseList[2].removeSuffix("\"").toInt()
+        } else house
+    }
+
+    private fun parseEntrance(string: String, entrance: Int?): Int?{
+        val entranceList = string.split(" ")
+        return if (entranceList[1] == "пд." && entrance == null) {
+            entranceList[2].removeSuffix("\"").toInt()
+        } else entrance
+    }
+
+    private fun parseFloor(string: String, floor: Int?): Int?{
+        val floorList = string.split(" ")
+        return if (floorList[1] == "эт." && floor == null) {
+            floorList[2].removeSuffix("\"").toInt()
+        } else floor
+    }
+
+    private fun parseFlat(string: String, flat: Int?): Int?{
+        val flatList = string.split(" ")
+        return if (flatList[1] == "кв." && flat == null) {
+            flatList[2].removeSuffix("\"").toInt()
+        } else flat
+    }
+
+    private fun parseBuilding(string: String, building: String): String{
+        val buildingList = string.split(" ")
+        return if (buildingList[1] == "корп." || buildingList[1] == "ст." && building.isNotEmpty()) {
+            buildingList[2].removeSuffix("\"")
+        } else building
     }
 
     fun saveAddress(address: Address) {
@@ -144,6 +206,7 @@ class OrderViewModel @Inject constructor(
         viewModelScope.launch {
             val listOrderCRM = orderRepo.getAllOrder(orderRepo.getAuthClient().clientId)
             val listMyOrder = mutableListOf<MyOrder>()
+            _statusLoad.value = OrderLoadStatus.LOADING
             if (listOrderCRM.isNotEmpty()){
                 listOrderCRM.forEach { order ->
                     val address = when {
@@ -160,17 +223,33 @@ class OrderViewModel @Inject constructor(
                             listProduct.add(product)
                         }
                     }
+                    Timber.d("ORDER_ID = ${order.order_id}")
+                    val status = when (order.order_id) {
+                        null -> 0
+                        else -> {
+                            val statusOrder = orderRepo.getStatusOrder(orderId = order.order_id)?.plus(1)
+                            statusOrder ?: 1
+                        }
+                    }
                     listMyOrder.add(
-                        MyOrder(id = order.id, address = address, cash = order.order_cost, date = "${order.date};${order.period}", products = listProduct, typeCash = order.payment_type, status = 0)
+                        MyOrder(address = address,
+                            cash = order.order_cost,
+                            date = "${order.date};${order.period}",
+                            products = listProduct,
+                            typeCash = order.payment_type,
+                            status = status,
+                            id = order.id)
                     )
                 }
+                _statusLoad.value = OrderLoadStatus.DONE
+            } else {
+                _statusLoad.value = OrderLoadStatus.ERROR
             }
-            _listMyOrder.value = listMyOrder.reversed()
+            _listMyOrder.value = listMyOrder
         }
     }
 
-
-    private fun getOrderCrm(id: Int) {
+    fun getOrderCrm(id: Int) {
         viewModelScope.launch {
             val orderFromCrm = orderRepo.getOrder(orderRepo.getAuthClient().clientId, id)
             Timber.d("ORDER SIZE ${orderFromCrm.size}")
@@ -191,8 +270,21 @@ class OrderViewModel @Inject constructor(
                             listProduct.add(product)
                         }
                     }
+                    val status = when (order.order_id) {
+                        null -> 0
+                        else -> {
+                            val statusOrder = orderRepo.getStatusOrder(orderId = order.order_id)?.plus(1)
+                            statusOrder ?: 1
+                        }
+                    }
                     myOrder.add(
-                        MyOrder(id = order.id, address = address, cash = order.order_cost, date = "${order.date};${order.period}", products = listProduct, typeCash = order.payment_type, status = 0)
+                        MyOrder(address = address,
+                            cash = order.order_cost,
+                            date = "${order.date};${order.period}",
+                            products = listProduct,
+                            typeCash = order.payment_type,
+                            status = status,
+                            id = order.id)
                     )
                 }
             }

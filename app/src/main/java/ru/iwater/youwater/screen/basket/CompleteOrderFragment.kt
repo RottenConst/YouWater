@@ -14,6 +14,7 @@ import ru.iwater.youwater.data.OrderViewModel
 import ru.iwater.youwater.data.PaymentStatus
 import ru.iwater.youwater.databinding.FragmentCompleteOrderBinding
 import ru.iwater.youwater.screen.adapters.MyOrderAdapter
+import timber.log.Timber
 import javax.inject.Inject
 
 class CompleteOrderFragment : BaseFragment() {
@@ -33,30 +34,34 @@ class CompleteOrderFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ): View {
         val orderId = CompleteOrderFragmentArgs.fromBundle(this.requireArguments()).orderId
+        val isPaid = CompleteOrderFragmentArgs.fromBundle(this.requireArguments()).isPaid
         val binding = FragmentCompleteOrderBinding.inflate(inflater)
         binding.lifecycleOwner = this
         val adapter = MyOrderAdapter()
         binding.cardOrderPay.adapter = adapter
-        viewModel.getPaymentStatus(orderId)
-        viewModel.listMyOrder.observe(this.viewLifecycleOwner) { myOrder ->
-            adapter.submitList(myOrder)
-        }
-        viewModel.paymentStatus.observe(viewLifecycleOwner) {
-            when (it) {
-                PaymentStatus.SUCCESSFULLY -> {
+        if (isPaid) {
+            viewModel.getPaymentStatus(orderId)
+            viewModel.paymentStatus.observe(viewLifecycleOwner) {
+                when (it) {
+                    PaymentStatus.SUCCESSFULLY -> {
 
-                }
-                else -> {
-                    binding.ivPayComplete.setImageResource(R.drawable.ic_cancel)
-                    binding.tvLogoPayComplete.text = "Ошибка, не удалось оплатить заказ"
-                    binding.tvOrderPayComment.text = ""
+                    }
+                    else -> {
+                        binding.ivPayComplete.setImageResource(R.drawable.ic_cancel)
+                        binding.tvLogoPayComplete.text = "Ошибка, не удалось оплатить заказ"
+                        binding.tvOrderPayComment.text = ""
+                    }
                 }
             }
+        } else {
+            viewModel.getOrderCrm(orderId.toInt())
+        }
+        viewModel.listMyOrder.observe(this.viewLifecycleOwner) { myOrder ->
+            adapter.submitList(myOrder)
         }
         binding.btnGoHome.setOnClickListener {
             findNavController().navigate(CompleteOrderFragmentDirections.actionCompleteOrderFragmentToHomeFragment())
         }
-        activity?.actionBar?.hide()
         return binding.root
     }
 

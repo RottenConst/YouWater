@@ -20,6 +20,7 @@ import ru.iwater.youwater.data.*
 import ru.iwater.youwater.databinding.FragmentCreateOrderBinding
 import ru.iwater.youwater.screen.adapters.OrderProductAdapter
 import timber.log.Timber
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -37,6 +38,7 @@ class CreateOrderFragment : BaseFragment(),
     private val productClear = mutableListOf<Product>()
     private var periodOne = ""
     private var periodTwo = ""
+    private var dayOrder = ""
     private var addressString = ""
     private var order =
         Order(0, 0, "", mutableListOf(), "", 0, "", "", 0, "", "", "", JsonObject(), "")
@@ -70,10 +72,50 @@ class CreateOrderFragment : BaseFragment(),
                 val addresses = mutableListOf<String>()
                 listAddress.forEach { address ->
                     when {
-                        address.entrance == null -> addresses.add("${address.region} ул.${address.street} д.${address.house}")
-                        address.floor == null -> addresses.add("${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance}")
+                        address.building.isNullOrEmpty() -> {
+                            if (address.entrance == null && address.floor == null && address.flat == null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house}")
+                            } else if (address.entrance == null && address.floor == null && address.flat != null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} кв.${address.flat}")
+                            } else if (address.entrance == null && address.floor != null && address.flat == null){
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} этаж${address.floor}")
+                            } else if (address.entrance != null && address.floor == null && address.flat == null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance}")
+                            } else if (address.entrance == null && address.floor != null && address.flat != null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} этаж${address.floor} кв.${address.flat}")
+                            } else if (address.entrance != null && address.floor == null && address.flat != null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} кв.${address.flat}")
+                            }
+                        }
+                        address.entrance == null -> {
+                            if (address.building.isNullOrEmpty() && address.floor == null && address.flat == null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house}")
+                            } else if (address.building.isNullOrEmpty() && address.floor == null && address.flat != null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} кв.${address.flat}")
+                            } else if (address.building.isNullOrEmpty() && address.floor != null && address.flat == null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} этаж${address.floor}")
+                            } else if (!address.building.isNullOrEmpty() && address.floor == null && address.flat == null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} ст. ${address.building}")
+                            } else if (!address.building.isNullOrEmpty() && address.floor != null && address.flat == null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} ст. ${address.building} этаж${address.floor}")
+                            } else if (!address.building.isNullOrEmpty() && address.floor == null && address.flat != null) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} ст. ${address.building} кв. ${address.flat}")
+                            }
+
+                        }
+                        address.floor == null -> {
+                            if (address.flat == null && address.building.isNullOrEmpty()) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance}")
+                            } else if (address.flat == null && !address.building.isNullOrEmpty()){
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} ст. ${address.building} подьезд ${address.entrance}")
+                            } else if (address.flat != null && address.building.isNullOrEmpty()) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} кв.${address.flat}")
+                            } else if (address.flat != null && !address.building.isNullOrEmpty()) {
+                                addresses.add("${address.region} ул.${address.street} д.${address.house} ст. ${address.building} подьезд ${address.entrance} кв.${address.flat}")
+                            }
+                        }
                         address.flat == null -> addresses.add("${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} этаж${address.floor}")
-                        else -> addresses.add("${address.region} ул.${address.street} д.${address.house} подьезд ${address.entrance} этаж${address.floor} кв.${address.flat}")
+                        else -> addresses.add("${address.region} ул.${address.street} д.${address.house} cт.${address.building} подьезд ${address.entrance} этаж${address.floor} кв.${address.flat}")
                     }
                 }
                 binding.tvAddressOrder.setOnClickListener {
@@ -107,9 +149,13 @@ class CreateOrderFragment : BaseFragment(),
             val year = calendar.get(Calendar.YEAR)
             val month = calendar.get(Calendar.MONTH)
             val day = calendar.get(Calendar.DAY_OF_MONTH)
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
             //Установить дату
             val datePickerDialog = DatePickerDialog.newInstance(this, year, month, day)
             datePickerDialog.setTitle("Укажите время заказа")
+            if (hour >= 15) {
+                calendar.set(year, month, day + 1)
+            }
             datePickerDialog.minDate = calendar
             datePickerDialog.show(parentFragmentManager, "SetDateDialog")
         }
@@ -172,82 +218,13 @@ class CreateOrderFragment : BaseFragment(),
                 "Оплата наличными",
                 "Оплата по карте",
                 "Выберите способ оплаты",
+            )
 
-            )
-            val beforeTimeArray = mutableListOf(
-                "9:00",
-                "10:00",
-                "11:00",
-                "17:00",
-                "19:00",
-                "--:--",
-            )
-            val afterTimeArray = mutableListOf(
-                "15:00",
-                "16:00",
-                "17:00",
-                "22:00",
-                "--:--",
-            )
             val spinnerAdapter =
                 ArrayAdapter(context,
                     R.layout.spinner_item_layout_resource,
                     R.id.TextView,
                     typesOfPay)
-            val spinnerBeforeTimeAdapter = ArrayAdapter(context,
-                R.layout.spinner_item_layout_resource,
-                R.id.TextView,
-                beforeTimeArray
-                )
-            val spinnerAfterTimeAdapter = ArrayAdapter(context,
-                R.layout.spinner_item_layout_resource,
-                R.id.TextView,
-                afterTimeArray
-                )
-            //установить время до
-            binding.beforeTimeSpinner.adapter = spinnerBeforeTimeAdapter
-            binding.beforeTimeSpinner.setSelection(5)
-            val itemTimeBeforeSelectListener: AdapterView.OnItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-                        periodOne = parent?.getItemAtPosition(position).toString()
-                        beforeTimeArray.remove("--:--")
-
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-                    }
-                }
-            binding.beforeTimeSpinner.onItemSelectedListener = itemTimeBeforeSelectListener
-            if (binding.beforeTimeSpinner.isFocused) spinnerBeforeTimeAdapter.notifyDataSetChanged()
-
-            //установить время посде
-            binding.afterTimeSpinner.adapter = spinnerAfterTimeAdapter
-            binding.afterTimeSpinner.setSelection(4)
-            val itemAfterSelectedListener: AdapterView.OnItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long,
-                    ) {
-                        periodTwo = parent?.getItemAtPosition(position).toString()
-                        afterTimeArray.remove("--:--")
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-                    }
-                }
-            binding.afterTimeSpinner.onItemSelectedListener = itemAfterSelectedListener
-            if (binding.afterTimeSpinner.isFocused) {
-                spinnerAfterTimeAdapter.notifyDataSetChanged()
-            }
 
             binding.spinnerPaymentType.adapter = spinnerAdapter
             binding.spinnerPaymentType.setSelection(3)
@@ -286,12 +263,14 @@ class CreateOrderFragment : BaseFragment(),
                 viewModel.statusOrder.observe(this.viewLifecycleOwner) { status ->
                     when (status) {
                         Status.SEND -> {
-                            viewModel.clearProduct(productClear)
-                            Toast.makeText(this.context, "Заявка отправлена", Toast.LENGTH_LONG)
-                                .show()
-                            this.findNavController().navigate(
-                                CreateOrderFragmentDirections.actionCreateOrderFragmentToHomeFragment()
-                            )
+                            viewModel.numberOrder.observe(this.viewLifecycleOwner) { numberOrder ->
+                                viewModel.clearProduct(productClear)
+                                Toast.makeText(this.context, "Заявка отправлена", Toast.LENGTH_LONG)
+                                    .show()
+                                this.findNavController().navigate(
+                                    CreateOrderFragmentDirections.actionCreateOrderFragmentToCompleteOrderFragment(numberOrder, false)
+                                )
+                            }
                         }
                         else -> {
                             Toast.makeText(this.context,
@@ -337,6 +316,59 @@ class CreateOrderFragment : BaseFragment(),
         return binding.root
     }
 
+    private fun setPeriodTime(
+        spinnerAdapterBefore: ArrayAdapter<String>,
+        spinnerAdapterAfter: ArrayAdapter<String>,
+        beforeTimeArray: MutableList<String>,
+        countBefore: Int,
+        afterTimeArray: MutableList<String>,
+        countAfter: Int
+        ) {
+        binding.beforeTimeSpinner.adapter = spinnerAdapterBefore
+        binding.beforeTimeSpinner.setSelection(countBefore)
+        val itemTimeBeforeSelectListener: AdapterView.OnItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    periodOne = parent?.getItemAtPosition(position).toString()
+                    beforeTimeArray.remove("--:--")
+
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        binding.beforeTimeSpinner.onItemSelectedListener = itemTimeBeforeSelectListener
+        if (binding.beforeTimeSpinner.isFocused) spinnerAdapterBefore.notifyDataSetChanged()
+
+        //установить время посде
+        binding.afterTimeSpinner.adapter = spinnerAdapterAfter
+        binding.afterTimeSpinner.setSelection(countAfter)
+        val itemAfterSelectedListener: AdapterView.OnItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long,
+                ) {
+                    periodTwo = parent?.getItemAtPosition(position).toString()
+                    afterTimeArray.remove("--:--")
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        binding.afterTimeSpinner.onItemSelectedListener = itemAfterSelectedListener
+        if (binding.afterTimeSpinner.isFocused) {
+            spinnerAdapterAfter.notifyDataSetChanged()
+        }
+    }
+
     companion object {
         @JvmStatic
         fun newInstance() = CreateOrderFragment()
@@ -349,11 +381,130 @@ class CreateOrderFragment : BaseFragment(),
             calendar.set(year, monthOfYear, dayOfMonth)
             order.date = "${calendar.timeInMillis / 1000}"
             binding.tvTimeOrder.text = it
+            binding.tvTimeSetLogo.visibility = View.VISIBLE
+            binding.cvTimeSet.visibility = View.VISIBLE
+            dayOrder = SimpleDateFormat("dd.MM").format(Date(calendar.timeInMillis))
+            val calendarNow = Calendar.getInstance().timeInMillis / 1000
+            val dayNow = SimpleDateFormat("dd.MM").format(Date(calendarNow * 1000))
+            Timber.d("DATE ===== $dayNow, $dayOrder")
+            when (dayNow) {
+                dayOrder -> {
+                    val beforeTimeArray = mutableListOf(
+                        "9:00",
+                        "10:00",
+                        "11:00",
+                        "--:--",
+                    )
+                    val afterTimeArray = mutableListOf(
+                        "15:00",
+                        "--:--",
+                    )
+                    val spinnerBeforeTimeAdapter = ArrayAdapter(this.requireContext(),
+                        R.layout.spinner_item_layout_resource,
+                        R.id.TextView,
+                        beforeTimeArray
+                    )
+                    val spinnerAfterTimeAdapter = ArrayAdapter(this.requireContext(),
+                        R.layout.spinner_item_layout_resource,
+                        R.id.TextView,
+                        afterTimeArray
+                    )
+                    setPeriodTime(spinnerBeforeTimeAdapter, spinnerAfterTimeAdapter, beforeTimeArray, 3, afterTimeArray, 1)
+                }
+                else -> {
+                    val beforeTimeArray = mutableListOf(
+                        "9:00",
+                        "10:00",
+                        "11:00",
+                        "17:00",
+                        "19:00",
+                        "--:--",
+                    )
+                    val afterTimeArray = mutableListOf(
+                        "15:00",
+                        "16:00",
+                        "17:00",
+                        "22:00",
+                        "--:--",
+                    )
+                    val spinnerBeforeTimeAdapter = ArrayAdapter(this.requireContext(),
+                        R.layout.spinner_item_layout_resource,
+                        R.id.TextView,
+                        beforeTimeArray
+                    )
+                    val spinnerAfterTimeAdapter = ArrayAdapter(this.requireContext(),
+                        R.layout.spinner_item_layout_resource,
+                        R.id.TextView,
+                        afterTimeArray
+                    )
+                    setPeriodTime(spinnerBeforeTimeAdapter, spinnerAfterTimeAdapter, beforeTimeArray, 5, afterTimeArray, 4)
+                }
+            }
+            Timber.d("ORDER DATE = ${dayOrder}")
         } else "$dayOfMonth.0${monthOfYear + 1}.$year".also {
             val calendar = Calendar.getInstance()
             calendar.set(year, monthOfYear, dayOfMonth)
             order.date = "${calendar.timeInMillis / 1000}"
             binding.tvTimeOrder.text = it
+            binding.tvTimeLogo.visibility = View.VISIBLE
+            binding.cvTimeSet.visibility = View.VISIBLE
+            dayOrder = SimpleDateFormat("dd.MM").format(Date(calendar.timeInMillis))
+            val calendarNow = Calendar.getInstance().timeInMillis / 1000
+            val dayNow = SimpleDateFormat("dd.MM").format(Date(calendarNow * 1000))
+            Timber.d("DATE ===== $dayNow, $dayOrder")
+            when (dayNow) {
+                dayOrder -> {
+                    val beforeTimeArray = mutableListOf(
+                        "9:00",
+                        "10:00",
+                        "11:00",
+                        "--:--",
+                    )
+                    val afterTimeArray = mutableListOf(
+                        "15:00",
+                        "--:--",
+                    )
+                    val spinnerBeforeTimeAdapter = ArrayAdapter(this.requireContext(),
+                        R.layout.spinner_item_layout_resource,
+                        R.id.TextView,
+                        beforeTimeArray
+                    )
+                    val spinnerAfterTimeAdapter = ArrayAdapter(this.requireContext(),
+                        R.layout.spinner_item_layout_resource,
+                        R.id.TextView,
+                        afterTimeArray
+                    )
+                    setPeriodTime(spinnerBeforeTimeAdapter, spinnerAfterTimeAdapter, beforeTimeArray, 3, afterTimeArray, 1)
+                }
+                else -> {
+                    val beforeTimeArray = mutableListOf(
+                        "9:00",
+                        "10:00",
+                        "11:00",
+                        "17:00",
+                        "19:00",
+                        "--:--",
+                    )
+                    val afterTimeArray = mutableListOf(
+                        "15:00",
+                        "16:00",
+                        "17:00",
+                        "22:00",
+                        "--:--",
+                    )
+                    val spinnerBeforeTimeAdapter = ArrayAdapter(this.requireContext(),
+                        R.layout.spinner_item_layout_resource,
+                        R.id.TextView,
+                        beforeTimeArray
+                    )
+                    val spinnerAfterTimeAdapter = ArrayAdapter(this.requireContext(),
+                        R.layout.spinner_item_layout_resource,
+                        R.id.TextView,
+                        afterTimeArray
+                    )
+                    setPeriodTime(spinnerBeforeTimeAdapter, spinnerAfterTimeAdapter, beforeTimeArray, 5, afterTimeArray, 4)
+                }
+            }
         }
     }
 }

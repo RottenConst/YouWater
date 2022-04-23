@@ -41,7 +41,7 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
         binding.rvBasketList.adapter = adapterBasketList
         viewModel.getBasket()
 //        binding.btnCheckoutOrder.isEnabled = false
-        viewModel.productsList.observe(viewLifecycleOwner, { products ->
+        viewModel.productsList.observe(viewLifecycleOwner) { products ->
             adapterBasketList.submitList(products)
             binding.btnCheckoutOrder.isEnabled = products.isNotEmpty() && products != null
             var priceTotal = 0
@@ -51,12 +51,14 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
             var discount = 0
             var price = 0
             products.forEach { product ->
-                val prices = product.price.removeSuffix(";") //тут я убираю последнюю точку с запятой что б null'a не было
+                val prices =
+                    product.price.removeSuffix(";") //тут я убираю последнюю точку с запятой что б null'a не было
                 val priceList = prices.split(";") //делю на массив по ;
                 val count = product.count //количество товара узнаю
                 if (product.category == 1) {
                     priceList.forEach {
-                        val priceCount = it.split(":") //дальше уже узнаю цены и сравниваю с количеством
+                        val priceCount =
+                            it.split(":") //дальше уже узнаю цены и сравниваю с количеством
                         if (priceCount[0].toInt() <= count) {
                             discount = (priceCount[1].toInt() - 15) * count
                             price = priceCount[1].toInt() * count
@@ -65,7 +67,8 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
                     priceCompleteDiscount += discount
                 } else {
                     priceList.forEach {
-                        val priceCount = it.split(":") //дальше уже узнаю цены и сравниваю с количеством
+                        val priceCount =
+                            it.split(":") //дальше уже узнаю цены и сравниваю с количеством
                         if (priceCount[0].toInt() <= count) {
                             price = priceCount[1].toInt() * count
                         }
@@ -79,7 +82,7 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
             "${priceDiscountTotal}₽".also { binding.tvSumComplete.text = it }
             "${priceTotal}₽".also { binding.tvSumOrder.text = it }
 
-        })
+        }
         binding.btnCheckoutOrder.setOnClickListener {
             this.findNavController().navigate(
                 BasketFragmentDirections.actionBasketFragmentToCreateOrderFragment()
@@ -94,7 +97,7 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
     }
 
     override fun addProduct(product: Product) {
-        viewModel.addCountProduct(product)
+        viewModel.addProductInBasket(product)
         viewModel.getBasket()
     }
 

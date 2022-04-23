@@ -183,4 +183,9 @@
         <item>Оплата наличными</item>
     </string-array>
 
+    <string name="price_list_logo">Прайс лист</string>
+    <string name="image_product">Изображение товара</string>
+    <string name="add_product_text">Добавить количество к покупке</string>
+    <string name="delete_product_text">Убрать количество к покупке</string>
+    <string name="add_product_to_basket">Добавить в корзину</string>
 </resources>

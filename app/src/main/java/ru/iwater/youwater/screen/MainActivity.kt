@@ -84,6 +84,7 @@ class MainActivity : BaseActivity() {
             true
         }
 
+        visibilityActionBar(navController, toolbar)
         visibilityNavElements(navController, binding)
 
         binding.navView.setNavigationItemSelectedListener { menuItem ->
@@ -141,6 +142,16 @@ class MainActivity : BaseActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun visibilityActionBar(navController: NavController, toolbar: Toolbar) {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when(destination.id) {
+                R.id.completeOrderFragment,
+                R.id.cardPaymentFragment -> toolbar.visibility = View.GONE
+                else -> toolbar.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun visibilityNavElements(navController: NavController, binding: MainLayoutBinding) {

@@ -17,6 +17,7 @@ data class OrderFromCRM(
     val name: String,
     val notice: String,
     val order_cost: String,
+    val order_id: Int?,
     val payment_type: String,
     val period: String,
     val status: Int,

@@ -59,7 +59,7 @@ class CardPaymentFragment : BaseFragment() {
                 if (endUrl.contentEquals("http://605d3ea8e59a.ngrok.io/") || endUrl.contentEquals("https://605d3ea8e59a.ngrok.io")){
                     viewModel.getPaymentStatus(orderId)
                     binding.wvCardPayment.visibility = View.GONE
-                    findNavController().navigate(CardPaymentFragmentDirections.actionCardPaymentFragmentToCompleteOrderFragment(orderId))
+                    findNavController().navigate(CardPaymentFragmentDirections.actionCardPaymentFragmentToCompleteOrderFragment(orderId, true))
                 }
                 super.onPageStarted(view, url, favicon)
             }

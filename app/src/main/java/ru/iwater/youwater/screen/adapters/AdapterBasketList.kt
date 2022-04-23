@@ -16,30 +16,31 @@ class AdapterBasketList(
     ListAdapter<Product, AdapterBasketList.BasketHolder>(BasketProductDiffUtilCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasketHolder {
-        return BasketHolder.from(parent)
+        return BasketHolder.from(parent, onProductItemListener)
     }
 
     override fun onBindViewHolder(holder: BasketHolder, position: Int) {
         val product = getItem(position)
-        holder.bindingProduct(product, onProductItemListener)
+        holder.bindingProduct(product)
     }
 
 
     class BasketHolder(val binding: ItemBasketProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-            fun bindingProduct(product: Product, onProductItemListener: OnProductItemListener) {
+            fun bindingProduct(product: Product) {
                 binding.product = product
-                binding.productItemClick = onProductItemListener
+//                binding.productItemClick = onProductItemListener
                 binding.tvSumProduct.text = product.count.toString()
                 binding.tvSumDiscount.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
                 binding.executePendingBindings()
             }
 
             companion object {
-                fun from(parent: ViewGroup): BasketHolder {
+                fun from(parent: ViewGroup, onProductItemListener: OnProductItemListener): BasketHolder {
                     val layoutInflater = LayoutInflater.from(parent.context)
                     val binding = ItemBasketProductBinding.inflate(layoutInflater, parent, false)
+                    binding.productItemClick = onProductItemListener
                     return BasketHolder(binding)
                 }
             }
