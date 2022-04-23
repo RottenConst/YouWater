@@ -59,10 +59,10 @@ class CreateOrderFragment : BaseFragment(),
         binding.lifecycleOwner = this
         viewModel.client.observe(viewLifecycleOwner) {
             binding.tvNameClient.text = it.name
-            binding.tvTelNumber.text = it.contact
-            order.clientId = it.id
+            binding.tvTelNumber.text = it.phone
+            order.clientId = it.client_id
             order.name = it.name
-            order.contact = it.contact
+            order.contact = it.phone
         }
         viewModel.address.observe(viewLifecycleOwner) { listAddress ->
             if (!listAddress.isNullOrEmpty()) {

@@ -28,7 +28,7 @@ interface ApiWater {
         @Body jsonObject: JsonObject
     ): JsonObject?
 
-    @GET("iwaterClients_detail/{client_id}/")
+    @GET("get_client_info/{client_id}/")
     suspend fun getClientDetail(
         @Path("client_id") clientId: Int
     ): Client?
@@ -59,4 +59,9 @@ interface ApiWater {
         @Path("orderNumber") orderNumber: Int,
         @Body parameters: JsonObject,
     ): Response<JsonObject>
+
+    @GET("status_order/{order_id}/")
+    suspend fun getStatusOrder(
+        @Path("order_id") orderId: Int
+    ): Response<List<JsonObject>>
 }

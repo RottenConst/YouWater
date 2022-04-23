@@ -307,6 +307,27 @@ fun TextView.bindIdOrder(id: Int?) {
     if (id != null) text = id.toString()
 }
 
+@BindingAdapter("setOrderStatus")
+fun TextView.bindOrderStatus(status: Int) {
+    when {
+        status == 0 -> {
+            text = "Заказ принят"
+        }
+        status == 1 -> {
+            text = "Передан в доставку"
+        }
+        status == 2 -> {
+            text = "Заказ отменён"
+        }
+        status == 3 -> {
+            text = "Заказ доставлен"
+        }
+        status == 4 -> {
+            text = "Заказ перенесён"
+        }
+    }
+}
+
 @BindingAdapter("setAddress")
 fun TextView.bindAddressOrder(address: String?) {
     if (address != null) text = address

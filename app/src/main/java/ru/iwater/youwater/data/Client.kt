@@ -10,38 +10,20 @@ import com.google.gson.annotations.SerializedName
 data class Client(
     @SerializedName("id")
     val id: Int,
-    @SerializedName("type")
-    val type: Int,
-    @SerializedName("company_id")
-    val companyId: String,
     @SerializedName("name")
     val name: String,
     @SerializedName("client_id")
     val client_id: Int,
-    @SerializedName("region")
-    val region: String,
-    @SerializedName("address")
-    val address: String,
-    @SerializedName("fact_address")
-    val factAddress: String,
-    @SerializedName("address_full")
-    val addressFull: String,
-    @SerializedName("coords")
-    val coords: String,
-    @SerializedName("contact")
-    val contact: String,
-    @SerializedName("tanks")
-    val tanks: Int,
-    @SerializedName("for_delete")
-    val forDelete: Int,
-    @SerializedName("time_change")
-    val timeChange: Int,
-    @SerializedName("user_changing")
-    val userChanging: Int,
-    @SerializedName("avg_difference")
-    val avgDifference: String?,
-    @SerializedName("last_date")
-    val lastDate: String,
+    @SerializedName("lastname")
+    val lastname: String,
     @SerializedName("email")
-    val email: String
+    val email: String,
+    @SerializedName("session")
+    val session: String,
+    @SerializedName("phone")
+    val phone: String,
+    @SerializedName("city")
+    val city: String,
+    @SerializedName("address")
+    val address: String?
 )

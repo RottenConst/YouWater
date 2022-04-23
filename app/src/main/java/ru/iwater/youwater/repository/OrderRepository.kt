@@ -87,14 +87,29 @@ class OrderRepository @Inject constructor(
 
     suspend fun getAllOrder(clientId: Int): List<OrderFromCRM> {
         try {
-            val listOrder = apiAuth.getOrderClient(clientId)
+            val listOrder = apiAuth.getOrderClient(clientId)?.reversed()
             return if (listOrder.isNullOrEmpty()) {
                 emptyList()
-            } else listOrder
+            } else listOrder.take(15)
         } catch (e: Exception) {
             Timber.e("error get order: $e")
         }
         return emptyList()
+    }
+
+    suspend fun getStatusOrder(orderId: Int): Int? {
+        return try {
+            val statusOrder = apiAuth.getStatusOrder(orderId)
+            if (statusOrder.isSuccessful) {
+                Timber.d("Status order = ${statusOrder.body()?.get(0)?.get("status")}")
+                statusOrder.body()?.get(0)?.get("status")?.asInt
+            } else {
+                0
+            }
+        }catch (e: Exception) {
+            Timber.e("error get status order $e")
+            0
+        }
     }
 
     suspend fun saveMyOrder(myOrder: MyOrder) {

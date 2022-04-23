@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitFactory {
     const val AUTH_KEY = "3OSkO8gl.puTQf56Hi8BuTRFTpEDZyNjkkOFkvlPX"
-    const val BASE_URL = "http://api.iwatercrm.ru/iwater/" //test
-//    const val BASE_URL = "http://app.iwatercrm.ru/iwater/" //prod
+    const val BASE_URL = "https://api.iwatercrm.ru/iwater/" //test
+//    const val BASE_URL = "https://app.iwatercrm.ru/iwater/" //prod
 
     fun makeRetrofit(): ApiWater {
         val httpLoggingInterceptor = HttpLoggingInterceptor()

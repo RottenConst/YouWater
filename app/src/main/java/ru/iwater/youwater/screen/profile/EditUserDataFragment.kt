@@ -20,8 +20,6 @@ import java.util.*
 import javax.inject.Inject
 
 class EditUserDataFragment : BaseFragment() {
-    private var param1: String? = null
-    private var param2: String? = null
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
@@ -69,14 +67,14 @@ class EditUserDataFragment : BaseFragment() {
             if (lastName) {
                 //name
                 binding.tvEditName.text.clear()
-                binding.tvEditName.text = Editable.Factory.getInstance().newEditable(client.name.split(" ")[0])
+                binding.tvEditName.text = Editable.Factory.getInstance().newEditable(client.name)
                 //lastName
                 binding.tvEditLastname.text.clear()
                 binding.tvEditLastname.text =
-                    Editable.Factory.getInstance().newEditable(client.name.split(" ")[1])
+                    Editable.Factory.getInstance().newEditable(client.lastname)
                 //phone
                 binding.tvEditPhone.text.clear()
-                binding.tvEditPhone.text = Editable.Factory.getInstance().newEditable(client.contact)
+                binding.tvEditPhone.text = Editable.Factory.getInstance().newEditable(client.phone)
                 //email
                 binding.tvEditEmail.text.clear()
                 binding.tvEditEmail.text = Editable.Factory.getInstance().newEditable(client.email)
@@ -88,7 +86,7 @@ class EditUserDataFragment : BaseFragment() {
                 binding.tvEditLastname.text.clear()
                 //phone
                 binding.tvEditPhone.text.clear()
-                binding.tvEditPhone.text = Editable.Factory.getInstance().newEditable(client.contact)
+                binding.tvEditPhone.text = Editable.Factory.getInstance().newEditable(client.phone)
                 //email
                 binding.tvEditEmail.text.clear()
                 binding.tvEditEmail.text = Editable.Factory.getInstance().newEditable(client.email)
