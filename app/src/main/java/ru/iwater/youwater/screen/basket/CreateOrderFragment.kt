@@ -254,35 +254,27 @@ class CreateOrderFragment : BaseFragment(),
             order.period = "$periodOne - $periodTwo"
             Timber.d("PERIOD ${order.period}")
             if (binding.tvAddressOrder.text != "Выбрать адрес доставки" &&
-                binding.tvTimeOrder.text != "Укажите дату и время" &&
+                binding.tvTimeOrder.text != "Укажите дату" &&
                 periodOne != "--:--" &&
                 periodTwo != "--:--" &&
-                order.paymentType == "Оплата по карте курьеру" ||
+                order.paymentType == "Оплата по карте курьеру") {
+                viewModel.sendAndSaveOrder(order, product, addressString)
+                createOrder(viewModel)
+
+
+            }
+
+            else if (binding.tvAddressOrder.text != "Выбрать адрес доставки" &&
+                binding.tvTimeOrder.text != "Укажите дату" &&
+                periodOne != "--:--" &&
+                periodTwo != "--:--" &&
                 order.paymentType == "Оплата наличными") {
                 viewModel.sendAndSaveOrder(order, product, addressString)
-                viewModel.statusOrder.observe(this.viewLifecycleOwner) { status ->
-                    when (status) {
-                        Status.SEND -> {
-                            viewModel.numberOrder.observe(this.viewLifecycleOwner) { numberOrder ->
-                                viewModel.clearProduct(productClear)
-                                Toast.makeText(this.context, "Заявка отправлена", Toast.LENGTH_LONG)
-                                    .show()
-                                this.findNavController().navigate(
-                                    CreateOrderFragmentDirections.actionCreateOrderFragmentToCompleteOrderFragment(numberOrder, false)
-                                )
-                            }
-                        }
-                        else -> {
-                            Toast.makeText(this.context,
-                                "Ошибка, возвожно проблемы с интернетом",
-                                Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }
+                createOrder(viewModel)
+            }
 
-
-            } else if (binding.tvAddressOrder.text != "Выбрать адрес доставки" &&
-                binding.tvTimeOrder.text != "Укажите дату и время" &&
+            else if (binding.tvAddressOrder.text != "Выбрать адрес доставки" &&
+                binding.tvTimeOrder.text != "Укажите дату" &&
                 periodOne != "--:--" &&
                 periodTwo != "--:--" &&
                 order.paymentType == "Оплата по карте") {
@@ -314,6 +306,28 @@ class CreateOrderFragment : BaseFragment(),
             }
         }
         return binding.root
+    }
+
+    private fun createOrder(viewModel: OrderViewModel) {
+        viewModel.statusOrder.observe(this.viewLifecycleOwner) { status ->
+            when (status) {
+                Status.SEND -> {
+                    viewModel.numberOrder.observe(this.viewLifecycleOwner) { numberOrder ->
+                        viewModel.clearProduct(productClear)
+                        Toast.makeText(this.context, "Заявка отправлена", Toast.LENGTH_LONG)
+                            .show()
+                        this.findNavController().navigate(
+                            CreateOrderFragmentDirections.actionCreateOrderFragmentToCompleteOrderFragment(numberOrder, false)
+                        )
+                    }
+                }
+                else -> {
+                    Toast.makeText(this.context,
+                        "Ошибка, возвожно проблемы с интернетом",
+                        Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     private fun setPeriodTime(
