@@ -87,7 +87,7 @@ class OrderRepository @Inject constructor(
 
     suspend fun getAllOrder(clientId: Int): List<OrderFromCRM> {
         try {
-            val listOrder = apiAuth.getOrderClient(clientId)?.reversed()
+            val listOrder = apiAuth.getOrderClient(clientId)
             return if (listOrder.isNullOrEmpty()) {
                 emptyList()
             } else listOrder.take(15)
