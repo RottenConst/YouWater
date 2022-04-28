@@ -3,8 +3,6 @@ package ru.iwater.youwater.screen.profile
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationRequest
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -14,39 +12,36 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
-import com.google.android.gms.tasks.CancellationToken
+import com.google.gson.JsonObject
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.Address
 import ru.iwater.youwater.data.AddressResult
 import ru.iwater.youwater.data.AddressViewModel
+import ru.iwater.youwater.data.StatusSendData
 import ru.iwater.youwater.databinding.FragmentAddAddressBinding
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 class AddAddressFragment : BaseFragment(), GoogleMap.OnPoiClickListener {
-
-    private var param1: String? = null
-    private var param2: String? = null
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     private val viewModel: AddressViewModel by viewModels { factory }
     private val screenComponent = App().buildScreenComponent()
 
-    private lateinit var lastLocation: Location
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var clientId = 0
 
     val binding: FragmentAddAddressBinding by lazy {
         FragmentAddAddressBinding.inflate(
@@ -84,6 +79,11 @@ class AddAddressFragment : BaseFragment(), GoogleMap.OnPoiClickListener {
             }
             return@setOnKeyListener false
         }
+
+        viewModel.client.observe(this.viewLifecycleOwner) {
+            clientId = this.id
+        }
+
         viewModel.addressResult.observe(this.viewLifecycleOwner) {
             if (it != null) {
                 val addressList = it.results[0].formatted_address.split(", ")
@@ -104,6 +104,10 @@ class AddAddressFragment : BaseFragment(), GoogleMap.OnPoiClickListener {
         binding.btnSaveAddress.setOnClickListener {
             if (!binding.etHome.text.isNullOrEmpty()) {
                 if (addressSave != null) {
+                    val sdf = SimpleDateFormat("dd.MM.yyyy")
+                    val date = sdf.format(Calendar.getInstance().time)
+                    val clientData = JsonObject()
+
                     val address = Address(
                         addressSave!!.results[0].address_components[2].short_name,
                         addressSave!!.results[0].address_components[1].long_name.removeSuffix(" улица"),
@@ -119,10 +123,27 @@ class AddAddressFragment : BaseFragment(), GoogleMap.OnPoiClickListener {
                             binding.etApartment.text.toString().toInt()
                         } else null,
                         binding.etNote.text.toString())
+                    clientData.addProperty("region", address.region)
+                    clientData.addProperty("street", address.street)
+                    clientData.addProperty("house", address.house)
+                    clientData.addProperty("building", address.building)
+                    clientData.addProperty("entrance", address.entrance)
+                    clientData.addProperty("floor", address.floor)
+                    clientData.addProperty("flat", address.flat)
+                    clientData.addProperty("note", address.note)
+                    viewModel.createAutoTask(clientId, date, clientData)
                     viewModel.saveAddress(address)
-                    this.findNavController().navigate(
-                        AddAddressFragmentDirections.actionAddAddressFragmentToAddresessFragment()
-                    )
+                    viewModel.statusSend.observe(this.viewLifecycleOwner) { status ->
+                        when (status) {
+                            StatusSendData.SUCCESS -> {
+                                this.findNavController().navigate(
+                                    AddAddressFragmentDirections.actionAddAddressFragmentToAddresessFragment()
+                                )
+                            }
+                            else -> Toast.makeText(context, "Ошибка, данные не были отправлены", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
                 } else {
                     Toast.makeText(this.context, "Не был указан корректный адрес", Toast.LENGTH_LONG).show()
                 }

@@ -1,11 +1,8 @@
 package ru.iwater.youwater.repository
 
-import retrofit2.Retrofit
 import ru.iwater.youwater.bd.AddressDao
 import ru.iwater.youwater.bd.YouWaterDB
-import ru.iwater.youwater.data.Address
-import ru.iwater.youwater.data.AddressResult
-import ru.iwater.youwater.data.ClientUserData
+import ru.iwater.youwater.data.*
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.GoogleMapApi
@@ -84,4 +81,18 @@ class AddressRepository @Inject constructor(
             emptyList()
         }
     }
+
+    suspend fun getClientInfo(clientId: Int): Client? {
+        try {
+            val client = waterApi.getClientDetail(clientId)
+            if (client != null) {
+                return client
+            }
+        }catch (e: Exception) {
+            Timber.e("error get client: $e")
+        }
+        return null
+    }
+
+    fun getAuthClient(): AuthClient = authClient.get()
 }

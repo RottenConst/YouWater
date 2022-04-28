@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 
 @Keep
 data class AddressJson(
-    val building: String,
+    val building: String?,
     val entrance: Int,
     val flat: Int,
     val floor: Int,

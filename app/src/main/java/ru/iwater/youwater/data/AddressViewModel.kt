@@ -23,9 +23,19 @@ class AddressViewModel @Inject constructor(
     val addressResult: LiveData<AddressResult>
         get() = _addressResult
 
+    private val _client: MutableLiveData<Client> = MutableLiveData()
+    val client: LiveData<Client>
+        get() = _client
+
     private val _statusSend: MutableLiveData<StatusSendData> = MutableLiveData()
     val statusSend: LiveData<StatusSendData>
         get() = _statusSend
+
+    private val authClient = addressRepo.getAuthClient()
+
+    init {
+        getClientInfo()
+    }
 
     fun getPlace(place: String) {
         viewModelScope.launch {
@@ -45,20 +55,24 @@ class AddressViewModel @Inject constructor(
                 if (index % 2 != 0) {
                     val region = listAddress[index - 1].split(",")[0].removePrefix("\"")
                     val address = getAddressFromString(listAddress[index].split(","), region)
+                    var x = 0
                     addresses.add(address)
                     val savedAddress = addressRepo.getAddressList()
                     if (savedAddress.isNullOrEmpty()) {
                         saveAddress(address)
                     } else {
                         savedAddress.forEach {
-                            if (it.street != address.street && it.house != address.house && it.flat != address.flat) {
-                                saveAddress(address)
+                            if (it.street == address.street && it.house == address.house && it.flat == address.flat) {
+                                x++
                             }
                         }
                     }
+                    if (x == 0) {
+                        saveAddress(address)
+                    }
                 }
             }
-            _addressList.value = addresses
+            _addressList.value = addressRepo.getAddressList()
         }
     }
 
@@ -116,6 +130,15 @@ class AddressViewModel @Inject constructor(
         return if (buildingList[1] == "корп." || buildingList[1] == "ст." && building.isNotEmpty()) {
             buildingList[2].removeSuffix("\"")
         } else building
+    }
+
+    private fun getClientInfo() {
+        viewModelScope.launch {
+            val client = addressRepo.getClientInfo(authClient.clientId)
+            if (client != null) {
+                _client.value = client
+            }
+        }
     }
 
     fun getInfoOnAddress(addressString: String) {
