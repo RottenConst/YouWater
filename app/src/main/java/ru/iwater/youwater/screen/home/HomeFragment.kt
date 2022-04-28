@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -16,13 +15,7 @@ import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.FragmentHomeBinding
 import ru.iwater.youwater.screen.adapters.AdapterProductList
 import ru.iwater.youwater.screen.adapters.CatalogWaterAdapter
-import ru.iwater.youwater.screen.basket.BasketFragment
 import javax.inject.Inject
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * Фрагмент для домашнего экрана
@@ -45,15 +38,18 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        viewModel.refreshProduct()
         val adapterWatter = CatalogWaterAdapter(CatalogWaterAdapter.OnClickListener{
             if (!it.onFavoriteClick) {
                 viewModel.deleteFavoriteProduct(it)
             } else {
                 viewModel.addProductInFavorite(it)
                 Snackbar.make(binding.frameHome, "Товар ${it.app_name} добавлен в избранное", Snackbar.LENGTH_LONG)
-                    .setAction("Избранное", View.OnClickListener {
-                        this.findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToFavoriteFragment())
-                    }).show()
+                    .setAction("Избранное") {
+                        this.findNavController()
+                            .navigate(HomeFragmentDirections.actionHomeFragmentToFavoriteFragment())
+                    }.show()
+
             }
         }, this)
         binding.rvTypeProductList.adapter = adapterWatter
@@ -68,9 +64,6 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
                 )
                 viewModel.displayProductComplete()
             }
-        }
-
-        viewModel.productLiveData.observe(viewLifecycleOwner) {
         }
         return binding.root
     }
@@ -90,12 +83,6 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        fun newInstance() = HomeFragment()
     }
 }

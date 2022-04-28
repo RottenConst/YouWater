@@ -25,9 +25,6 @@ class CatalogListViewModel @Inject constructor(
     private val _catalogList: MutableLiveData<List<TypeProduct>> = MutableLiveData()
     val catalogList: LiveData<List<TypeProduct>> get() = _catalogList
 
-    private val _productLiveData: MutableLiveData<List<Product>> = MutableLiveData()
-    val productLiveData: LiveData<List<Product>> get() = _productLiveData
-
     private val _navigateToSelectCategory: MutableLiveData<TypeProduct> = MutableLiveData()
     val navigateToSelectCategory: LiveData<TypeProduct>
         get() = _navigateToSelectCategory
@@ -36,13 +33,10 @@ class CatalogListViewModel @Inject constructor(
     val navigateToSelectProduct: LiveData<Int>
         get() = _navigateToSelectProduct
 
-    init {
-        viewModelScope.launch {
-            catalogs.addAll(productRepo.getCategoryList())
-            _catalogList.value = catalogs
-            getFavoriteProduct()
-            getAllProducts(catalogs)
-        }
+
+    override fun onCleared() {
+        super.onCleared()
+        catalogClear()
     }
 
     private suspend fun getAllProducts(catalogs: List<TypeProduct>) {
@@ -78,6 +72,20 @@ class CatalogListViewModel @Inject constructor(
         viewModelScope.launch {
             productRepo.getAllFavoriteProducts()?.let { favoriteProducts.addAll(it) }
         }
+    }
+
+    fun refreshProduct() {
+        viewModelScope.launch {
+            _catalogProductMap.value = emptyMap()
+            catalogs.addAll(productRepo.getCategoryList())
+            _catalogList.value = catalogs
+            getFavoriteProduct()
+            getAllProducts(catalogs)
+        }
+    }
+
+    private fun catalogClear() {
+        _catalogProductMap.value = emptyMap()
     }
 
 
