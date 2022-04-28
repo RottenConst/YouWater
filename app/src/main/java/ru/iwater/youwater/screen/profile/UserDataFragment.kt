@@ -2,8 +2,6 @@ package ru.iwater.youwater.screen.profile
 
 import android.os.Bundle
 import android.view.*
-import androidx.core.view.get
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -45,14 +43,14 @@ class UserDataFragment : BaseFragment() {
             }
             if (lastName) {
                 binding.tvName.text = client.name
-                binding.tvLastname.text = client.lastname
+                binding.tvLastname.text = if (client.lastname != "NULL") client.lastname else ""
                 binding.tvPhone.text = client.phone
-                binding.tvEmail.text = client.email
+                binding.tvEmail.text = if (client.email != "NULL") client.email else ""
             } else {
                 binding.tvName.text = client.name
-                binding.tvLastname.text = client.lastname
+                binding.tvLastname.text = if (client.lastname != "NULL") client.lastname else ""
                 binding.tvPhone.text = client.phone
-                binding.tvEmail.text = client.email
+                binding.tvEmail.text = if (client.email != "NULL") client.email else ""
             }
         }
         return binding.root
