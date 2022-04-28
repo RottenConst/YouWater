@@ -209,11 +209,51 @@ class OrderViewModel @Inject constructor(
             _statusLoad.value = OrderLoadStatus.LOADING
             if (listOrderCRM.isNotEmpty()){
                 listOrderCRM.forEach { order ->
-                    val address = when {
-                        order.address_json.entrance == null -> "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house})"
-                        order.address_json.floor == null -> "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance}"
-                        order.address_json.flat == null -> "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance} этаж${order.address_json.floor}"
-                        else -> "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance} этаж${order.address_json.floor} кв.${order.address_json.flat}"
+                    var address = ""
+                    when {
+                        order.address_json.building == null -> {
+                            if (order.address_json.entrance == 0 && order.address_json.floor == 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house}"
+                            } else if (order.address_json.entrance == 0 && order.address_json.floor == 0 && order.address_json.flat != 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} кв.${order.address_json.flat}"
+                            } else if (order.address_json.entrance == 0 && order.address_json.floor != 0 && order.address_json.flat == 0){
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} этаж${order.address_json.floor}"
+                            } else if (order.address_json.entrance != 0 && order.address_json.floor == 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance}"
+                            } else if (order.address_json.entrance == 0 && order.address_json.floor != 0 && order.address_json.flat != 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} этаж${order.address_json.floor} кв.${order.address_json.flat}"
+                            } else if (order.address_json.entrance != 0 && order.address_json.floor == 0 && order.address_json.flat != 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance} кв.${order.address_json.flat}"
+                            }
+                        }
+                        order.address_json.entrance == 0 -> {
+                            if (order.address_json.building.isEmpty() && order.address_json.floor == 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house}"
+                            } else if (order.address_json.building.isEmpty() && order.address_json.floor == 0 && order.address_json.flat != 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} кв.${order.address_json.flat}"
+                            } else if (order.address_json.building.isEmpty() && order.address_json.floor != 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} этаж${order.address_json.floor}"
+                            } else if (order.address_json.building.isNotEmpty() && order.address_json.floor == 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} ст. ${order.address_json.building}"
+                            } else if (order.address_json.building.isNotEmpty() && order.address_json.floor != 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} ст. ${order.address_json.building} этаж${order.address_json.floor}"
+                            } else if (order.address_json.building.isNotEmpty() && order.address_json.floor == 0 && order.address_json.flat != 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} ст. ${order.address_json.building} кв. ${order.address_json.flat}"
+                            }
+                        }
+                        order.address_json.floor == 0 -> {
+                            if (order.address_json.flat == 0 && order.address_json.building.isEmpty()) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance}"
+                            } else if (order.address_json.flat == 0 && order.address_json.building.isNotEmpty()){
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} ст. ${order.address_json.building} подьезд ${order.address_json.entrance}"
+                            } else if (order.address_json.flat != 0 && order.address_json.building.isEmpty()) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance} кв.${order.address_json.flat}"
+                            } else if (order.address_json.flat != 0 && order.address_json.building.isNotEmpty()) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} ст. ${order.address_json.building} подьезд ${order.address_json.entrance} кв.${order.address_json.flat}"
+                            }
+                        }
+                        order.address_json.flat == 0 -> address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance} этаж${order.address_json.floor}"
+                        else -> address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} cт.${order.address_json.building} подьезд ${order.address_json.entrance} этаж${order.address_json.floor} кв.${order.address_json.flat}"
                     }
                     val listProduct = mutableListOf<Product>()
                     order.water_equip.forEach {
@@ -256,11 +296,51 @@ class OrderViewModel @Inject constructor(
             val myOrder = mutableListOf<MyOrder>()
             if (orderFromCrm.isNotEmpty()) {
                 orderFromCrm.forEach { order ->
-                    val address = when {
-                        order.address_json.entrance == null -> "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house})"
-                        order.address_json.floor == null -> "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance}"
-                        order.address_json.flat == null -> "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance} этаж${order.address_json.floor}"
-                        else -> "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance} этаж${order.address_json.floor} кв.${order.address_json.flat}"
+                    var address = ""
+                    when {
+                        order.address_json.building == null -> {
+                            if (order.address_json.entrance == 0 && order.address_json.floor == 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house}"
+                            } else if (order.address_json.entrance == 0 && order.address_json.floor == 0 && order.address_json.flat != 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} кв.${order.address_json.flat}"
+                            } else if (order.address_json.entrance == 0 && order.address_json.floor != 0 && order.address_json.flat == 0){
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} этаж${order.address_json.floor}"
+                            } else if (order.address_json.entrance != 0 && order.address_json.floor == 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance}"
+                            } else if (order.address_json.entrance == 0 && order.address_json.floor != 0 && order.address_json.flat != 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} этаж${order.address_json.floor} кв.${order.address_json.flat}"
+                            } else if (order.address_json.entrance != 0 && order.address_json.floor == 0 && order.address_json.flat != 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance} кв.${order.address_json.flat}"
+                            }
+                        }
+                        order.address_json.entrance == 0 -> {
+                            if (order.address_json.building.isEmpty() && order.address_json.floor == 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house}"
+                            } else if (order.address_json.building.isEmpty() && order.address_json.floor == 0 && order.address_json.flat != 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} кв.${order.address_json.flat}"
+                            } else if (order.address_json.building.isEmpty() && order.address_json.floor != 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} этаж${order.address_json.floor}"
+                            } else if (order.address_json.building.isNotEmpty() && order.address_json.floor == 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} ст. ${order.address_json.building}"
+                            } else if (order.address_json.building.isNotEmpty() && order.address_json.floor != 0 && order.address_json.flat == 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} ст. ${order.address_json.building} этаж${order.address_json.floor}"
+                            } else if (order.address_json.building.isNotEmpty() && order.address_json.floor == 0 && order.address_json.flat != 0) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} ст. ${order.address_json.building} кв. ${order.address_json.flat}"
+                            }
+                        }
+                        order.address_json.floor == 0 -> {
+                            if (order.address_json.flat == 0 && order.address_json.building.isEmpty()) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance}"
+                            } else if (order.address_json.flat == 0 && order.address_json.building.isNotEmpty()){
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} ст. ${order.address_json.building} подьезд ${order.address_json.entrance}"
+                            } else if (order.address_json.flat != 0 && order.address_json.building.isEmpty()) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance} кв.${order.address_json.flat}"
+                            } else if (order.address_json.flat != 0 && order.address_json.building.isNotEmpty()) {
+                                address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} ст. ${order.address_json.building} подьезд ${order.address_json.entrance} кв.${order.address_json.flat}"
+                            }
+                        }
+                        order.address_json.flat == 0 -> address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} подьезд ${order.address_json.entrance} этаж${order.address_json.floor}"
+                        else -> address = "${order.address_json.region} ул.${order.address_json.street} д.${order.address_json.house} cт.${order.address_json.building} подьезд ${order.address_json.entrance} этаж${order.address_json.floor} кв.${order.address_json.flat}"
                     }
                     val listProduct = mutableListOf<Product>()
                     order.water_equip.forEach {
