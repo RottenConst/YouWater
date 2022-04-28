@@ -65,6 +65,7 @@ class CreateOrderFragment : BaseFragment(),
             order.clientId = it.client_id
             order.name = it.name
             order.contact = it.phone
+            if (it.email.isNotEmpty()) order.email = it.email
         }
         viewModel.address.observe(viewLifecycleOwner) { listAddress ->
             if (!listAddress.isNullOrEmpty()) {
@@ -132,7 +133,13 @@ class CreateOrderFragment : BaseFragment(),
                                 addProperty("flat", listAddress[witch].flat)
                             }
                             addressString = addresses[witch]
-                            dialog.cancel()
+                            order.address = addresses[witch]
+                            if (!listAddress[witch].note.isNullOrEmpty()) order.notice = listAddress[witch].note
+//                            dialog.cancel()
+                        }
+                        .setTitle("Выбирите адрес")
+                        .setPositiveButton(R.string.yes) { dialogInterface, _ ->
+                            dialogInterface.cancel()
                         }
                         .create().show()
                 }
@@ -216,7 +223,7 @@ class CreateOrderFragment : BaseFragment(),
             val typesOfPay = mutableListOf(
                 "Оплата по карте курьеру",
                 "Оплата наличными",
-                "Оплата по карте",
+//                "Оплата по карте",
                 "Выберите способ оплаты",
             )
 
@@ -227,7 +234,7 @@ class CreateOrderFragment : BaseFragment(),
                     typesOfPay)
 
             binding.spinnerPaymentType.adapter = spinnerAdapter
-            binding.spinnerPaymentType.setSelection(3)
+            binding.spinnerPaymentType.setSelection(2)
             //выбор способа оплаты
             val itemTypePeySelectedListener: AdapterView.OnItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
@@ -238,7 +245,7 @@ class CreateOrderFragment : BaseFragment(),
                         id: Long,
                     ) {
                         order.paymentType = parent?.getItemAtPosition(position).toString()
-                        if (order.paymentType == "Оплата по карте") binding.btnCreateOrder.text = "Перейти к оплате"
+//                        if (order.paymentType == "Оплата по карте") binding.btnCreateOrder.text = "Перейти к оплате"
                         typesOfPay.remove("Выберите способ оплаты")
                     }
 
@@ -251,7 +258,7 @@ class CreateOrderFragment : BaseFragment(),
             }
         }
         binding.btnCreateOrder.setOnClickListener {
-            order.period = "$periodOne - $periodTwo"
+            order.period = "$periodOne-$periodTwo"
             Timber.d("PERIOD ${order.period}")
             if (binding.tvAddressOrder.text != "Выбрать адрес доставки" &&
                 binding.tvTimeOrder.text != "Укажите дату" &&
@@ -302,7 +309,7 @@ class CreateOrderFragment : BaseFragment(),
                 }
             } else {
                 Timber.d("${order.period}, ${order.paymentType}")
-                Toast.makeText(this.context, "Укажите время и тип оплаты", Toast.LENGTH_LONG).show()
+                Toast.makeText(this.context, "Уточните основные данные: адрес, время, тип оплаты", Toast.LENGTH_LONG).show()
             }
         }
         return binding.root
