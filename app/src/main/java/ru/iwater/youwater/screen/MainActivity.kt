@@ -1,26 +1,33 @@
 package ru.iwater.youwater.screen
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.RingtoneManager
+import android.os.Build
 import android.os.Bundle
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.navigation.findNavController
-import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import com.google.firebase.messaging.RemoteMessage
+import com.pusher.pushnotifications.*
+import com.pusher.pushnotifications.auth.AuthData
+import com.pusher.pushnotifications.auth.AuthDataGetter
+import com.pusher.pushnotifications.auth.BeamsTokenProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,8 +37,7 @@ import ru.iwater.youwater.base.BaseActivity
 import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.databinding.MainLayoutBinding
 import ru.iwater.youwater.repository.AuthorisationRepository
-import ru.iwater.youwater.screen.home.HomeFragmentDirections
-import ru.iwater.youwater.screen.profile.UserDataFragment
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : BaseActivity() {
