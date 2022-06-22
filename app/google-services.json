@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "771710121568",
+    "project_id": "yourwater-34713",
+    "storage_bucket": "yourwater-34713.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771710121568:android:35210873c595424110f505",
+        "android_client_info": {
+          "package_name": "ru.iwater.youwater"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771710121568-nv244bikr8fv7vt9800qokf61q9vrtgf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.iwater.youwater",
+            "certificate_hash": "31a64c78222057fb24586663308b5b297d0f3a05"
+          }
+        },
+        {
+          "client_id": "771710121568-cmtll4jasmh7io3ocq8dr829pii3ronp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeue70VIwLNnh9u0XTMVfPjvSTnrs8g9Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771710121568-cmtll4jasmh7io3ocq8dr829pii3ronp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

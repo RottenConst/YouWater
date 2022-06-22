@@ -17,6 +17,12 @@
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
         android:theme="@style/Theme.YouWater">
+        <service android:name=".utils.NotificationsMessagingService"
+            android:exported="false">
+            <intent-filter android:priority="1">
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

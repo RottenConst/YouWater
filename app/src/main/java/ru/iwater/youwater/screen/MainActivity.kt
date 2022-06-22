@@ -40,6 +40,20 @@ class MainActivity : BaseActivity() {
     lateinit var authRepository: AuthorisationRepository
     private val screenComponent = App().buildScreenComponent()
 
+    private val authURLString = "http://docs.iwatercrm.ru:8080/pusher/beams-auth"
+    private val authToken = "mN#h8MjPw3KJ!vi"
+    private val tokenProvider = BeamsTokenProvider(
+        authURLString,
+        object: AuthDataGetter {
+            override fun getAuthData(): AuthData {
+                return AuthData(
+                    headers = hashMapOf("X-Key" to authToken),
+                    queryParams = hashMapOf()
+                )
+            }
+        }
+    )
+
     private val appBarConfiguration by lazy {
         AppBarConfiguration(
             setOf(
@@ -114,6 +128,60 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        PushNotifications.setUserId(
+            "user-${authRepository.getAuthClient().clientId}",
+            tokenProvider,
+            object: BeamsCallback<Void, PusherCallbackError> {
+                override fun onFailure(error: PusherCallbackError) {
+                    Timber.e("Could not login to Beams: ${error.message}")
+                }
+
+                override fun onSuccess(vararg values: Void) {
+                    Timber.d("Beams login success")
+                    PushNotifications.setOnMessageReceivedListenerForVisibleActivity(this@MainActivity, object : PushNotificationReceivedListener {
+                        override fun onMessageReceived(remoteMessage: RemoteMessage) {
+                            val messagePayload = remoteMessage.data
+//                            if (messagePayload.isNotEmpty()) {
+//                                Timber.d("Error")
+//                            } else {
+                                val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                val pendingIntent = PendingIntent.getActivity(baseContext, 0 /* Request code */, intent,
+                                    PendingIntent.FLAG_ONE_SHOT)
+
+                                val channelId = getString(R.string.default_notification_channel_id)
+                                val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                                val notificationBuilder = NotificationCompat.Builder(baseContext, channelId)
+                                    .setSmallIcon(R.drawable.ic_youwater_logo)
+                                    .setContentTitle(remoteMessage.notification?.title)
+                                    .setContentText(remoteMessage.notification?.body)
+                                    .setAutoCancel(true)
+                                    .setWhen(System.currentTimeMillis())
+                                    .setSound(defaultSoundUri)
+                                    .setContentIntent(pendingIntent)
+
+
+                                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                                // Since android Oreo notification channel is needed.
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    val channel = NotificationChannel(channelId,
+                                        "hello",
+                                        NotificationManager.IMPORTANCE_DEFAULT)
+                                    channel.enableVibration(true)
+                                    notificationManager.createNotificationChannel(channel)
+                                }
+
+                                notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
+//                            }
+                        }
+                    })
+                }
+            }
+        )
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return super.onCreateOptionsMenu(menu)
@@ -133,6 +201,7 @@ class MainActivity : BaseActivity() {
                         CoroutineScope(Dispatchers.Default).launch {
                             YouWaterDB.getYouWaterDB(applicationContext)?.clearAllTables()
                         }
+                        PushNotifications.clearAllState()
                         authRepository.deleteClient()
                         startActivity(intent)
                     }

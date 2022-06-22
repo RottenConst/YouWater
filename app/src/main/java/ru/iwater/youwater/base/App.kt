@@ -1,6 +1,7 @@
 package ru.iwater.youwater.base
 
 import android.app.Application
+import com.pusher.pushnotifications.PushNotifications
 import ru.iwater.youwater.di.ContextModule
 import ru.iwater.youwater.di.DataBaseModule
 import ru.iwater.youwater.di.components.AppComponent
@@ -15,10 +16,14 @@ class App() : Application() {
         lateinit var appComponent: AppComponent
     }
 
+    private val instanceID = "60f03696-9ffd-4b38-95ea-910ad9b90d3a"
+
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
         initAppComponent()
+        PushNotifications.start(applicationContext, instanceID)
+        PushNotifications.addDeviceInterest("hello")
     }
 
     private fun initAppComponent() {
