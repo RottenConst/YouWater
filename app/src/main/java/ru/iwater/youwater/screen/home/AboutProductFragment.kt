@@ -68,6 +68,15 @@ class AboutProductFragment : BaseFragment() {
                     }.show()
             }
         }
+
+        binding.ibGetPrice.setOnClickListener {
+            viewModel.product.observe(this.viewLifecycleOwner) {
+                val priceProduct = it.price
+                this.findNavController()
+                    .navigate(AboutProductFragmentDirections.actionAboutProductFragmentToPriceBottomSheetFragment(priceProduct))
+            }
+
+        }
         return binding.root
     }
 

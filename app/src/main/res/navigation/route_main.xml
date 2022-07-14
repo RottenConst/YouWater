@@ -96,6 +96,9 @@
             app:destination="@id/basketFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_aboutProductFragment_to_priceBottomSheetFragment"
+            app:destination="@id/priceBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/userDataFragment"
@@ -235,6 +238,14 @@
             android:name="isPaid"
             app:argType="boolean" />
     </fragment>
+    <dialog
+        android:id="@+id/priceBottomSheetFragment"
+        android:name="ru.iwater.youwater.screen.home.PriceBottomSheetFragment"
+        android:label="PriceBottomSheetFragment" >
+        <argument
+            android:name="price_product"
+            app:argType="string" />
+    </dialog>
 
 
 </navigation>
