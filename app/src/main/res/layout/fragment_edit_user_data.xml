@@ -50,7 +50,8 @@
                 android:text="@string/last_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_edit_name" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_edit_name"
+                tools:visibility="gone" />
 
             <EditText
                 android:id="@+id/tv_edit_lastname"

@@ -20,6 +20,8 @@ class UserDataFragment : BaseFragment() {
     private val viewModel: ClientProfileViewModel by viewModels { factory }
     private val screenComponent = App().buildScreenComponent()
 
+    private val binding by lazy { FragmentUserDataBinding.inflate(LayoutInflater.from(this.context)) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         screenComponent.inject(this)
@@ -30,28 +32,13 @@ class UserDataFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentUserDataBinding.inflate(inflater)
+//        val binding = FragmentUserDataBinding.inflate(inflater)
+        binding.lifecycleOwner = this
+        binding.clientVM = viewModel
         val sendUserData = UserDataFragmentArgs.fromBundle(this.requireArguments()).userDataSend
         Timber.d("USER SEND DATA $sendUserData")
         if (sendUserData) {
             binding.tvEditUserData.visibility = View.VISIBLE
-        }
-        viewModel.client.observe(viewLifecycleOwner) { client ->
-            var lastName = false
-            client.name.forEach {
-                if (it.isWhitespace()) lastName = true
-            }
-            if (lastName) {
-                binding.tvName.text = client.name
-                binding.tvLastname.text = if (client.lastname != "NULL") client.lastname else ""
-                binding.tvPhone.text = client.phone
-                binding.tvEmail.text = if (client.email != "NULL") client.email else ""
-            } else {
-                binding.tvName.text = client.name
-                binding.tvLastname.text = if (client.lastname != "NULL") client.lastname else ""
-                binding.tvPhone.text = client.phone
-                binding.tvEmail.text = if (client.email != "NULL") client.email else ""
-            }
         }
         return binding.root
     }

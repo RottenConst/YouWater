@@ -10,10 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.Address
-import ru.iwater.youwater.data.BankCard
-import ru.iwater.youwater.data.Product
-import ru.iwater.youwater.data.TypeProduct
+import ru.iwater.youwater.data.*
 import ru.iwater.youwater.screen.adapters.AdapterCatalogList
 import ru.iwater.youwater.screen.adapters.AdapterProductList
 import ru.iwater.youwater.screen.adapters.OrderProductAdapter
@@ -329,6 +326,24 @@ fun bindCatalogList(recyclerView: RecyclerView, data: List<TypeProduct>?) {
 @BindingAdapter("setNameClient")
 fun TextView.bidingNameClient(clientName: String?) {
     text = clientName
+}
+
+@BindingAdapter("setNameAndLastnameClient")
+fun TextView.bindingNameAndLastnameClient(client: Client?) {
+    if (client != null) {
+        text =
+            if (client.lastname != "NULL") "${client.name} ${client.lastname}" else client.name
+    }
+}
+
+@BindingAdapter("setPhoneClient")
+fun TextView.bindingPhoneClient(phone: String?) {
+    text = phone
+}
+
+@BindingAdapter("setEmailClient")
+fun TextView.bindingEmailClient(email: String?) {
+    text = if (email != "NULL") email else ""
 }
 
 @BindingAdapter("setTanks")

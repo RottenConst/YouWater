@@ -346,7 +346,7 @@ class OrderViewModel @Inject constructor(
                     order.water_equip.forEach {
                         val product = orderRepo.getProduct(it.id)
                         if (product != null) {
-                            product.count = it.count
+                            product.count = it.amount
                             listProduct.add(product)
                         }
                     }
