@@ -1,14 +1,27 @@
 package ru.iwater.youwater.bd
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room.*
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.utils.ProductConverter
 
-@Database(version = 1, entities = [Product::class, Address::class, FavoriteProduct::class, MyOrder::class, BankCard::class])
+@Database(
+    version = 1,
+    entities = [
+        Product::class,
+        Address::class,
+        FavoriteProduct::class,
+        MyOrder::class,
+        BankCard::class,
+        RawAddress::class
+    ],
+//    autoMigrations = [
+//        AutoMigration(from = 1, to = 2)
+//    ],
+//    exportSchema = true
+)
 @TypeConverters(ProductConverter::class )
 abstract class YouWaterDB: RoomDatabase() {
     abstract fun productDao(): ProductDao
@@ -16,6 +29,7 @@ abstract class YouWaterDB: RoomDatabase() {
     abstract fun favoriteProductDao(): FavoriteProductDao
     abstract fun myOrderDao(): MyOrderDao
     abstract fun bankCard(): BankCardDao
+    abstract fun rawAddressDao(): RawAddressDao
 
     companion object {
         private var INSTANCE: YouWaterDB? = null
@@ -27,7 +41,9 @@ abstract class YouWaterDB: RoomDatabase() {
                         context.applicationContext,
                         YouWaterDB::class.java,
                         "database"
-                    ).build()
+                    )
+//                        .addMigrations(MIGRATION_1_2)
+                        .build()
                 }
             }
             return INSTANCE
@@ -38,3 +54,19 @@ abstract class YouWaterDB: RoomDatabase() {
         }
     }
 }
+
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE 'RawAddress' " +
+                            "(" +
+                            "'id' INTEGER," +
+                            " 'factAddress' TEXT," +
+                            " 'fullAddress' TEXT," +
+                            " 'verified' INTEGER, " +
+                            "PRIMARY KEY ('id')" +
+                            ")"
+                )
+            }
+        }

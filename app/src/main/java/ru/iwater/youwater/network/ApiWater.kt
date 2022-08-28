@@ -33,6 +33,22 @@ interface ApiWater {
         @Path("client_id") clientId: Int
     ): Client?
 
+    @FormUrlEncoded
+    @POST("sign-up/")
+    suspend fun singUp(
+        @Field("id") id: Int,
+        @Field("phone") phone: String,
+        @Field("name") name: String,
+        @Field("email") email: String
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST("sign-up/")
+    suspend fun register(
+        @Field("phone") phone: String,
+        @Field("name") name: String,
+        @Field("email") email: String
+    ): Response<JsonObject>
 
     @POST("OrderCreate/")
     suspend fun createOrder(
