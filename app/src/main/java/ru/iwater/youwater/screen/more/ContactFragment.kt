@@ -30,17 +30,10 @@ class ContactFragment : BaseFragment() {
         val binding = FragmentContactBinding.inflate(inflater)
         binding.lifecycleOwner = this
         binding.btnCallMe.setOnClickListener {
-            val callOperator = Intent(Intent.ACTION_CALL)
-            callOperator.data = Uri.parse("tel: +78129477993")
-            if (callOperator.data != null) {
-                if (ActivityCompat.checkSelfPermission(
-                        this.requireContext(),
-                        Manifest.permission.CALL_PHONE
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    startActivity(callOperator)
-                }
+            val callIntent: Intent = Uri.parse("tel:+78129477993").let { number ->
+                Intent(Intent.ACTION_DIAL, number)
             }
+            startActivity(callIntent)
         }
 
         binding.btnCallBoss.setOnClickListener {

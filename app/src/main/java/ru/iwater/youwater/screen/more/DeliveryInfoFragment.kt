@@ -36,10 +36,10 @@ class DeliveryInfoFragment : BaseFragment() {
         TabLayoutMediator(binding.tabDelivery, binding.pager) { tab, position ->
             when (position) {
                 0 -> {
-                    tab.text = "за два часа"
+                    tab.text = "В этот же день"
                 }
                 1 -> {
-                    tab.text = "Стандартная"
+                    tab.text = "Доставка на следующий день"
                 }
                 2 -> {
                     tab.text = "В пригороды"

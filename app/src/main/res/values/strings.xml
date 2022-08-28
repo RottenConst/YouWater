@@ -2,6 +2,7 @@
     <string name="app_name">YourWater</string>
     <!--    экран входа-->
     <string name="begin">Начать</string>
+    <string name="about_app_logo">Доставка питьевой воды в Санкт-Петербурге</string>
     <string name="tel_number">Номер мобильного телефона</string>
     <string name="enter">Вход</string>
     <string name="sent_code">Отправить код</string>
@@ -69,6 +70,8 @@
     <string name="btn_add_desc">Добавить продукт</string>
     <!--    add address-->
     <string name="add_address">Добавить адрес</string>
+    <string name="address_city">Город/посёлок</string>
+    <string name="address_street">Улица</string>
     <string name="address_home">Дом</string>
     <string name="address_corp">Корпус</string>
     <string name="address_structure">Строение</string>
@@ -120,23 +123,17 @@
     <string name="benefit">Польза: </string>
     <string name="benefit_text">благодаря бережной очистке воды в ней сохраняется оптимальный уровень солей и микроэлементов</string>
 
-    <string name="delivery_two_hour_logo">Доставка воды за 2 часа:</string>
-    <string name="delivery_two_hour_text">Доставляем воду за 2 часа по Санкт-Петербургу  в пределах КАДа, либо в удобное для вас время</string>
+    <string name="delivery_two_hour_logo">Доставка в тот же день:</string>
+    <string name="delivery_two_hour_text">Доставляем воду в тот же день Санкт-Петербургу для заказов, сделанных до 12:00 этого дня.</string>
     <string name="time_order">Время заказа</string>
-    <string name="time_delivery">Время доставки</string>
-    <string name="time_two_hour"> 9:00-20:00 \nПн-Пт</string>
-    <string name="time_two_hour_sat"> 9:00-20:00\nCб</string>
-    <string name="time_delivery_two_hour">11:00-22:00\n в тот же день</string>
-    <string name="time_delivery_sat_two_hour">10:00-18:00\nв тот же день</string>
+    <string name="time_delivery">Доставка возможна в один из интервалов:</string>
+    <string name="time_delivery_two_hour">17:00-22:00\n в тот же день</string>
+    <string name="time_delivery_sat_two_hour">19:00-22:00\nв тот же день</string>
 
-    <string name="delivery_logo_stg">Доставка воды стандартная:</string>
-    <string name="delivery_text_std">Доставляем воду по Санкт-Петербургу \nв пределах КАДа</string>
-    <string name="time_std_1_4">9:00-19:00\nПн-Чт</string>
-    <string name="time_std_5">9:00-19:00\nПт</string>
-    <string name="time_std_6">после 19:00\nПн-Сб</string>
-    <string name="delivery_std_1_4">9:00-21:00 \n на следующий будний день</string>
-    <string name="delivery_std_5">10:00-18:00 \nСб</string>
-    <string name="delivery_std_6">9:00-21:00 \nчерез день</string>
+    <string name="delivery_logo_stg">Доставка на следующий день:</string>
+    <string name="delivery_text_std">Доставляем воду по Санкт-Петербургу \nдля заказов, сделанных до 16:00 текущего дня.\nЗаказ, сделанный после 16:00, доставляется через 1 рабочий день.</string>
+    <string name="delivery_std_1_4">Пн.- Пт. \n9:00-16:00 \n17:00-22:00 \n19:00-22:00 </string>
+    <string name="delivery_std_5">Сб. \n9:00-16:00</string>
 
     <string name="to_suburbs">В пригороды</string>
     <string name="delivery_suburbs">Доставка воды в пригороды  Санкт-Петербурга</string>
@@ -146,14 +143,46 @@
 В Субботу с 9 ч до 18 ч, мин. интервал 3 часа.
 </string>
     <string name="kolino">Колпино</string>
+    <string name="kolino_text">
+        Доставка воды в Колпино на дом и в офисы по расписанию:
+С Пн по Пт с 9 до 21, минимальный интервал 3 часа.
+В Субботу с 9 до 18, минимальный интервал 3 часа.
+    </string>
     <string name="krondshtat">Кронштадт</string>
+    <string name="krondshtat_text">
+Доставка воды 19 литров в Кронштадт на дом и в офисы по расписанию
+Пн и Чт. с 12ч до 18ч
+    </string>
     <string name="metalstroy">пос. Металлострой </string>
+    <string name="metalstroy_text">
+        Доставка воды в пос. Металлострой на дом и в офисы по расписанию:
+С Пн по Пт с 9 до 21, минимальный интервал 3 часа.
+В Субботу с 9 до 18, минимальный интервал 3 часа.
+    </string>
     <string name="krasnoe_selo">Красное село и окрестные пункты</string>
+    <string name="krasnoe_selo_text">
+        Доставка воды в Красное село и окрестные пункты. Заказать воду на дом и в офисы в Красное село можно по расписанию:
+Вт, Ср, Пт с 10ч до 18ч
+    </string>
+    <string name="shushari">Шушары</string>
+    <string name="shushari_text">
+        Доставка воды 19 литров в Шушары на дом и в офисы по расписанию:
+С Пн по Пт с 9 до 21, минимальный интервал 3 часа.
+В Субботу с 9 до 18, минимальный интервал 3 часа.
+    </string>
     <string name="petergof">Петергоф, Ломоносов, Стрельна </string>
+    <string name="petergof_text">
+        Доставка питьевой воды в Петергоф, Ломоносов, Стрельну на дом и в офис по расписанию:
+Стандартная доставка на следующий день, при заказе с Пн по Пт с 10 до 18
+    </string>
 
     <string name="faq_label">Часто задаваемые вопросы </string>
-    <string name="one_quest">1. У вас 2 вида воды, в чём отличие и какую лучше взять?</string>
-    <string name="one_quest_answer_1">Нашим клиентам мы предлагаем 2 вида воды:  Plesca Классическая и Plesca Натуральная. Каждая из них подходит под разные нужды. Поэтому вы можете выбрать ту, которая отвечает вашему запросу:</string>
+    <string name="one_quest">В чем отличие воды?</string>
+    <string name="one_quest_answer_1_1">Обе воды добываются в сердце Карельского перешейка. Около посёлка Стеклянный расположены скважины глубиной 185 метров — там же, прямо на месте добычы, происходит розлив. Вода доставляется в Санкт-Петербург и область, сохранив свежесть, чистоту и пользу.</string>
+    <string name="one_quest_answer_1_2">Вода «Plesca Натуральная» — подходит для повседневного употребления в любом виде. Содержит комплекс веществ, необходимых для здоровья городских жителей.</string>
+    <string name="one_quest_answer_1_3">• Глубина источника гарантирует неизменный состав воды.\n• Содержит природный комплекс полезных веществ: кальций, магний, калий, натрий.\n• Подходит для готовки, ежедневного употребления без ограничений. \n• Соответствует нормативам качества.</string>
+    <string name="one_quest_answer_1_4">Вода «Plesca Классическая» — смягченная артезианская вода, оптимальный выбор для офисов и предприятий. Подходит для использования в кулерах, чайниках и кофе-машинах.</string>
+    <string name="one_quest_answer_1_5">• Отсутствие накипи и осадка при кипячении, щадящее воздействие на бытовую технику.\n• Идеально подходит для использования в кулерах, чайниках и кофе-машинах.\n• Рекомендована для ежедневного употребления.\n• Имеет сертификаты качества.</string>
     <string name="one_quest_answer_2">Plesca Натуральная – это вода из артезианской скважины из Псковской области Печерского района. Этот вид воды отлично подходит для питья в сыром виде. В воде Plesca Натуральная много природных минералов полезных для здоровья, она обладает хорошими вкусовые качествами и безопасна для употребления взрослыми и детьми.</string>
     <string name="one_quest_answer_3">Plesca Классическая – это вода из поверхностных источников Санкт-Петербурга, доочищенная  и ионизированная серебром. Она хорошо подходит  для горячих напитков, использования в кулерах, не оставляет накипи и осадка.</string>
     <string name="two_quest">2. Кто производитель воды?  Есть сертификат?</string>
@@ -173,7 +202,8 @@
     <string name="vk">Связаться c помощью VK</string>
     <string name="whatsApp">Связаться c помощью WhatsApp</string>
     <string name="instagram">Связаться c помощью Instagram</string>
-    <string name="user_data_sent_for_moderation">Ваши данные отправлены на модерацию.  Мы проверим их корректность и внесём изменения. Спасибо вам за то, что предупреждаете нас.</string>
+<!--    <string name="user_data_sent_for_moderation">Ваши данные отправлены на модерацию.  Мы проверим их корректность и внесём изменения. Спасибо вам за то, что предупреждаете нас.</string>-->
+    <string name="user_data_sent_for_moderation">Ваши данные изменены.</string>
     <string name="complete_order_pay">Оформление прошло успешно</string>
     <string name="comment_order_pay">Мы сообщим вам, когда заказ будет передан  в доставку</string>
     <string name="go_to_home_text">Перейти на главную</string>
@@ -196,4 +226,7 @@
     <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
     <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
     <string name="fcm_message">FCM Message</string>
+    <string name="register">Регистрация</string>
+    <string name="finish">Завершить</string>
+    <string name="no_address_string">У вас не указано ни одного адреса</string>
 </resources>
