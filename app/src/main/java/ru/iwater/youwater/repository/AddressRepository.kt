@@ -1,6 +1,8 @@
 package ru.iwater.youwater.repository
 
+import com.google.gson.JsonObject
 import ru.iwater.youwater.bd.AddressDao
+import ru.iwater.youwater.bd.RawAddressDao
 import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
@@ -11,80 +13,115 @@ import ru.iwater.youwater.network.RetrofitGoogleService
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * репоситорий адресов
+ */
 class AddressRepository @Inject constructor(
     youWaterDB: YouWaterDB,
     private val authClient: StorageStateAuthClient
 ) {
-    private val addressDao: AddressDao = youWaterDB.addressDao()
+    private val addressDao: RawAddressDao = youWaterDB.rawAddressDao()
     private val waterApi: ApiWater = RetrofitFactory.makeRetrofit()
-    private val googleApi: GoogleMapApi = RetrofitGoogleService.makeRetrofit()
 
-    suspend fun getAddressList(): List<Address>? {
-        return addressDao.getAllAddresses()
+    /**
+     * получить все сохраненные адреса
+     */
+    suspend fun getAddressList(): List<RawAddress> {
+        val rawAddress = addressDao.getAddresses()
+        return if (rawAddress.isNullOrEmpty()) emptyList() else rawAddress
     }
 
-    suspend fun saveAddress(address: Address) {
-        addressDao.save(address)
+    /**
+     * получить адрес
+     */
+    suspend fun getAddress(id: Int): RawAddress? {
+        return addressDao.getAddress(id)
     }
 
-    suspend fun deleteAddress(address: Address) {
-        addressDao.delete(address)
+    /**
+     * сохранить адрес
+     */
+    suspend fun saveAddress(rawAddress: RawAddress) {
+        addressDao.save(rawAddress)
     }
 
-    suspend fun getStreetOnCoordinate(placeId: String, googleKey: String): AddressResult? {
-        try {
-            val answer = googleApi.getAddressOnPlaceId(placeId, "ru", googleKey)
-            if (answer != null) {
-                return answer
-            }
-        }catch (e: Exception) {
-            Timber.e(e)
-        }
-        return null
+    /**
+     *  удалить адрес
+     */
+    suspend fun deleteAddress(rawAddress: RawAddress) {
+        addressDao.deleteAddress(rawAddress)
     }
 
-    suspend fun getInfoOnAddress(address: String, googleKey: String): AddressResult? {
-        try {
-            val addressResult = googleApi.getCoordinateOnAddress(address, "ru", googleKey)
-            if (addressResult != null) {
-                return addressResult
-            }
-        }catch (e: java.lang.Exception) {
-            Timber.e(e)
-        }
-        return null
-    }
-
-    suspend fun createAutoTask(addressData: ClientUserData): String {
-        try {
-            val answer = waterApi.sendUserData(addressData)
-            if (answer?.id != null) return "address sent for moderation"
-        } catch (e: Exception) {
-            Timber.e("error send address $e")
-        }
-        return "address not send"
-    }
-
-    suspend fun getAllFactAddress(): List<String> {
+    /**
+     * послать запрос на деактивироватцию адреса
+     */
+    suspend fun inactiveAddress(id: Int): Boolean {
         return try {
-            val jsonAddress = waterApi.getAllAddresses(authClient.get().clientId)
-            if (jsonAddress.isSuccessful) {
-                val listAddress = mutableListOf<String>()
-                jsonAddress.body()?.forEach {
-                    listAddress.add(it["full_address"].toString())
-                    listAddress.add(it["fact_address"].toString())
-                }
-                listAddress.toList()
-            } else emptyList()
+            val active = waterApi.deleteAddress(id)
+            Timber.d("DELETE ADDRESS Message: ${active.body()}")
+            active.isSuccessful
+        } catch (e: Exception) {
+            Timber.e("delete address error $e")
+            false
+        }
+    }
+
+    suspend fun getAllFactAddress(): List<RawAddress> {
+        return try {
+            val rawAddress = waterApi.getAllAddresses(authClient.get().clientId)
+            return rawAddress.ifEmpty { emptyList() }
         } catch (e: Exception) {
             Timber.e("Error get address $e")
             emptyList()
         }
     }
 
-    suspend fun getClientInfo(clientId: Int): Client? {
+    /**
+     * отправить запрос на создание адреса
+     */
+    suspend fun createAddress(
+        clientId: Int,
+        contact: String,
+        region: String,
+        factAddress: String,
+        address: String,
+        coords: String,
+        fullAddress: String,
+        returnTare: Int,
+        phoneContact: String,
+        nameContact: String,
+        addressJson: JsonObject
+    ): String? {
+        return try {
+            val response = waterApi.createNewAddress(
+                clientId,
+                contact,
+                region,
+                factAddress,
+                address,
+                coords,
+                1,
+                fullAddress,
+                returnTare,
+                phoneContact,
+                nameContact,
+                addressJson
+            )
+            if (response.isSuccessful) {
+                response.body()?.get("message")?.asString
+            } else null
+        } catch (e: Exception) {
+            Timber.e("Error create address: $e")
+            null
+        }
+    }
+
+    /**
+     * получить информацию о авторизированном клиенте
+     */
+    suspend fun getClientInfo(): Client? {
         try {
-            val client = waterApi.getClientDetail(clientId)
+            val client = waterApi.getClientDetail(authClient.get().clientId)
             if (client != null) {
                 return client
             }
@@ -93,6 +130,4 @@ class AddressRepository @Inject constructor(
         }
         return null
     }
-
-    fun getAuthClient(): AuthClient = authClient.get()
 }

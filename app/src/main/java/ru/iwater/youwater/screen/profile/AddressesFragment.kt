@@ -5,32 +5,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.Address
-import ru.iwater.youwater.data.AddressViewModel
+import ru.iwater.youwater.data.StatusLoading
+import ru.iwater.youwater.vm.AddressViewModel
+import ru.iwater.youwater.data.RawAddress
 import ru.iwater.youwater.databinding.FragmentAddresessBinding
 import ru.iwater.youwater.screen.adapters.AdapterAddresses
 import javax.inject.Inject
 
-
-class AddressesFragment : BaseFragment(), AdapterAddresses.OnAddressItemListener {
+/**
+ * фрагмент выводит список активных адресов клиента
+ */
+class AddressesFragment : BaseFragment(), AdapterAddresses.OnAddressItemListener, SwipeRefreshLayout.OnRefreshListener {
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     private val viewModel: AddressViewModel by viewModels { factory }
     private val binding: FragmentAddresessBinding by lazy { initBinding(LayoutInflater.from(this.context)) }
 
-
     private val screenComponent = App().buildScreenComponent()
-
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,25 +42,48 @@ class AddressesFragment : BaseFragment(), AdapterAddresses.OnAddressItemListener
         binding.lifecycleOwner = this
         val adapter = AdapterAddresses(this)
         binding.rvAddresses.adapter = adapter
-        viewModel.getAllFactAddress()
-        viewModel.addressList.observe(this.viewLifecycleOwner) {
-            if (it.isNullOrEmpty()) {
-                Toast.makeText(context, "Ошибка, не удаётся загрузить адреса", Toast.LENGTH_SHORT).show()
-            } else {
-                adapter.submitList(it)
+        binding.refreshAddressContainer.setOnRefreshListener(this)
+        viewModel.statusLoad.observe(this.viewLifecycleOwner) { status ->
+            when (status) {
+                StatusLoading.LOADING -> binding.refreshAddressContainer.isRefreshing = true
+                StatusLoading.EMPTY -> {
+                    binding.nothingAddressString.visibility = View.VISIBLE
+                    binding.rvAddresses.visibility = View.GONE
+                    binding.refreshAddressContainer.isRefreshing = false
+                }
+                StatusLoading.DONE -> {
+                    binding.refreshAddressContainer.isRefreshing = false
+                    binding.nothingAddressString.visibility = View.GONE
+                    binding.rvAddresses.visibility = View.VISIBLE
+                    viewModel.rawAddress.observe(this.viewLifecycleOwner) {
+                        adapter.submitList(it)
+                    }
+                }
+                else -> {
+                    warning("Oшибка загрузки адресов")
+                    binding.refreshAddressContainer.isRefreshing = false
+                }
             }
         }
         binding.btnAddAddress.setOnClickListener {
             this.findNavController().navigate(
-                AddressesFragmentDirections.actionAddresessFragmentToAddAddressFragment()
+                AddressesFragmentDirections.actionAddresessFragmentToAddAddressFragment(false)
             )
 
         }
         return binding.root
     }
 
-    override fun onDeleteAddressClick(address: Address) {
+    override fun onDeleteAddressClick(address: RawAddress) {
         viewModel.deleteAddress(address)
+    }
+
+    override fun onRefresh() {
+        viewModel.getRawAddress()
+    }
+
+    private fun warning(message: String) {
+        Toast.makeText(this.context, message, Toast.LENGTH_LONG).show()
     }
 
     private fun initBinding(inflater: LayoutInflater) = FragmentAddresessBinding.inflate(inflater)

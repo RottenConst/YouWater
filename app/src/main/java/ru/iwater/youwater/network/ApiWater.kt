@@ -52,9 +52,31 @@ interface ApiWater {
     @GET("all_adresses/{client_id}/")
     suspend fun getAllAddresses(
         @Path("client_id") clientId: Int
-    ):Response<List<JsonObject>>
+    ):List<RawAddress>
 
-    @POST("OrdersInfo/{orderNumber}")
+    @FormUrlEncoded
+    @POST("address/")
+    suspend fun createNewAddress(
+        @Field("client_id") clientId: Int,
+        @Field("contact") contact: String,
+        @Field("region") region: String,
+        @Field("fact_address") factAddress: String,
+        @Field("address") address: String,
+        @Field("coords") coords: String,
+        @Field("active") active: Int,
+        @Field("full_address") fullAddress: String,
+        @Field("return_tare") returnTare: Int,
+        @Field("phone_contact") phoneContact: String,
+        @Field("name_contact") nameContact: String,
+        @Field("address_json") addressJson: JsonObject
+    ): Response<JsonObject>
+
+    @PUT("address_delete/{id}/")
+    suspend fun deleteAddress(
+        @Path("id") idAddress: Int
+    ): Response<JsonObject>
+
+    @POST("OrdersInfo/{orderNumber}/")
     suspend fun setStatusPayment(
         @Path("orderNumber") orderNumber: Int,
         @Body parameters: JsonObject,

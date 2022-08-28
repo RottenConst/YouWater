@@ -15,6 +15,6 @@ data class Address (
     val floor: Int?,
     val flat: Int?,
     val note: String?,
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey
+    val id: Int,
     )

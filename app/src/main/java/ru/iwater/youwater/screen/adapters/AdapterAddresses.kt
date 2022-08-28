@@ -7,10 +7,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import ru.iwater.youwater.data.Address
+import ru.iwater.youwater.data.RawAddress
 import ru.iwater.youwater.databinding.ItemAddressBinding
 import ru.iwater.youwater.screen.adapters.AdapterAddresses.*
 
-class AdapterAddresses(private val onAddressItemListener: OnAddressItemListener) : ListAdapter<Address, AddressHolder>(AddressDiffUtilCallback) {
+class AdapterAddresses(private val onAddressItemListener: OnAddressItemListener) : ListAdapter<RawAddress, AddressHolder>(AddressDiffUtilCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AddressHolder {
         return AddressHolder.from(parent)
@@ -25,7 +26,7 @@ class AdapterAddresses(private val onAddressItemListener: OnAddressItemListener)
 
     class AddressHolder(val binding: ItemAddressBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bindingAddress(address: Address, onAddressItemListener: OnAddressItemListener) {
+        fun bindingAddress(address: RawAddress, onAddressItemListener: OnAddressItemListener) {
             binding.address = address
             binding.onAddressItemClick = onAddressItemListener
             binding.ivDeleteAddress.setBackgroundColor(Color.TRANSPARENT)
@@ -42,17 +43,17 @@ class AdapterAddresses(private val onAddressItemListener: OnAddressItemListener)
     }
 
 
-    companion object AddressDiffUtilCallback : DiffUtil.ItemCallback<Address>() {
-        override fun areItemsTheSame(oldItem: Address, newItem: Address): Boolean {
+    companion object AddressDiffUtilCallback : DiffUtil.ItemCallback<RawAddress>() {
+        override fun areItemsTheSame(oldItem: RawAddress, newItem: RawAddress): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: Address, newItem: Address): Boolean {
+        override fun areContentsTheSame(oldItem: RawAddress, newItem: RawAddress): Boolean {
             return oldItem == newItem
         }
     }
 
     interface OnAddressItemListener {
-        fun onDeleteAddressClick(address: Address)
+        fun onDeleteAddressClick(address: RawAddress)
     }
 }
