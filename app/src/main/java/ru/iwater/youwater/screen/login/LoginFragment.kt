@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.AuthViewModel
@@ -46,28 +48,31 @@ class LoginFragment : BaseFragment() {
                     btnEnter
                 )
             )
-            etPinCode.addTextChangedListener(PhoneTextFormatter(etPinCode, "####", btnEnterHome))
             btnEnter.setOnClickListener {
                 val tel = etTelNum.text.toString()
                 viewModel.authPhone(tel)
-                "Код отправлен на номер: $tel".also { tvInfoCode.text = it }
                 viewModel.statusPhone.observe(viewLifecycleOwner) { status ->
                     when (status) {
                         StatusPhone.LOAD -> {
 
                         }
                         StatusPhone.DONE -> {
-                            tvEnterPin.visibility = View.VISIBLE
-                            tvInfoCode.visibility = View.VISIBLE
-                            btnEnterHome.visibility = View.VISIBLE
-                            etPinCode.visibility = View.VISIBLE
-                            etTelNum.visibility = View.GONE
-                            tilTelNum.visibility = View.GONE
-                            btnEnter.visibility = View.GONE
-                            etPinCode.requestFocus()
+                            viewModel.clientId.observe(viewLifecycleOwner) { id ->
+                                if (id != null) {
+                                    it.findNavController().navigate(
+                                        LoginFragmentDirections.actionLoginFragmentToEnterPinCodeFragment(
+                                            tel, id
+                                        )
+                                    )
+                                } else {
+                                    Toast.makeText(context, "Что-то пошло не так", Toast.LENGTH_LONG).show()
+                                }
+                            }
                         }
                         StatusPhone.ERROR -> {
-                            Toast.makeText(context, "Данный номер не привязан ни к одному пользователю", Toast.LENGTH_LONG).show()
+                            it.findNavController().navigate(
+                                LoginFragmentDirections.actionLoginFragmentToRegisterFragment(tel)
+                            )
                         }
                         StatusPhone.NET_ERROR -> {
                             Toast.makeText(context, "ошибка соединения", Toast.LENGTH_LONG).show()
@@ -75,25 +80,7 @@ class LoginFragment : BaseFragment() {
                     }
                 }
             }
-            btnEnterHome.setOnClickListener {
-                viewModel.checkPin(context, etPinCode.text.toString())
-                viewModel.statusPinCode.observe(viewLifecycleOwner) { status ->
-                    when (status) {
-                        StatusPinCode.DONE -> {
-                            Toast.makeText(context, "Успешно", Toast.LENGTH_LONG).show()
-                        }
-                        StatusPinCode.ERROR -> {
-                            Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
-                        }
-                        StatusPinCode.LOAD -> {
-
-                        }
-                    }
-                }
-
-            }
         }
-
         return binding.root
     }
 

@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.repository.AuthorisationRepository
 import ru.iwater.youwater.screen.MainActivity
-import timber.log.Timber
 import javax.inject.Inject
 
 enum class StatusPhone {LOAD, ERROR, NET_ERROR, DONE}
@@ -32,6 +31,10 @@ class AuthViewModel @Inject constructor(
     val statusSession: LiveData<StatusSession>
         get() = _statusSession
 
+    private val _clientId: MutableLiveData<Int> = MutableLiveData()
+    val clientId: LiveData<Int>
+        get() = _clientId
+
     private val clientAuth = authorisationRepository.getAuthClient()
 
 
@@ -46,6 +49,7 @@ class AuthViewModel @Inject constructor(
                 }
                 authPhone.status -> {
                     _statusPhone.value = StatusPhone.DONE
+                    _clientId.value = authPhone.clientId
                     clientAuth.clientId = authPhone.clientId
                 }
                 !authPhone.status -> {
@@ -55,10 +59,9 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun checkPin(context: Context?, pinCode: String) {
+    fun checkPin(context: Context?, pinCode: String, clientId: Int) {
         viewModelScope.launch {
             _statusPinCode.value = StatusPinCode.LOAD
-            val clientId = clientAuth.clientId
             val clientFullAuth = authorisationRepository.checkCode(clientId, pinCode)
             when {
                 clientFullAuth == null -> {
@@ -84,6 +87,36 @@ class AuthViewModel @Inject constructor(
                 true -> _statusSession.value = StatusSession.TRY
                 false -> _statusSession.value = StatusSession.FALSE
                 else -> _statusSession.value = StatusSession.ERROR
+            }
+        }
+    }
+
+    fun registerClient(phone: String, name: String, email: String) {
+        viewModelScope.launch {
+            val registerClient = authorisationRepository.registerClient(
+                phone, name, email
+            )
+            if (registerClient != null) {
+                val status = registerClient.get("status").asBoolean
+                if (status) {
+//                    _clientId.value = registerClient.get("client_id").asInt
+                    authPhone(phone)
+                }
+            }
+        }
+    }
+
+    fun singUpClient(phone: String, name: String, email: String) {
+        viewModelScope.launch {
+            val registerClient = authorisationRepository.registerClient(
+                phone, name, email
+            )
+            if (registerClient != null) {
+                val status = registerClient.get("status").asBoolean
+                if (status) {
+//                    _clientId.value = registerClient.get("client_id").asInt
+                    authPhone(phone)
+                }
             }
         }
     }

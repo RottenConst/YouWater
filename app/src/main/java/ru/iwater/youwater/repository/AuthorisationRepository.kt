@@ -1,5 +1,6 @@
 package ru.iwater.youwater.repository
 
+import android.provider.ContactsContract
 import com.google.gson.JsonObject
 import ru.iwater.youwater.data.AuthClient
 import ru.iwater.youwater.data.Client
@@ -76,6 +77,34 @@ class AuthorisationRepository @Inject constructor(
         return null
     }
 
+    suspend fun registerClient(phone: String, name: String, email: String): JsonObject? {
+        return try {
+            val client = apiAuth.register(phone, name, email)
+            if (client.isSuccessful) {
+               client.body()
+            } else {
+                null
+            }
+        }catch (e: Exception) {
+            Timber.e("Register error: $e")
+            null
+        }
+    }
+
+    suspend fun singUpClient(id: Int, phone: String, name: String, email: String): JsonObject? {
+        return try {
+            val client = apiAuth.singUp(id, phone, name, email)
+            if (client.isSuccessful) {
+                client.body()
+            } else {
+                null
+            }
+        }catch (e: Exception) {
+            Timber.e("Register error: $e")
+            null
+        }
+    }
+
     suspend fun sendUserData(clientUserData: ClientUserData): String {
         try {
             val answer = apiAuth.sendUserData(clientUserData)
@@ -86,6 +115,18 @@ class AuthorisationRepository @Inject constructor(
             Timber.e("error send user data: $e")
         }
         return "user data not send"
+    }
+
+    suspend fun editUserData(clientId: Int, clientUserData: JsonObject): Boolean {
+        try {
+            val answer = apiAuth.editUserData(clientId, clientUserData)
+            if (answer?.isSuccessful == true) {
+                return answer.body()?.get("status")?.asBoolean == true
+            }
+        } catch (e: java.lang.Exception) {
+            Timber.e("error edit user data: $e")
+        }
+        return false
     }
 
     fun saveAuthClient(authClient: AuthClient?) {
