@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.di.components.OnScreen
+import ru.iwater.youwater.vm.*
 
 @Module
 abstract class ViewModelFactoryModule {

@@ -5,10 +5,16 @@ import com.google.gson.annotations.SerializedName
 
 @Keep
 data class PaymentCard(
+    //prod sber
     @SerializedName("userName")
-    val userName: String = "T602720481107-api",
+    val userName: String = "p602720481107-api",
     @SerializedName("password")
-    val password: String = "T602720481107",
+    val password: String = "r6tMp1y78",
+//    test sber
+//    @SerializedName("userName")
+//    val userName: String = "t602720481107-api",
+//    @SerializedName("password")
+//    val password: String = "ZwUEyuso",
     @SerializedName("orderNumber")
     val orderNumber: String,
     @SerializedName("amount")

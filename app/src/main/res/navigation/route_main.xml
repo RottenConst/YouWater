@@ -79,10 +79,15 @@
             app:argType="string" />
         <action
             android:id="@+id/action_catalogProductFragment_to_basketFragment"
-            app:destination="@id/basketFragment" />
+            app:destination="@id/basketFragment"
+            app:popUpTo="@id/catalogProductFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_catalogProductFragment_to_aboutProductFragment"
             app:destination="@id/aboutProductFragment" />
+        <action
+            android:id="@+id/action_catalogProductFragment_to_favoriteFragment"
+            app:destination="@id/favoriteFragment" />
     </fragment>
     <fragment
         android:id="@+id/aboutProductFragment"
@@ -95,7 +100,7 @@
             android:id="@+id/action_aboutProductFragment_to_basketFragment"
             app:destination="@id/basketFragment"
             app:popUpTo="@id/homeFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_aboutProductFragment_to_priceBottomSheetFragment"
             app:destination="@id/priceBottomSheetFragment" />
@@ -148,6 +153,14 @@
             app:destination="@id/addresessFragment"
             app:popUpTo="@id/addresessFragment"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="isFromOrder"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/action_addAddressFragment_to_createOrderFragment"
+            app:destination="@id/createOrderFragment"
+            app:popUpTo="@id/basketFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/createOrderFragment"
@@ -155,7 +168,8 @@
         android:label="@string/complete_order">
         <action
             android:id="@+id/action_createOrderFragment_to_addAddressFragment"
-            app:destination="@id/addAddressFragment" />
+            app:destination="@id/addAddressFragment"
+            app:popUpTo="@id/basketFragment" />
         <action
             android:id="@+id/action_createOrderFragment_to_homeFragment"
             app:destination="@id/homeFragment"
@@ -165,12 +179,15 @@
             android:id="@+id/action_createOrderFragment_to_cardPaymentFragment"
             app:destination="@id/cardPaymentFragment"
             app:popUpTo="@id/createOrderFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_createOrderFragment_to_completeOrderFragment"
             app:destination="@id/completeOrderFragment"
             app:popUpTo="@id/createOrderFragment"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="isShowMessage"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/myOrdersFragment"
@@ -219,6 +236,11 @@
             app:destination="@id/completeOrderFragment"
             app:launchSingleTop="true"
             app:popUpTo="@id/completeOrderFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_cardPaymentFragment_to_createOrderFragment"
+            app:destination="@id/createOrderFragment"
+            app:popUpTo="@id/createOrderFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment

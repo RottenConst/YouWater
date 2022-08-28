@@ -23,6 +23,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import androidx.room.DatabaseConfiguration
 import com.google.firebase.messaging.RemoteMessage
 import com.pusher.pushnotifications.*
 import com.pusher.pushnotifications.auth.AuthData
@@ -39,6 +40,7 @@ import ru.iwater.youwater.databinding.MainLayoutBinding
 import ru.iwater.youwater.repository.AuthorisationRepository
 import timber.log.Timber
 import javax.inject.Inject
+
 
 class MainActivity : BaseActivity() {
 
@@ -152,34 +154,34 @@ class MainActivity : BaseActivity() {
 //                            if (messagePayload.isNotEmpty()) {
 //                                Timber.d("Error")
 //                            } else {
-                                val intent = Intent(this@MainActivity, MainActivity::class.java)
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                val pendingIntent = PendingIntent.getActivity(baseContext, 0 /* Request code */, intent,
-                                    PendingIntent.FLAG_ONE_SHOT)
+                            val intent = Intent(this@MainActivity, MainActivity::class.java)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                            val pendingIntent = PendingIntent.getActivity(baseContext, 0 /* Request code */, intent,
+                                PendingIntent.FLAG_IMMUTABLE)
 
-                                val channelId = getString(R.string.default_notification_channel_id)
-                                val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                                val notificationBuilder = NotificationCompat.Builder(baseContext, channelId)
-                                    .setSmallIcon(R.drawable.ic_youwater_logo)
-                                    .setContentTitle(remoteMessage.notification?.title)
-                                    .setContentText(remoteMessage.notification?.body)
-                                    .setAutoCancel(true)
-                                    .setWhen(System.currentTimeMillis())
-                                    .setSound(defaultSoundUri)
-                                    .setContentIntent(pendingIntent)
+                            val channelId = getString(R.string.default_notification_channel_id)
+                            val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                            val notificationBuilder = NotificationCompat.Builder(baseContext, channelId)
+                                .setSmallIcon(R.drawable.ic_youwater_logo)
+                                .setContentTitle(remoteMessage.notification?.title)
+                                .setContentText(remoteMessage.notification?.body)
+                                .setAutoCancel(true)
+                                .setWhen(System.currentTimeMillis())
+                                .setSound(defaultSoundUri)
+                                .setContentIntent(pendingIntent)
 
 
-                                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                                // Since android Oreo notification channel is needed.
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    val channel = NotificationChannel(channelId,
-                                        "hello",
-                                        NotificationManager.IMPORTANCE_DEFAULT)
-                                    channel.enableVibration(true)
-                                    notificationManager.createNotificationChannel(channel)
-                                }
+                            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                            // Since android Oreo notification channel is needed.
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                val channel = NotificationChannel(channelId,
+                                    "hello",
+                                    NotificationManager.IMPORTANCE_DEFAULT)
+                                channel.enableVibration(true)
+                                notificationManager.createNotificationChannel(channel)
+                            }
 
-                                notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
+                            notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
 //                            }
                         }
                     })
@@ -208,6 +210,7 @@ class MainActivity : BaseActivity() {
                             YouWaterDB.getYouWaterDB(applicationContext)?.clearAllTables()
                         }
                         PushNotifications.clearAllState()
+                        PushNotifications.clearDeviceInterests()
                         authRepository.deleteClient()
                         startActivity(intent)
                     }

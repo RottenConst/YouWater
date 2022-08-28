@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.OrderLoadStatus
+import ru.iwater.youwater.data.StatusLoading
 import ru.iwater.youwater.data.OrderViewModel
 import ru.iwater.youwater.databinding.FragmentMyOrdersBinding
 import ru.iwater.youwater.screen.adapters.MyOrderAdapter
@@ -71,8 +71,9 @@ class MyOrdersFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun statusLoad() {
         viewModel.statusLoad.observe(this.viewLifecycleOwner) { statusLoad ->
             when(statusLoad) {
-                OrderLoadStatus.LOADING -> binding.refreshContainer.isRefreshing = true
-                OrderLoadStatus.DONE -> binding.refreshContainer.isRefreshing = false
+                StatusLoading.LOADING -> binding.refreshContainer.isRefreshing = true
+                StatusLoading.DONE -> binding.refreshContainer.isRefreshing = false
+                StatusLoading.EMPTY -> binding.refreshContainer.isRefreshing = false
                 else -> {
                     Toast.makeText(this.context, "Ошибка", Toast.LENGTH_SHORT).show()
                     binding.refreshContainer.isRefreshing = false

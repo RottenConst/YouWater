@@ -45,52 +45,21 @@ class EditUserDataFragment : BaseFragment() {
         binding.ibClearPhone.setOnClickListener {
             binding.tvEditPhone.text.clear()
         }
-        binding.ibClearLastname.setOnClickListener {
-            binding.tvEditLastname.text.clear()
-        }
         binding.ibClearName.setOnClickListener {
             binding.tvEditName.text.clear()
         }
         viewModel.client.observe(this.viewLifecycleOwner) { client ->
             //clientId
             clientId = client.client_id
-
-
-            //lastname
-
-            var lastName = false
-            client.name.forEach {
-                if (it.isWhitespace()) {
-                    lastName = true
-                }
-            }
-            if (lastName) {
-                //name
-                binding.tvEditName.text.clear()
-                binding.tvEditName.text = Editable.Factory.getInstance().newEditable(client.name)
-                //lastName
-                binding.tvEditLastname.text.clear()
-                binding.tvEditLastname.text =
-                    Editable.Factory.getInstance().newEditable(client.lastname)
-                //phone
-                binding.tvEditPhone.text.clear()
-                binding.tvEditPhone.text = Editable.Factory.getInstance().newEditable(client.phone)
-                //email
-                binding.tvEditEmail.text.clear()
-                binding.tvEditEmail.text = Editable.Factory.getInstance().newEditable(client.email)
-            } else {
-                //name
-                binding.tvEditName.text.clear()
-                binding.tvEditName.text = Editable.Factory.getInstance().newEditable(client.name)
-                //lastname
-                binding.tvEditLastname.text.clear()
-                //phone
-                binding.tvEditPhone.text.clear()
-                binding.tvEditPhone.text = Editable.Factory.getInstance().newEditable(client.phone)
-                //email
-                binding.tvEditEmail.text.clear()
-                binding.tvEditEmail.text = Editable.Factory.getInstance().newEditable(client.email)
-            }
+            //name
+            binding.tvEditName.text.clear()
+            binding.tvEditName.text = Editable.Factory.getInstance().newEditable(client.name)
+            //phone
+            binding.tvEditPhone.text.clear()
+            binding.tvEditPhone.text = Editable.Factory.getInstance().newEditable(client.contact)
+            //email
+            binding.tvEditEmail.text.clear()
+            binding.tvEditEmail.text = Editable.Factory.getInstance().newEditable(client.email)
         }
         return binding.root
     }
@@ -108,10 +77,9 @@ class EditUserDataFragment : BaseFragment() {
                 val date = sdf.format(Calendar.getInstance().time)
                 val clientData = JsonObject()
                 clientData.addProperty("name", binding.tvEditName.text.toString())
-                clientData.addProperty("lastname", binding.tvEditLastname.text.toString())
                 clientData.addProperty("phone", binding.tvEditPhone.text.toString())
                 clientData.addProperty("email", binding.tvEditEmail.text.toString())
-                viewModel.createAutoTask(clientId, date, clientData)
+                viewModel.editUserData(clientId, clientData)
                 viewModel.statusSend.observe(this.viewLifecycleOwner) { status ->
                     when (status) {
                         StatusSendData.SUCCESS -> {

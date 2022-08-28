@@ -11,7 +11,9 @@ import ru.iwater.youwater.screen.catalog.CatalogFragment
 import ru.iwater.youwater.screen.catalog.CatalogProductFragment
 import ru.iwater.youwater.screen.home.AboutProductFragment
 import ru.iwater.youwater.screen.home.HomeFragment
+import ru.iwater.youwater.screen.login.EnterPinCodeFragment
 import ru.iwater.youwater.screen.login.LoginFragment
+import ru.iwater.youwater.screen.login.RegisterFragment
 import ru.iwater.youwater.screen.login.StartFragment
 import ru.iwater.youwater.screen.profile.*
 
@@ -23,6 +25,8 @@ interface ScreenComponent {
     fun inject(catalogFragment: CatalogFragment)
     fun inject(catalogProductFragment: CatalogProductFragment)
     fun inject(loginFragment: LoginFragment)
+    fun inject(enterPinCodeFragment: EnterPinCodeFragment)
+    fun inject(registerFragment: RegisterFragment)
     fun inject(startFragment: StartFragment)
     fun inject(profileFragment: ProfileFragment)
     fun inject(userDataFragment: UserDataFragment)

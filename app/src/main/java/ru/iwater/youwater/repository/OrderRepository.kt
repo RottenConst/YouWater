@@ -1,10 +1,7 @@
 package ru.iwater.youwater.repository
 
 import com.google.gson.JsonObject
-import ru.iwater.youwater.bd.AddressDao
-import ru.iwater.youwater.bd.MyOrderDao
-import ru.iwater.youwater.bd.ProductDao
-import ru.iwater.youwater.bd.YouWaterDB
+import ru.iwater.youwater.bd.*
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
@@ -20,7 +17,7 @@ class OrderRepository @Inject constructor(
 ) {
     private val apiAuth: ApiWater = RetrofitFactory.makeRetrofit()
     private val sberApi: SberPaymentApi = RetrofitSberApi.makeRetrofit()
-    private val addressDao: AddressDao = youWaterDB.addressDao()
+    private val addressDao: RawAddressDao = youWaterDB.rawAddressDao()
     private val productDao: ProductDao = youWaterDB.productDao()
     private val myOrderDao: MyOrderDao = youWaterDB.myOrderDao()
 
@@ -38,27 +35,25 @@ class OrderRepository @Inject constructor(
 
     fun getAuthClient(): AuthClient = authClient.get()
 
-    suspend fun getAllAddress(): List<Address>? {
-        val listAddress = addressDao.getAllAddresses()
-        return if (listAddress.isNullOrEmpty()) {
-            null
-        } else listAddress
+    // получить все адреса из бд
+    suspend fun getAllAddress(): List<RawAddress> {
+        val address = addressDao.getAddresses()
+        return if (address.isNullOrEmpty()) emptyList() else address
     }
 
-    suspend fun saveAddress(address: Address) {
-        addressDao.save(address)
+    suspend fun getAddress(id: Int): RawAddress? {
+        return addressDao.getAddress(id)
     }
 
-    suspend fun getAllFactAddress(): List<String> {
+    suspend fun saveAddress(rawAddress: RawAddress) {
+        addressDao.save(rawAddress)
+    }
+
+    suspend fun getAllFactAddress(): List<RawAddress> {
         return try {
-            val jsonAddress = apiAuth.getAllAddresses(authClient.get().clientId)
-            if (jsonAddress.isSuccessful) {
-                val listAddress = mutableListOf<String>()
-                jsonAddress.body()?.forEach {
-                    listAddress.add(it["full_address"].toString())
-                    listAddress.add(it["fact_address"].toString())
-                }
-                listAddress.toList()
+            val rawAddress = apiAuth.getAllAddresses(authClient.get().clientId)
+            if (!rawAddress.isNullOrEmpty()) {
+                rawAddress
             } else emptyList()
         } catch (e: Exception) {
             Timber.e("Error get address $e")
@@ -175,7 +170,8 @@ class OrderRepository @Inject constructor(
 
     suspend fun getPaymentStatus(orderId: String): Pair<Int, Int> {
         try {
-            val answer = sberApi.getOrderStatus("T602720481107-api", "T602720481107", orderId)
+//            val answer = sberApi.getOrderStatus("t602720481107-api", "ZwUEyuso", orderId) //test
+            val answer = sberApi.getOrderStatus("p602720481107-api", "r6tMp1y78", orderId) //prod
             if (answer != null) {
                 return Pair(
                     answer["orderNumber"].toString().removePrefix("\"").removeSuffix("\"").toInt(),

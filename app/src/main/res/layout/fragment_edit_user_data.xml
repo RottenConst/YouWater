@@ -41,35 +41,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_edit_name_logo" />
 
             <TextView
-                android:id="@+id/tv_edit_lastname_logo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/last_name"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_edit_name"
-                tools:visibility="gone" />
-
-            <EditText
-                android:id="@+id/tv_edit_lastname"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="32dp"
-                android:autofillHints="name"
-                android:inputType="textAutoComplete"
-                android:text="@string/last_name"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/ib_clear_lastname"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_edit_lastname_logo" />
-
-            <TextView
                 android:id="@+id/tv_edit_phone_logo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -79,7 +50,7 @@
                 android:text="@string/phone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_edit_lastname" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_edit_name" />
 
             <EditText
                 android:id="@+id/tv_edit_phone"
@@ -132,11 +103,11 @@
                 android:layout_marginEnd="32dp"
                 android:background="@color/brown"
                 android:backgroundTint="@color/white"
-                android:tint="@color/lightGrey"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_edit_email"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tv_edit_email"
-                app:srcCompat="@drawable/ic_cancel_24" />
+                app:srcCompat="@drawable/ic_cancel_24"
+                app:tint="@color/lightGrey" />
 
             <ImageButton
                 android:id="@+id/ib_clear_phone"
@@ -145,24 +116,11 @@
                 android:layout_marginEnd="32dp"
                 android:background="@color/brown"
                 android:backgroundTint="@color/white"
-                android:tint="@color/lightGrey"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_edit_phone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tv_edit_phone"
-                app:srcCompat="@drawable/ic_cancel_24" />
-
-            <ImageButton
-                android:id="@+id/ib_clear_lastname"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="32dp"
-                android:background="@color/brown"
-                android:backgroundTint="@color/white"
-                android:tint="@color/lightGrey"
-                app:layout_constraintBottom_toBottomOf="@+id/tv_edit_lastname"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tv_edit_lastname"
-                app:srcCompat="@drawable/ic_cancel_24" />
+                app:srcCompat="@drawable/ic_cancel_24"
+                app:tint="@color/lightGrey" />
 
             <ImageButton
                 android:id="@+id/ib_clear_name"
@@ -171,11 +129,11 @@
                 android:layout_marginEnd="32dp"
                 android:background="@color/brown"
                 android:backgroundTint="@color/white"
-                android:tint="@color/lightGrey"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_edit_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tv_edit_name"
-                app:srcCompat="@drawable/ic_cancel_24" />
+                app:srcCompat="@drawable/ic_cancel_24"
+                app:tint="@color/lightGrey" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,13 +1,9 @@
 package ru.iwater.youwater.screen.profile
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -15,14 +11,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.BankCard
-import ru.iwater.youwater.data.BankCardViewModel
+import ru.iwater.youwater.vm.BankCardViewModel
 import ru.iwater.youwater.databinding.FragmentBankCardBinding
 import ru.iwater.youwater.screen.adapters.BankCardAdapter
 import ru.iwater.youwater.utils.PhoneTextFormatter
 import javax.inject.Inject
-import androidx.core.content.ContextCompat.getSystemService
-
-
 
 
 // TODO: Rename parameter arguments, choose names that match

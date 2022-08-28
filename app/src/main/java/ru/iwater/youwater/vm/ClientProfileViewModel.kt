@@ -55,6 +55,15 @@ class ClientProfileViewModel @Inject constructor(
         }
     }
 
+    fun editUserData(clientId: Int, clientData: JsonObject) {
+        viewModelScope.launch {
+            val clientUserData = authRepository.editUserData(clientId, clientData)
+            if (clientUserData) {
+                _statusSend.value = StatusSendData.SUCCESS
+            } else _statusSend.value = StatusSendData.ERROR
+        }
+    }
+
     private fun getClientInfo() {
         viewModelScope.launch {
             val client = authRepository.getClientInfo(authClient.clientId)
