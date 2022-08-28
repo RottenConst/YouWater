@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -12,9 +13,8 @@ import com.google.android.material.snackbar.Snackbar
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.FragmentCatalogProductBinding
-import ru.iwater.youwater.data.ProductListViewModel
+import ru.iwater.youwater.vm.ProductListViewModel
 import ru.iwater.youwater.screen.adapters.AdapterProductList
-import ru.iwater.youwater.screen.home.HomeFragmentDirections
 import javax.inject.Inject
 
 
@@ -42,7 +42,17 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
         val catalogId = CatalogProductFragmentArgs.fromBundle(requireArguments()).typeId
         val catalogTitle = CatalogProductFragmentArgs.fromBundle(requireArguments()).typeString
         val adapterProductList = AdapterProductList(AdapterProductList.OnClickListener {
+            if (!it.onFavoriteClick) {
+                viewModel.deleteFavoriteProduct(it)
+            } else {
+                viewModel.addProductInFavorite(it)
+                Snackbar.make(binding.constraintCatalogProduct, "Товар ${it.app_name} добавлен в избранное", Snackbar.LENGTH_LONG)
+                    .setAction("Избранное") {
+                        this.findNavController()
+                            .navigate(CatalogProductFragmentDirections.actionCatalogProductFragmentToFavoriteFragment())
+                    }.show()
 
+            }
         }, this)
         viewModel.setCatalogItem(catalogId)
         binding.tvLabelCatalog.text = catalogTitle
@@ -65,10 +75,18 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
 
     override fun onProductItemClicked(product: Product) {
         viewModel.addProductInBasket(product)
-        Snackbar.make(binding.constraintCatalogProduct, "Товар ${product.app_name} добавлн в корзину", Snackbar.LENGTH_LONG)
-            .setAction("Перейти в корзину") {
-                this.findNavController().navigate(CatalogProductFragmentDirections.actionCatalogProductFragmentToBasketFragment())
-            }.show()
+        if (product.category != 20) {
+            Snackbar.make(
+                binding.constraintCatalogProduct,
+                "Товар ${product.app_name} добавлн в корзину",
+                Snackbar.LENGTH_LONG
+            )
+                .setAction("Перейти в корзину") {
+                    findNavController().navigate(CatalogProductFragmentDirections.actionCatalogProductFragmentToBasketFragment())
+                }.show()
+        } else {
+            Toast.makeText(this.context, "Стартовый пакет возможно заказать только 1", Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun aboutProductClick(product: Product) {

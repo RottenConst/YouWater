@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.CatalogListViewModel
+import ru.iwater.youwater.vm.CatalogListViewModel
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.FragmentHomeBinding
 import ru.iwater.youwater.screen.adapters.AdapterProductList
@@ -70,11 +71,19 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
 
     override fun onProductItemClicked(product: Product) {
         viewModel.addProductInBasket(product)
-        Snackbar.make(binding.frameHome, "Товар ${product.app_name} добавлен в корзину", Snackbar.LENGTH_LONG)
-            .setAction("Перейти в корзину", View.OnClickListener {
-                this.findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToBasketFragment())
-        }).show()
-
+        if (product.category != 20) {
+            Snackbar.make(
+                binding.frameHome,
+                "Товар ${product.app_name} добавлен в корзину",
+                Snackbar.LENGTH_LONG
+            )
+                .setAction("Перейти в корзину", View.OnClickListener {
+                    this.findNavController()
+                        .navigate(HomeFragmentDirections.actionHomeFragmentToBasketFragment())
+                }).show()
+        } else {
+            Toast.makeText(this.context, "Стартовый пакет возможно заказать только 1", Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun aboutProductClick(product: Product) {

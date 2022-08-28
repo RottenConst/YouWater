@@ -1,12 +1,16 @@
-package ru.iwater.youwater.data
+package ru.iwater.youwater.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import ru.iwater.youwater.data.FavoriteProduct
+import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.data.TypeProduct
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.repository.ProductRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 @OnScreen
@@ -58,12 +62,20 @@ class CatalogListViewModel @Inject constructor(
     fun addProductInBasket(product: Product) {
         viewModelScope.launch {
             val dbProduct = productRepo.getProductFromDB(product.id)
-            if (dbProduct != null) {
+            val productStart = productRepo.getProductList()?.filter { it.category == 20 }
+            val start = productStart.isNullOrEmpty()
+            Timber.d("STAAAAAAAAAAAAAART == $start")
+            if (dbProduct != null && dbProduct.category != 20) {
                 dbProduct.count += 1
                 productRepo.updateProductInBasket(dbProduct)
             } else {
-                product.count += 1
-                productRepo.addProductInBasket(product)
+                if (product.category == 20 && start) {
+                    product.count = 1
+                    productRepo.addProductInBasket(product)
+                } else if (product.category != 20) {
+                    product.count += 1
+                    productRepo.addProductInBasket(product)
+                }
             }
         }
     }
@@ -77,7 +89,7 @@ class CatalogListViewModel @Inject constructor(
     fun refreshProduct() {
         viewModelScope.launch {
             _catalogProductMap.value = emptyMap()
-            catalogs.addAll(productRepo.getCategoryList())
+            catalogs.addAll(productRepo.getCategoryList().sortedBy { it.priority })
             _catalogList.value = catalogs
             getFavoriteProduct()
             getAllProducts(catalogs)

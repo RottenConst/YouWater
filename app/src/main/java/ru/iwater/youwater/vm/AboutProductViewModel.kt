@@ -1,10 +1,11 @@
-package ru.iwater.youwater.data
+package ru.iwater.youwater.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.repository.ProductRepository
 import javax.inject.Inject
 
@@ -13,13 +14,12 @@ class AboutProductViewModel @Inject constructor(
 ): ViewModel() {
 
     private val _product: MutableLiveData<Product> = MutableLiveData()
-    val product: LiveData<Product>
-        get() = _product
+    val product: LiveData<Product> get() = _product
 
 
     fun plusCountProduct() {
         val product = _product.value
-        if (product != null) {
+        if (product != null && product.category != 20) {
             product.count += 1
             _product.value = product
         }

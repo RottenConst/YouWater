@@ -7,10 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.iwater.youwater.data.Product
-import ru.iwater.youwater.databinding.ItemFavoriteProductBinding
 import ru.iwater.youwater.databinding.ItemOrderProductBinding
 
-class OrderProductAdapter() : ListAdapter<Product, OrderProductAdapter.OrderProductHolder>(OrderProductDiffCallback) {
+class OrderProductAdapter : ListAdapter<Product, OrderProductAdapter.OrderProductHolder>(OrderProductDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderProductHolder {
         return OrderProductHolder.from(parent)

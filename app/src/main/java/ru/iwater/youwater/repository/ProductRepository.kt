@@ -3,10 +3,12 @@ package ru.iwater.youwater.repository
 import ru.iwater.youwater.bd.FavoriteProductDao
 import ru.iwater.youwater.bd.ProductDao
 import ru.iwater.youwater.bd.YouWaterDB
+import ru.iwater.youwater.data.AuthClient
 import ru.iwater.youwater.data.FavoriteProduct
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.TypeProduct
+import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.RetrofitFactory
 import timber.log.Timber
@@ -15,7 +17,8 @@ import javax.inject.Inject
 
 @OnScreen
 class ProductRepository @Inject constructor(
-    youWaterDB: YouWaterDB
+    youWaterDB: YouWaterDB,
+    private val authClient: StorageStateAuthClient
 ) {
 
     private val productDao: ProductDao = youWaterDB.productDao()
@@ -71,10 +74,8 @@ class ProductRepository @Inject constructor(
 
     suspend fun getProduct(productId: Int): Product? {
         try {
-            val product = apiWater.getProductList()
-            if (!product.isNullOrEmpty())
-                return product.filter { it.id == productId }[0]
-        }catch (e: Exception) {
+            return apiWater.getProduct(productId)
+        } catch (e: Exception) {
             Timber.e("Exception get product $e")
         }
         return null
@@ -86,8 +87,16 @@ class ProductRepository @Inject constructor(
     suspend fun getCategoryList(): List<TypeProduct> {
         var category: List<TypeProduct> = emptyList()
         try {
+            val startPocket = apiWater.isStartPocket(getAuthClient().clientId)
+            var startClient: Boolean? = false
+            if (startPocket.isSuccessful) {
+                startClient = startPocket.body()?.get("status")?.asBoolean
+            }
             category = apiWater.getCategoryList()
             if (!category.isNullOrEmpty()) {
+                if (startClient == false || startClient == null) {
+                    return category.filter { it.id != 20 && it.visible_app == 1 && it.company_id == "0007" }
+                }
                 return category.filter { it.visible_app == 1 && it.company_id == "0007"}
             }
         }catch (e: Exception) {
@@ -95,4 +104,6 @@ class ProductRepository @Inject constructor(
         }
         return category
     }
+
+    private fun getAuthClient(): AuthClient = authClient.get()
 }

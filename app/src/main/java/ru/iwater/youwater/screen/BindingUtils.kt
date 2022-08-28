@@ -31,15 +31,24 @@ fun TextView.bindNameProduct(product: Product?) {
 @BindingAdapter("costProduct")
 fun TextView.bindCostProduct(product: Product?) {
     if (product != null) {
-        if (product.category == 1) {
-            if (product.price.isNotEmpty()) {
-                val price = product.price.split(";")[0].split(":")[1]
-                "от ${price.toInt() - 15}₽".also { text = it }
+        when (product.id) {
+            81 -> {
+                if (product.price.isNotEmpty()) {
+                    val price = product.price.split(";")[0].split(":")[1]
+                    "от ${price.toInt() - 15}₽".also { text = it }
+                }
             }
-        } else {
-            if (product.price.isNotEmpty() && product.price.length > 4) {
-                val price = product.price.split(";")[0].split(":")[1]
-                "от ${price}₽".also { text = it }
+            84 -> {
+                if (product.price.isNotEmpty()) {
+                    val price = product.price.split(";")[0].split(":")[1]
+                    "от ${price.toInt() - 15}₽".also { text = it }
+                }
+            }
+            else -> {
+                if (product.price.isNotEmpty() && product.price.length > 4) {
+                    val price = product.price.split(";")[0].split(":")[1]
+                    "от ${price}₽".also { text = it }
+                }
             }
         }
     }
@@ -48,15 +57,26 @@ fun TextView.bindCostProduct(product: Product?) {
 @BindingAdapter("costProductNoDiscount")
 fun TextView.bindCostNoDiscount(product: Product?) {
     if (product != null) {
-        if (product.category == 1) {
-            visibility = View.VISIBLE
-            paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
-            if (product.price.isNotEmpty()) {
-                val price = product.price.split(";")[0].split(":")[1]
-                "от ${price.toInt()}₽".also { text = it }
+        when (product.id) {
+            81 -> {
+                visibility = View.VISIBLE
+                paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+                if (product.price.isNotEmpty()) {
+                    val price = product.price.split(";")[0].split(":")[1]
+                    "от ${price.toInt()}₽".also { text = it }
+                }
             }
-        } else {
-            visibility = View.GONE
+            84 -> {
+                visibility = View.VISIBLE
+                paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+                if (product.price.isNotEmpty()) {
+                    val price = product.price.split(";")[0].split(":")[1]
+                    "от ${price.toInt()}₽".also { text = it }
+                }
+            }
+            else -> {
+                visibility = View.GONE
+            }
         }
     }
 }
@@ -64,23 +84,42 @@ fun TextView.bindCostNoDiscount(product: Product?) {
 @BindingAdapter("setCostNoDiscount")
 fun TextView.bindNoDiscount(product: Product?) {
     if (product != null) {
-        if (product.category == 1) {
-            visibility = View.VISIBLE
-            val prices = product.price.removeSuffix(";")
-            val priceList = prices.split(";")
-            val count = product.count
-            var price = 0
-            priceList.forEach {
-                Timber.d("COUNT = $count")
-                val priceCount = it.split(":")
-                if (priceCount[0].toInt() <= count) {
-                    Timber.d("Place = ${priceCount[1].toInt()}")
-                    price = priceCount[1].toInt() * count
+        when (product.id) {
+            81 -> {
+                visibility = View.VISIBLE
+                val prices = product.price.removeSuffix(";")
+                val priceList = prices.split(";")
+                val count = product.count
+                var price = 0
+                priceList.forEach {
+                    Timber.d("COUNT = $count")
+                    val priceCount = it.split(":")
+                    if (priceCount[0].toInt() <= count) {
+                        Timber.d("Place = ${priceCount[1].toInt()}")
+                        price = priceCount[1].toInt() * count
+                    }
                 }
+                "$price₽".also { text = it }
             }
-            "$price₽".also { text = it }
-        } else {
-            visibility = View.GONE
+            84 -> {
+                visibility = View.VISIBLE
+                val prices = product.price.removeSuffix(";")
+                val priceList = prices.split(";")
+                val count = product.count
+                var price = 0
+                priceList.forEach {
+                    Timber.d("COUNT = $count")
+                    val priceCount = it.split(":")
+                    if (priceCount[0].toInt() <= count) {
+                        Timber.d("Place = ${priceCount[1].toInt()}")
+                        price = priceCount[1].toInt() * count
+                    }
+                }
+                "$price₽".also { text = it }
+            }
+            else -> {
+                visibility = View.GONE
+            }
         }
     }
 }
@@ -89,25 +128,40 @@ fun TextView.bindNoDiscount(product: Product?) {
 fun TextView.bindPriceProduct(product: Product?) {
     if (!product?.price.isNullOrEmpty()) {
         val prices = product?.price?.removeSuffix(";")
+        Timber.d("PRICES $prices ${product?.count}")
         val priceList = prices?.split(";")
         val count = product?.count ?: 0
         var price = 0
-        if (product?.category == 1) {
-            priceList?.forEach {
-                Timber.d("COUNT = $count")
-                val priceCount = it.split(":")
-                if (priceCount[0].toInt() <= count) {
-                    Timber.d("Place = ${priceCount[1].toInt()}")
-                    price = (priceCount[1].toInt() - 15) * count
+        Timber.d("COUNT $count PRICE $price")
+        when (product?.id) {
+            81 -> {
+                priceList?.forEach {
+                    Timber.d("COUNT = $count")
+                    val priceCount = it.split(":")
+                    if (priceCount[0].toInt() <= count) {
+                        Timber.d("Place = ${priceCount[1].toInt()}")
+                        price = (priceCount[1].toInt() - 15) * count
+                    }
                 }
             }
-        } else {
-            priceList?.forEach {
-                Timber.d("COUNT = $count")
-                val priceCount = it.split(":")
-                if (priceCount[0].toInt() <= count) {
-                    Timber.d("Place = ${priceCount[1].toInt()}")
-                    price = priceCount[1].toInt() * count
+            84 -> {
+                priceList?.forEach {
+                    Timber.d("COUNT = $count")
+                    val priceCount = it.split(":")
+                    if (priceCount[0].toInt() <= count) {
+                        Timber.d("Place = ${priceCount[1].toInt()}")
+                        price = (priceCount[1].toInt() - 15) * count
+                    }
+                }
+            }
+            else -> {
+                priceList?.forEach {
+                    Timber.d("COUNT = $count")
+                    val priceCount = it.split(":")
+                    if (priceCount[0].toInt() <= count) {
+                        Timber.d("Place = ${priceCount[1].toInt()}")
+                        price = priceCount[1].toInt() * count
+                    }
                 }
             }
         }
@@ -124,22 +178,35 @@ fun TextView.bindBtnPriceProduct(product: Product?) {
         val priceList = prices.split(";")
         val count = product.count
         var price = 0
-        if (product.category == 1) {
-            priceList.forEach {
-                Timber.d("COUNT = $count")
-                val priceCount = it.split(":")
-                if (priceCount[0].toInt() <= count) {
-                    Timber.d("Place = ${priceCount[1].toInt()}")
-                    price = (priceCount[1].toInt() - 15) * count
+        when (product.id) {
+            81 -> {
+                priceList.forEach {
+                    Timber.d("COUNT = $count")
+                    val priceCount = it.split(":")
+                    if (priceCount[0].toInt() <= count) {
+                        Timber.d("Place = ${priceCount[1].toInt()}")
+                        price = (priceCount[1].toInt() - 15) * count
+                    }
                 }
             }
-        } else {
-            priceList.forEach {
-                Timber.d("COUNT = $count")
-                val priceCount = it.split(":")
-                if (priceCount[0].toInt() <= count) {
-                    Timber.d("Place = ${priceCount[1].toInt()}")
-                    price = priceCount[1].toInt() * count
+            84 -> {
+                priceList.forEach {
+                    Timber.d("COUNT = $count")
+                    val priceCount = it.split(":")
+                    if (priceCount[0].toInt() <= count) {
+                        Timber.d("Place = ${priceCount[1].toInt()}")
+                        price = (priceCount[1].toInt() - 15) * count
+                    }
+                }
+            }
+            else -> {
+                priceList.forEach {
+                    Timber.d("COUNT 1 = $count")
+                    val priceCount = it.split(":")
+                    if (priceCount[0].toInt() <= count) {
+                        Timber.d("Place 1 = ${priceCount[1].toInt()}")
+                        price = priceCount[1].toInt() * count
+                    }
                 }
             }
         }
@@ -167,7 +234,8 @@ fun TextView.bindAboutProduct(product: Product?) {
  */
 @BindingAdapter("imageUrl")
 fun bindImageProduct(imgView: ImageView, file: String?) {
-    val imgUrl = "https://dev.new.iwatercrm.ru/iwatercrm/images/$file"
+    val imgUrl = "https://dev.new.iwatercrm.ru/iwatercrm/images/$file" //test
+//    val imgUrl = "https://crm.new.iwatercrm.ru/iwatercrm/images/$file" //prod
     imgUrl.let {
         val imgUrl = imgUrl.toUri().buildUpon().build()
         Glide.with(imgView.context)
@@ -331,8 +399,7 @@ fun TextView.bidingNameClient(clientName: String?) {
 @BindingAdapter("setNameAndLastnameClient")
 fun TextView.bindingNameAndLastnameClient(client: Client?) {
     if (client != null) {
-        text =
-            if (client.lastname != "NULL") "${client.name} ${client.lastname}" else client.name
+        text = client.name
     }
 }
 
@@ -366,7 +433,20 @@ fun TextView.bindDateMyOrder(dateOrder: String?) {
 
 @BindingAdapter("setTypeCash")
 fun TextView.bindTypeCash(typeCash: String?) {
-    "$typeCash".also { text = it }
+    text = when (typeCash) {
+        "0" -> {
+            "Оплата наличными"
+        }
+        "2" -> {
+            "Оплата по карте"
+        }
+        "4" -> {
+            "Оплата по карте курьеру"
+        }
+        else -> {
+            typeCash
+        }
+    }
 }
 
 @BindingAdapter("setIdOrder")
@@ -393,6 +473,11 @@ fun TextView.bindOrderStatus(status: Int) {
             text = "Заказ перенесён"
         }
     }
+}
+
+@BindingAdapter("setRawAddress")
+fun TextView.bindRawAddress(rawAddress: RawAddress?) {
+    text = "${rawAddress?.fullAddress?.split(",")?.get(0)}, ${rawAddress?.factAddress}"
 }
 
 @BindingAdapter("setAddress")

@@ -1,5 +1,6 @@
 package ru.iwater.youwater.network
 
+import androidx.annotation.Nullable
 import com.google.gson.JsonObject
 import retrofit2.Response
 import retrofit2.http.*
@@ -7,8 +8,13 @@ import ru.iwater.youwater.data.*
 
 interface ApiWater {
 
-    @GET("iwaterProducts_list/")
+    @GET("products/")
     suspend fun getProductList():List<Product>
+
+    @GET("product-detail/{product_id}")
+    suspend fun getProduct(
+        @Path("product_id") productId: Int
+    ): Product
 
     @GET("categoryProducts_list/")
     suspend fun getCategoryList():List<TypeProduct>
@@ -28,7 +34,7 @@ interface ApiWater {
         @Body jsonObject: JsonObject
     ): JsonObject?
 
-    @GET("get_client_info/{client_id}/")
+    @GET("client_detail/{client_id}/")
     suspend fun getClientDetail(
         @Path("client_id") clientId: Int
     ): Client?
@@ -65,7 +71,13 @@ interface ApiWater {
         @Body editClientData: ClientUserData
     ): AutoTaskData?
 
-    @GET("all_adresses/{client_id}/")
+    @PUT("client_detail/{client_id}/")
+    suspend fun editUserData(
+        @Path("client_id") clientId: Int,
+        @Body clientData: JsonObject
+    ): Response<JsonObject>?
+
+    @GET("address/{client_id}/")
     suspend fun getAllAddresses(
         @Path("client_id") clientId: Int
     ):List<RawAddress>
@@ -102,4 +114,9 @@ interface ApiWater {
     suspend fun getStatusOrder(
         @Path("order_id") orderId: Int
     ): Response<List<JsonObject>>
+
+    @GET("starter-eligible/{client_id}")
+    suspend fun isStartPocket(
+        @Path("client_id") client_id: Int
+    ): Response<JsonObject>
 }

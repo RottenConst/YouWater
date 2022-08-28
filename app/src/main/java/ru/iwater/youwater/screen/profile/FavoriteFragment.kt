@@ -11,12 +11,10 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.FavoriteProduct
-import ru.iwater.youwater.data.FavoriteViewModel
+import ru.iwater.youwater.vm.FavoriteViewModel
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.FragmentFavoriteBinding
 import ru.iwater.youwater.screen.adapters.FavoriteProductAdapter
-import ru.iwater.youwater.screen.home.HomeFragmentDirections
 import javax.inject.Inject
 
 // TODO: Rename parameter arguments, choose names that match

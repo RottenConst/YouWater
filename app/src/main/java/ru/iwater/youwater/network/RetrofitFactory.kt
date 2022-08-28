@@ -63,7 +63,8 @@ object RetrofitGoogleService {
 }
 
 object RetrofitSberApi {
-    const val BASE_URL = "https://3dsec.sberbank.ru/payment/rest/"
+a//    const val BASE_URL = "https://3dsec.sberbank.ru/payment/rest/" //test
+    const val BASE_URL = "https://securepayments.sberbank.ru/payment/rest/" //prod
 
     fun makeRetrofit(): SberPaymentApi {
         val httpLoggingInterceptor = HttpLoggingInterceptor()

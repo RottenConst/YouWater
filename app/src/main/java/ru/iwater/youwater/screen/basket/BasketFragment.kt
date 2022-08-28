@@ -10,7 +10,7 @@ import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.Product
-import ru.iwater.youwater.data.ProductListViewModel
+import ru.iwater.youwater.vm.ProductListViewModel
 import ru.iwater.youwater.databinding.FragmentBasketBinding
 import ru.iwater.youwater.screen.adapters.AdapterBasketList
 import timber.log.Timber
@@ -55,7 +55,7 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
                     product.price.removeSuffix(";") //тут я убираю последнюю точку с запятой что б null'a не было
                 val priceList = prices.split(";") //делю на массив по ;
                 val count = product.count //количество товара узнаю
-                if (product.category == 1) {
+                if (product.id == 81 || product.id == 84) {
                     priceList.forEach {
                         val priceCount =
                             it.split(":") //дальше уже узнаю цены и сравниваю с количеством
@@ -85,7 +85,7 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
         }
         binding.btnCheckoutOrder.setOnClickListener {
             this.findNavController().navigate(
-                BasketFragmentDirections.actionBasketFragmentToCreateOrderFragment()
+                BasketFragmentDirections.actionBasketFragmentToCreateOrderFragment(false)
             )
         }
         return binding.root

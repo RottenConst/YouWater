@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.OrderViewModel
+import ru.iwater.youwater.data.PaymentStatus
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.FragmentCardPaymentBinding
 import timber.log.Timber
@@ -59,7 +60,17 @@ class CardPaymentFragment : BaseFragment() {
                 if (endUrl.contentEquals("http://605d3ea8e59a.ngrok.io/") || endUrl.contentEquals("https://605d3ea8e59a.ngrok.io")){
                     viewModel.getPaymentStatus(orderId)
                     binding.wvCardPayment.visibility = View.GONE
-                    findNavController().navigate(CardPaymentFragmentDirections.actionCardPaymentFragmentToCompleteOrderFragment(orderId, true))
+                    viewModel.paymentStatus.observe(viewLifecycleOwner) { paymentStatus ->
+                        when (paymentStatus) {
+                            PaymentStatus.SUCCESSFULLY -> {
+                                viewModel.clearProduct(productClear)
+                                findNavController().navigate(CardPaymentFragmentDirections.actionCardPaymentFragmentToCompleteOrderFragment(orderId, true))
+                            }
+                            PaymentStatus.ERROR -> {
+                                findNavController().navigate(CardPaymentFragmentDirections.actionCardPaymentFragmentToCreateOrderFragment(true))
+                            }
+                        }
+                    }
                 }
                 super.onPageStarted(view, url, favicon)
             }

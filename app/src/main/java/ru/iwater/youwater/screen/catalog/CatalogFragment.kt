@@ -10,7 +10,7 @@ import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.databinding.FragmentCatalogBinding
-import ru.iwater.youwater.data.CatalogListViewModel
+import ru.iwater.youwater.vm.CatalogListViewModel
 import ru.iwater.youwater.screen.adapters.AdapterCatalogList
 import javax.inject.Inject
 

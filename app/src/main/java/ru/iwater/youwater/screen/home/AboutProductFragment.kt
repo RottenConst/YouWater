@@ -4,16 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
-import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.AboutProductViewModel
+import ru.iwater.youwater.vm.AboutProductViewModel
 import ru.iwater.youwater.databinding.FragmentAboutProductBinding
-import timber.log.Timber
 import javax.inject.Inject
 
 class AboutProductFragment : BaseFragment() {
@@ -43,7 +42,7 @@ class AboutProductFragment : BaseFragment() {
         binding.btnMinusCount.setOnClickListener {
             viewModel.minusCountProduct()
         }
-//        viewModel.product.observe(this.viewLifecycleOwner, { product ->
+//        viewModel.product.observe(this.viewLifecycleOwner) { product ->
 //            if (product != null) {
 //                if (product.category == 1) {
 //                    if (product.price.isNotEmpty()) {
@@ -55,17 +54,23 @@ class AboutProductFragment : BaseFragment() {
 //                    binding.tvPriceDiscount.text = "от ${price}₽"
 //                }
 //            }
-//        })
+//        }
         binding.btnBuyProduct.setOnClickListener {
             viewModel.product.observe(this.viewLifecycleOwner) {
                 viewModel.addProductToBasket(it)
-                Snackbar.make(binding.constraintAboutProduct,
-                    "Товар ${it.app_name} добавлен в корзину",
-                    Snackbar.LENGTH_LONG)
-                    .setAction("Перейти в корзину") {
-                        this.findNavController()
-                            .navigate(AboutProductFragmentDirections.actionAboutProductFragmentToBasketFragment())
-                    }.show()
+                if (it.category != 20) {
+                    Snackbar.make(
+                        binding.constraintAboutProduct,
+                        "Товар ${it.app_name} добавлен в корзину",
+                        Snackbar.LENGTH_LONG
+                    )
+                        .setAction("Перейти в корзину") {
+                            this.findNavController()
+                                .navigate(AboutProductFragmentDirections.actionAboutProductFragmentToBasketFragment())
+                        }.show()
+                } else {
+                    Toast.makeText(this.context, "Стартовый пакет возможно заказать только 1", Toast.LENGTH_LONG).show()
+                }
             }
         }
 
