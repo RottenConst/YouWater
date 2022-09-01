@@ -252,7 +252,7 @@ class CreateOrderFragment : BaseFragment(),
                     when(status) {
                         Status.SEND -> {
                             viewModel.numberOrder.observe(this.viewLifecycleOwner) { numberOrder ->
-                                viewModel.payToCard(numberOrder, amount = order.orderCost, order.contact)//*100
+                                viewModel.payToCard(numberOrder, amount = order.orderCost * 100, order.contact)//*100
                                 viewModel.dataPayment.observe(this.viewLifecycleOwner) { dataPayment ->
                                     Timber.d("SBER LINK: ${dataPayment[0]}; ${dataPayment[1]}")
                                     val orderId = dataPayment[0].removePrefix("\"").removeSuffix("\"")
