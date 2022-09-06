@@ -22,7 +22,9 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_homeFragment_to_favoriteFragment"
-            app:destination="@id/favoriteFragment" />
+            app:destination="@id/favoriteFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/catalogFragment"
@@ -100,10 +102,11 @@
             android:id="@+id/action_aboutProductFragment_to_basketFragment"
             app:destination="@id/basketFragment"
             app:popUpTo="@id/homeFragment"
-            app:popUpToInclusive="false" />
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_aboutProductFragment_to_priceBottomSheetFragment"
-            app:destination="@id/priceBottomSheetFragment" />
+            app:destination="@id/priceBottomSheetFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/userDataFragment"

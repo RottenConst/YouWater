@@ -14,7 +14,7 @@ interface ApiWater {
     @GET("product-detail/{product_id}")
     suspend fun getProduct(
         @Path("product_id") productId: Int
-    ): Product
+    ): Product?
 
     @GET("categoryProducts_list/")
     suspend fun getCategoryList():List<TypeProduct>?

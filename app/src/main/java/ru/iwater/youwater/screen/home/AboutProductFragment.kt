@@ -15,6 +15,9 @@ import ru.iwater.youwater.vm.AboutProductViewModel
 import ru.iwater.youwater.databinding.FragmentAboutProductBinding
 import javax.inject.Inject
 
+/**
+ * Фрагмент подробной информации о товаре
+ */
 class AboutProductFragment : BaseFragment() {
 
     @Inject
@@ -36,51 +39,61 @@ class AboutProductFragment : BaseFragment() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         viewModel.initProduct(productId)
-        binding.btnPlusCount.setOnClickListener {
-            viewModel.plusCountProduct()
-        }
-        binding.btnMinusCount.setOnClickListener {
-            viewModel.minusCountProduct()
-        }
-//        viewModel.product.observe(this.viewLifecycleOwner) { product ->
-//            if (product != null) {
-//                if (product.category == 1) {
-//                    if (product.price.isNotEmpty()) {
-//                        val price = product.price.split(";")[0].split(":")[1]
-//                        "от ${price.toInt() - 15}₽".also { binding.tvPriceDiscount.text = it }
-//                    }
-//                } else {
-//                    val price = product.price.split(";")[0].split(":")[1]
-//                    binding.tvPriceDiscount.text = "от ${price}₽"
-//                }
-//            }
-//        }
-        binding.btnBuyProduct.setOnClickListener {
-            viewModel.product.observe(this.viewLifecycleOwner) {
-                viewModel.addProductToBasket(it)
-                if (it.category != 20) {
-                    Snackbar.make(
-                        binding.constraintAboutProduct,
-                        "Товар ${it.app_name} добавлен в корзину",
-                        Snackbar.LENGTH_LONG
-                    )
-                        .setAction("Перейти в корзину") {
-                            this.findNavController()
-                                .navigate(AboutProductFragmentDirections.actionAboutProductFragmentToBasketFragment())
-                        }.show()
-                } else {
-                    Toast.makeText(this.context, "Стартовый пакет возможно заказать только 1", Toast.LENGTH_LONG).show()
+        viewModel.product.observe(this.viewLifecycleOwner) { product ->
+            if (product != null) {
+                //клик по "+"
+                binding.btnPlusCount.setOnClickListener {
+                    viewModel.plusCountProduct(product)
                 }
-            }
-        }
 
-        binding.ibGetPrice.setOnClickListener {
-            viewModel.product.observe(this.viewLifecycleOwner) {
-                val priceProduct = it.price
-                this.findNavController()
-                    .navigate(AboutProductFragmentDirections.actionAboutProductFragmentToPriceBottomSheetFragment(priceProduct))
-            }
+                //клик по "-"
+                binding.btnMinusCount.setOnClickListener {
+                    viewModel.minusCountProduct(product)
+                }
 
+                //клик по кнопке "добавить в корзину"
+                binding.btnBuyProduct.setOnClickListener {
+                    viewModel.addProductToBasket(product)
+                    if (product.category != 20) { //является ли товар стартовым пакетом
+                        Snackbar.make(
+                            binding.constraintAboutProduct,
+                            "Товар ${product.app_name} добавлен в корзину",
+                            Snackbar.LENGTH_LONG
+                        )
+                            .setAction("Перейти в корзину") {
+                                this.findNavController()
+                                    .navigate(AboutProductFragmentDirections.actionAboutProductFragmentToBasketFragment())
+                            }.show()
+                    } else {
+                        Toast.makeText(
+                            this.context,
+                            "Стартовый пакет возможно заказать только 1",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+
+                }
+
+                //клик по "?"
+                binding.ibGetPrice.setOnClickListener {
+                    viewModel.displayPrice(product.price)
+                    viewModel.navigateToPriceProduct.observe(this.viewLifecycleOwner) {
+                        if (it != null) {
+                            this.findNavController()
+                                .navigate(
+                                    AboutProductFragmentDirections.actionAboutProductFragmentToPriceBottomSheetFragment(
+                                        it
+                                    )
+                                )
+                            viewModel.displayPriceComplete()
+                        }
+
+                    }
+
+                }
+            } else {
+                Toast.makeText(this.context, "Неудается загрузить информацию о заказе", Toast.LENGTH_LONG).show()
+            }
         }
         return binding.root
     }

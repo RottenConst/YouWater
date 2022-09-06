@@ -23,7 +23,6 @@ class PriceProductAdapter() : ListAdapter<String, PriceProductAdapter.PriceProdu
     class PriceProductHolder(val binding: ItemPriceBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bindingPrice(prices: String) {
-            Timber.d("prices = $prices" )
             val price = prices.split(":")
             if (price[0] == "1") {
                 binding.tvCountProducts.text = "От одной шт."

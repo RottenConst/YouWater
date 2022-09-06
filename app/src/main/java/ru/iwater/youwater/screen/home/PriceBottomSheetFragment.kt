@@ -22,9 +22,7 @@ class PriceBottomSheetFragment : BottomSheetDialogFragment() {
         val adapter = PriceProductAdapter()
         val priceProduct = PriceBottomSheetFragmentArgs.fromBundle(requireArguments()).priceProduct
         val prices = priceProduct.removeSuffix(";")
-        Timber.d("PRICES $prices")
         val priceList = prices.split(";")
-        Timber.d("PRICES LIST ${priceList[1]}")
         binding.rvPrice.adapter = adapter
         adapter.submitList(priceList)
         return binding.root
