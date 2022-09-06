@@ -27,7 +27,6 @@ class CatalogFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         screenComponent.inject(this)
-        viewModel.refreshProduct()
     }
 
     override fun onCreateView(

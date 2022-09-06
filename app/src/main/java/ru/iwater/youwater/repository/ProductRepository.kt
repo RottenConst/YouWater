@@ -45,6 +45,10 @@ class ProductRepository @Inject constructor(
         productDao.delete(product)
     }
 
+    suspend fun getFavoriteProductFromDB(id: Int): FavoriteProduct? {
+        return favoriteDao.getFavoriteProduct(id)
+    }
+
     suspend fun addToFavoriteProduct(favoriteProduct: FavoriteProduct) {
         favoriteDao.save(favoriteProduct)
     }
@@ -53,56 +57,59 @@ class ProductRepository @Inject constructor(
         favoriteDao.delete(favoriteProduct)
     }
 
-    suspend fun getAllFavoriteProducts(): List<FavoriteProduct>? = favoriteDao.getAllProduct()
+    suspend fun getAllFavoriteProducts(): List<FavoriteProduct>{
+        val favoriteProducts = favoriteDao.getAllProduct()
+        return if (favoriteProducts.isNullOrEmpty()) {
+            emptyList()
+        } else favoriteProducts
+    }
 
 
     /**
      * получить список товаров определённой категории
      */
     suspend fun getProductList(category: Int): List<Product> {
-        var productList: List<Product> = emptyList()
-        try {
-            productList = apiWater.getProductList()
-            if (!productList.isNullOrEmpty()) {
-                return productList.filter { it.app == 1 && it.category == category }
-            }
+        return try {
+            val productList = apiWater.getProductList()
+            if (productList.isNotEmpty()) {
+                productList.filter { it.app == 1 && it.category == category }
+            } else emptyList()
         }catch (e: Exception) {
-            Timber.e(e)
+            Timber.e("Error getProductList: $e")
+            emptyList()
         }
-        return productList
     }
 
     suspend fun getProduct(productId: Int): Product? {
-        try {
-            return apiWater.getProduct(productId)
+        return try {
+            apiWater.getProduct(productId)
         } catch (e: Exception) {
             Timber.e("Exception get product $e")
+            null
         }
-        return null
     }
 
     /**
      * получить список категорий
      */
     suspend fun getCategoryList(): List<TypeProduct> {
-        var category: List<TypeProduct> = emptyList()
-        try {
-            val startPocket = apiWater.isStartPocket(getAuthClient().clientId)
-            var startClient: Boolean? = false
+        return try {
+            val startPocket = apiWater.isStartPocket(getAuthClient().clientId) //стартовый пакет
+            var startClient: Boolean? = false // клиент новый?
             if (startPocket.isSuccessful) {
                 startClient = startPocket.body()?.get("status")?.asBoolean
             }
-            category = apiWater.getCategoryList()
+            val category = apiWater.getCategoryList()
             if (!category.isNullOrEmpty()) {
                 if (startClient == false || startClient == null) {
-                    return category.filter { it.id != 20 && it.visible_app == 1 && it.company_id == "0007" }
+                    return category.filter { it.id != 20 && it.visible_app == 1 && it.company_id == "0007" }.sortedBy { it.priority }
                 }
-                return category.filter { it.visible_app == 1 && it.company_id == "0007"}
-            }
+                return category.filter { it.visible_app == 1 && it.company_id == "0007"}.sortedBy { it.priority }
+            } else emptyList()
         }catch (e: Exception) {
-            Timber.e(e)
+            Timber.e("Error get catalog list: $e")
+            emptyList()
         }
-        return category
     }
 
     private fun getAuthClient(): AuthClient = authClient.get()

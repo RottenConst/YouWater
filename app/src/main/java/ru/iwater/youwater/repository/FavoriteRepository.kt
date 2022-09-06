@@ -64,8 +64,4 @@ class FavoriteRepository @Inject constructor(
         }
         return emptyList()
     }
-
-//    suspend fun getFavoriteProduct(favoriteProduct: FavoriteProduct){
-//        TODO()
-//    }
 }

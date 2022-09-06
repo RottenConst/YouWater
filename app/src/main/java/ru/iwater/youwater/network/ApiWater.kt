@@ -17,7 +17,7 @@ interface ApiWater {
     ): Product
 
     @GET("categoryProducts_list/")
-    suspend fun getCategoryList():List<TypeProduct>
+    suspend fun getCategoryList():List<TypeProduct>?
 
     @POST("auth-phone/")
     suspend fun authPhone(

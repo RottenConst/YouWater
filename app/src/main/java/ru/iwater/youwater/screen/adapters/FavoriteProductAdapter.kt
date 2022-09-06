@@ -5,11 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import ru.iwater.youwater.data.FavoriteProduct
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.ItemFavoriteProductBinding
 
 class FavoriteProductAdapter(private val onFavoriteProductClickListener: OnFavoriteProductClickListener) :
-    ListAdapter<Product, FavoriteProductAdapter.FavoriteProductHolder>(FavoriteDiffCallback) {
+    ListAdapter<FavoriteProduct, FavoriteProductAdapter.FavoriteProductHolder>(FavoriteDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteProductHolder {
         return FavoriteProductHolder.from(parent)
@@ -23,7 +24,7 @@ class FavoriteProductAdapter(private val onFavoriteProductClickListener: OnFavor
     class FavoriteProductHolder(val binding: ItemFavoriteProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bindingFavoriteCard(favoriteProduct: Product, onFavoriteProductClickListener: OnFavoriteProductClickListener) {
+        fun bindingFavoriteCard(favoriteProduct: FavoriteProduct, onFavoriteProductClickListener: OnFavoriteProductClickListener) {
             binding.favorite = favoriteProduct
             binding.onFavoriteItemClick = onFavoriteProductClickListener
             binding.executePendingBindings()
@@ -38,22 +39,22 @@ class FavoriteProductAdapter(private val onFavoriteProductClickListener: OnFavor
         }
     }
 
-    companion object FavoriteDiffCallback: DiffUtil.ItemCallback<Product>() {
-        override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
+    companion object FavoriteDiffCallback: DiffUtil.ItemCallback<FavoriteProduct>() {
+        override fun areItemsTheSame(oldItem: FavoriteProduct, newItem: FavoriteProduct): Boolean {
             return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(
-            oldItem: Product,
-            newItem: Product
+            oldItem: FavoriteProduct,
+            newItem: FavoriteProduct
         ): Boolean {
             return oldItem == newItem
         }
     }
 
     interface OnFavoriteProductClickListener {
-        fun onLikeItemClick(favoriteProduct: Product)
-        fun addItemInBasked(favoriteProduct: Product)
-        fun aboutFavoriteClick(favoriteProduct: Product)
+        fun onLikeItemClick(favoriteProduct: FavoriteProduct)
+        fun addItemInBasked(favoriteProduct: FavoriteProduct)
+        fun aboutFavoriteClick(favoriteProduct: FavoriteProduct)
     }
 }

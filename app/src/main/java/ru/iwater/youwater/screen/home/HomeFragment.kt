@@ -6,16 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import okhttp3.internal.notifyAll
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.vm.CatalogListViewModel
 import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.data.TypeProduct
 import ru.iwater.youwater.databinding.FragmentHomeBinding
 import ru.iwater.youwater.screen.adapters.AdapterProductList
 import ru.iwater.youwater.screen.adapters.CatalogWaterAdapter
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -29,6 +33,7 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
     private val screenComponent = App().buildScreenComponent()
     private val viewModel: CatalogListViewModel by viewModels { factory }
     private val binding: FragmentHomeBinding by lazy { FragmentHomeBinding.inflate(LayoutInflater.from(this.context)) }
+    private val adapterWatter: CatalogWaterAdapter by lazy { getCatalogWaterAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,24 +44,18 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel.refreshProduct()
-        val adapterWatter = CatalogWaterAdapter(CatalogWaterAdapter.OnClickListener{
-            if (!it.onFavoriteClick) {
-                viewModel.deleteFavoriteProduct(it)
-            } else {
-                viewModel.addProductInFavorite(it)
-                Snackbar.make(binding.frameHome, "Товар ${it.app_name} добавлен в избранное", Snackbar.LENGTH_LONG)
-                    .setAction("Избранное") {
-                        this.findNavController()
-                            .navigate(HomeFragmentDirections.actionHomeFragmentToFavoriteFragment())
-                    }.show()
-
-            }
-        }, this)
         binding.rvTypeProductList.adapter = adapterWatter
-        viewModel.catalogProductMap.observe(viewLifecycleOwner) { catalogs ->
-            adapterWatter.submitList(catalogs.toList())
+        viewModel.catalogList.observe(viewLifecycleOwner) { catalogs ->
+            if (catalogs.isEmpty()) {
+                Toast.makeText(this.context, "Ошибка не удалось загрузить котегории товаров", Toast.LENGTH_LONG).show()
+            }
         }
+
+        val productCatalog = Observer<Map<TypeProduct, List<Product>>> {
+            adapterWatter.submitList(it.toList())
+        }
+
+        viewModel.catalogProductMap.observeForever(productCatalog)
 
         viewModel.navigateToSelectProduct.observe(this.viewLifecycleOwner) {
             if (null != it) {
@@ -69,8 +68,13 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.getFavoriteProduct()
+    }
+
     override fun onProductItemClicked(product: Product) {
-        viewModel.addProductInBasket(product)
+        viewModel.addProductInBasket(product.id)
         if (product.category != 20) {
             Snackbar.make(
                 binding.frameHome,
@@ -88,6 +92,22 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
 
     override fun aboutProductClick(product: Product) {
         viewModel.displayProduct(product.id)
+    }
+
+    private fun getCatalogWaterAdapter(): CatalogWaterAdapter {
+        return CatalogWaterAdapter(CatalogWaterAdapter.OnClickListener{
+            if (!it.onFavoriteClick) {
+                viewModel.deleteFavoriteProduct(it)
+            } else {
+                viewModel.addProductInFavorite(it)
+                Snackbar.make(binding.frameHome, "Товар ${it.app_name} добавлен в избранное", Snackbar.LENGTH_LONG)
+                    .setAction("Избранное") {
+                        this.findNavController()
+                            .navigate(HomeFragmentDirections.actionHomeFragmentToFavoriteFragment())
+                    }.show()
+
+            }
+        }, this)
     }
 
     companion object {

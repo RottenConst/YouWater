@@ -25,6 +25,11 @@ fun TextView.bindNameProduct(product: Product?) {
     text = product?.name
 }
 
+@BindingAdapter("nameFavoriteProduct")
+fun TextView.bindNameFavoriteProduct(FavoriteProduct: FavoriteProduct?) {
+    text = FavoriteProduct?.name
+}
+
 /**
  * отображение стоимости товара
  */
@@ -54,8 +59,61 @@ fun TextView.bindCostProduct(product: Product?) {
     }
 }
 
+@BindingAdapter("costFavoriteProduct")
+fun TextView.bindCostFavoriteProduct(product: FavoriteProduct?) {
+    if (product != null) {
+        when (product.id) {
+            81 -> {
+                if (product.price.isNotEmpty()) {
+                    val price = product.price.split(";")[0].split(":")[1]
+                    "от ${price.toInt() - 15}₽".also { text = it }
+                }
+            }
+            84 -> {
+                if (product.price.isNotEmpty()) {
+                    val price = product.price.split(";")[0].split(":")[1]
+                    "от ${price.toInt() - 15}₽".also { text = it }
+                }
+            }
+            else -> {
+                if (product.price.isNotEmpty() && product.price.length > 4) {
+                    val price = product.price.split(";")[0].split(":")[1]
+                    "от ${price}₽".also { text = it }
+                }
+            }
+        }
+    }
+}
+
 @BindingAdapter("costProductNoDiscount")
 fun TextView.bindCostNoDiscount(product: Product?) {
+    if (product != null) {
+        when (product.id) {
+            81 -> {
+                visibility = View.VISIBLE
+                paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+                if (product.price.isNotEmpty()) {
+                    val price = product.price.split(";")[0].split(":")[1]
+                    "от ${price.toInt()}₽".also { text = it }
+                }
+            }
+            84 -> {
+                visibility = View.VISIBLE
+                paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+                if (product.price.isNotEmpty()) {
+                    val price = product.price.split(";")[0].split(":")[1]
+                    "от ${price.toInt()}₽".also { text = it }
+                }
+            }
+            else -> {
+                visibility = View.GONE
+            }
+        }
+    }
+}
+
+@BindingAdapter("costFavoriteProductNoDiscount")
+fun TextView.bindCostNoDiscountFavorite(product: FavoriteProduct?) {
     if (product != null) {
         when (product.id) {
             81 -> {

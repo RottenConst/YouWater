@@ -6,7 +6,7 @@
     <data>
         <variable
             name="favorite"
-            type="ru.iwater.youwater.data.Product" />
+            type="ru.iwater.youwater.data.FavoriteProduct" />
         <variable
             name="onFavoriteItemClick"
             type="ru.iwater.youwater.screen.adapters.FavoriteProductAdapter.OnFavoriteProductClickListener" />
@@ -65,7 +65,7 @@
                 android:layout_marginBottom="2dp"
                 android:textColor="@color/black"
                 android:textSize="14sp"
-                app:nameProduct="@{favorite}" />
+                app:nameFavoriteProduct="@{favorite}" />
 
             <TextView
                 android:id="@+id/tv_favorite_no_discount"
@@ -77,7 +77,7 @@
                 android:layout_marginBottom="0dp"
                 android:visibility="gone"
                 android:textSize="12sp"
-                app:costProductNoDiscount="@{favorite}"/>
+                app:costFavoriteProductNoDiscount="@{favorite}"/>
 
             <TextView
                 android:id="@+id/tv_cost_favorite"
@@ -92,7 +92,7 @@
                 android:textColor="@color/blue"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:costProduct="@{favorite}" />
+                app:costFavoriteProduct="@{favorite}" />
 
         <Button
             android:id="@+id/iv_btn_plus"
