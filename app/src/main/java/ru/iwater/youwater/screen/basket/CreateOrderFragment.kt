@@ -278,9 +278,9 @@ class CreateOrderFragment : BaseFragment(),
         viewModel.statusOrder.observe(this.viewLifecycleOwner) { status ->
             when (status) {
                 Status.SEND -> {
+//                    viewModel.clearProduct(productClear)
                     viewModel.numberOrder.observe(this.viewLifecycleOwner) { numberOrder ->
-                        viewModel.clearProduct(productClear)
-                        warning("Заявка отправлена")
+                            warning("Заявка отправлена")
                         this.findNavController().navigate(
                             CreateOrderFragmentDirections.actionCreateOrderFragmentToCompleteOrderFragment(numberOrder, false)
                         )
