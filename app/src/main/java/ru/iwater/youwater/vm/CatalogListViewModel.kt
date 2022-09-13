@@ -74,20 +74,25 @@ class CatalogListViewModel @Inject constructor(
             val productStart = productRepo.getProductList()?.filter { it.category == 20 }
             val start = productStart.isNullOrEmpty()
             Timber.d("STAAAAAAAAAAAAAART == $start")
-            if (dbProduct != null && dbProduct.category != 20) {
-                dbProduct.count += 1
-                productRepo.updateProductInBasket(dbProduct)
-            } else {
-                if (product?.category == 20 && start) {
-                    product.count = 1
-                    productRepo.addProductInBasket(product)
-                } else if (product?.category != 20) {
-                    if (product != null) {
-                        product.count += 1
+            try {
+                if (dbProduct != null && dbProduct.category != 20) {
+                    dbProduct.count += 1
+                    productRepo.updateProductInBasket(dbProduct)
+                } else {
+                    if (product?.category == 20 && start) {
+                        product.count = 1
                         productRepo.addProductInBasket(product)
+                    } else if (product?.category != 20) {
+                        if (product != null) {
+                            product.count += 1
+                            productRepo.addProductInBasket(product)
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                Timber.e("Error add in basket: $e")
             }
+
         }
     }
 

@@ -78,39 +78,43 @@ class AddAddressFragment : BaseFragment() {
             val address = getAddress(street, house, building)
             val fullAddress = getFullAddress(region, street, house, building)
 
-            viewModel.createNewAddress(
-                region,
-                factAddress,
-                address,
-                "",
-                fullAddress,
-                0,
-                addressJson
-            )
-            viewModel.statusSend.observe(viewLifecycleOwner) { status ->
-                when (status) {
-                    //адрес создался
-                    StatusSendData.SUCCESS -> {
-                        // перешли из заявки?
-                        if (isFromOrder) {
-                            this.findNavController().navigate(
-                                //отправляем назад к созданию заявки
-                                AddAddressFragmentDirections.actionAddAddressFragmentToCreateOrderFragment(
-                                    false
-                                )
-                            )
-                        } else {
-                            this.findNavController().navigate(
-                                //отправляем назад в меню адреса
-                                AddAddressFragmentDirections.actionAddAddressFragmentToAddresessFragment()
-                            )
-                        }
-                    }
-                    //адрес не создан
-                    else -> warning("Ошибка, данные не были отправлены")
-                }
-            }
+            if (addressJson != null) {
+                viewModel.createNewAddress(
+                    region,
+                    factAddress,
+                    address,
+                    "",
+                    fullAddress,
+                    0,
+                    addressJson
+                )
 
+                viewModel.statusSend.observe(viewLifecycleOwner) { status ->
+                    when (status) {
+                        //адрес создался
+                        StatusSendData.SUCCESS -> {
+                            // перешли из заявки?
+                            if (isFromOrder) {
+                                this.findNavController().navigate(
+                                    //отправляем назад к созданию заявки
+                                    AddAddressFragmentDirections.actionAddAddressFragmentToCreateOrderFragment(
+                                        false
+                                    )
+                                )
+                            } else {
+                                this.findNavController().navigate(
+                                    //отправляем назад в меню адреса
+                                    AddAddressFragmentDirections.actionAddAddressFragmentToAddresessFragment()
+                                )
+                            }
+                        }
+                        //адрес не создан
+                        else -> warning("Ошибка, данные не были отправлены")
+                    }
+                }
+            } else {
+                warning("Не был указан корректный адрес")
+            }
         }
 
         return binding.root
@@ -188,16 +192,16 @@ class AddAddressFragment : BaseFragment() {
         floor: String,
         flat: String,
         note: String
-    ): JsonObject {
+    ): JsonObject? {
         val addressJson = JsonObject()
         if (street.isEmpty()) {
-            warning("Не был указан корректный адрес")
+            return null
         } else {
             addressJson.addProperty("region", region)
             addressJson.addProperty("street", street)
         }
         if (house.isEmpty()) {
-            warning("Не был указан корректный адрес")
+            return null
         } else {
             addressJson.addProperty("house", house)
         }
