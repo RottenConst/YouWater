@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.view.*
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -77,7 +76,7 @@ class EditUserDataFragment : BaseFragment() {
                 val date = sdf.format(Calendar.getInstance().time)
                 val clientData = JsonObject()
                 clientData.addProperty("name", binding.tvEditName.text.toString())
-                clientData.addProperty("phone", binding.tvEditPhone.text.toString())
+                clientData.addProperty("contact", binding.tvEditPhone.text.toString())
                 clientData.addProperty("email", binding.tvEditEmail.text.toString())
                 viewModel.editUserData(clientId, clientData)
                 viewModel.statusSend.observe(this.viewLifecycleOwner) { status ->
