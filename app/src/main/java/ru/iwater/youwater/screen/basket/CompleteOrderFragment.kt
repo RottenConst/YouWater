@@ -14,7 +14,6 @@ import ru.iwater.youwater.data.OrderViewModel
 import ru.iwater.youwater.data.PaymentStatus
 import ru.iwater.youwater.databinding.FragmentCompleteOrderBinding
 import ru.iwater.youwater.screen.adapters.MyOrderAdapter
-import timber.log.Timber
 import javax.inject.Inject
 
 class CompleteOrderFragment : BaseFragment() {
@@ -39,6 +38,9 @@ class CompleteOrderFragment : BaseFragment() {
         binding.lifecycleOwner = this
         val adapter = MyOrderAdapter()
         binding.cardOrderPay.adapter = adapter
+        viewModel.products.observe(viewLifecycleOwner) {
+            viewModel.clearProduct(it)
+        }
         if (isPaid) {
             viewModel.getPaymentStatus(orderId)
             viewModel.paymentStatus.observe(viewLifecycleOwner) {
