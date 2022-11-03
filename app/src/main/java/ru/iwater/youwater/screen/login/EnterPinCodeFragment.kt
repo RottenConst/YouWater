@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.data.AuthViewModel
 import ru.iwater.youwater.data.StatusPinCode
@@ -43,7 +42,7 @@ class EnterPinCodeFragment : Fragment() {
                 when (status) {
                     StatusPinCode.DONE -> {
                         Toast.makeText(context, "Успешно", Toast.LENGTH_LONG).show()
-                        this.onDestroy()
+                        this.activity?.finish()
                     }
                     StatusPinCode.ERROR -> {
                         Toast.makeText(context, "Ошибка", Toast.LENGTH_LONG).show()
@@ -51,6 +50,7 @@ class EnterPinCodeFragment : Fragment() {
                     StatusPinCode.LOAD -> {
 
                     }
+                    else -> Toast.makeText(context, "Ошибка", Toast.LENGTH_LONG).show()
                 }
             }
         }

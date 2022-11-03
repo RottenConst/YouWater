@@ -38,12 +38,18 @@ class StartFragment : BaseFragment() {
         val navController = NavHostFragment.findNavController(this)
         binding.btnStart.visibility = View.GONE
         viewModel.checkSession()
-        viewModel.statusSession.observe(viewLifecycleOwner) {
-            when (it) {
-                StatusSession.TRY -> MainActivity.start(this.context)
+        viewModel.statusSession.observe(viewLifecycleOwner) { statusSession ->
+            when (statusSession) {
+                StatusSession.TRY -> {
+                    MainActivity.start(this.context)
+                    this.activity?.finish()
+                }
                 StatusSession.FALSE -> binding.btnStart.visibility = View.VISIBLE
                 StatusSession.ERROR -> Toast.makeText(context,
                     "ОШИБКА СОЕДИНЕНИЯ",
+                    Toast.LENGTH_LONG).show()
+                else -> Toast.makeText(context,
+                    "НЕ ИЗВЕСНАЯ ОШИБКА",
                     Toast.LENGTH_LONG).show()
             }
         }
