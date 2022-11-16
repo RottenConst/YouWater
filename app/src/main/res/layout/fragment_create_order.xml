@@ -17,7 +17,7 @@
                 android:id="@+id/scrollView2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/cv_total_info"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -100,97 +100,96 @@
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content">
 
-                            <ImageView
-                                android:id="@+id/iv_marker"
-                                android:layout_width="wrap_content"
+                            <Button
+                                android:id="@+id/btn_set_address"
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
-                                android:layout_marginTop="16dp"
-                                android:layout_marginBottom="16dp"
-                                android:src="@drawable/ic_address"
+                                android:text="@string/fragment_create_order_add_address_to_order"
+                                android:textAlignment="viewStart"
+                                app:icon="@drawable/ic_address"
+                                app:iconPadding="8dp"
                                 app:layout_constraintBottom_toTopOf="@id/view"
+                                app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
+
+                            <Button
+                                android:id="@+id/btn_set_time"
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/fragment_create_order_set_time_order"
+                                android:textAlignment="textStart"
+                                app:icon="@drawable/ic_time_24"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/view" />
 
                             <View
                                 android:id="@+id/view"
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
-                                android:layout_marginTop="16dp"
                                 android:background="@color/grey"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/tv_address_order" />
+                                app:layout_constraintTop_toBottomOf="@+id/btn_set_address" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cv_notice_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:elevation="8dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="8dp"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/cv_order_info">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
                             <TextView
-                                android:id="@+id/tv_address_order"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginTop="16dp"
-                                android:layout_marginEnd="8dp"
-                                android:layout_marginBottom="16dp"
-                                android:text=""
-                                app:layout_constraintBottom_toTopOf="@+id/view"
-                                app:layout_constraintEnd_toStartOf="@+id/btn_set_address"
-                                app:layout_constraintStart_toEndOf="@+id/iv_marker"
-                                app:layout_constraintTop_toTopOf="parent"
-                                tools:text="@sample/sample_title[5]" />
-
-                            <ImageView
-                                android:id="@+id/iv_clock"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
-                                android:layout_marginTop="16dp"
-                                android:layout_marginBottom="16dp"
-                                android:src="@drawable/ic_time_24"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/view" />
-
-                            <TextView
-                                android:id="@+id/tv_time_order"
-                                android:layout_width="0dp"
+                                android:id="@+id/tv_address_note_label"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginEnd="8dp"
                                 android:layout_marginBottom="8dp"
-                                android:text=""
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@+id/btn_set_time"
-                                app:layout_constraintStart_toEndOf="@+id/iv_clock"
-                                app:layout_constraintTop_toBottomOf="@+id/view"
-                                tools:text="@sample/sample_title[8]" />
-
-                            <ImageButton
-                                android:id="@+id/btn_set_address"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp"
-                                android:layout_marginEnd="8dp"
-                                android:layout_marginBottom="16dp"
-                                android:background="@color/transparent"
-                                android:src="@drawable/ic_arrow_left_24"
-                                app:layout_constraintBottom_toTopOf="@+id/view"
+                                android:text="@string/fragment_create_order_address_notice"
+                                android:textColor="@color/black"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toTopOf="@id/tv_address_notice"
                                 app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <ImageButton
-                                android:id="@+id/btn_set_time"
-                                android:layout_width="wrap_content"
+                            <TextView
+                                android:id="@+id/tv_address_notice"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp"
+                                android:layout_marginStart="8dp"
                                 android:layout_marginEnd="8dp"
-                                android:layout_marginBottom="16dp"
-                                android:background="@color/transparent"
-                                android:src="@drawable/ic_arrow_left_24"
+                                android:layout_marginBottom="8dp"
+                                android:text="@string/fragment_add_address_notice"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/view" />
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/tv_address_note_label" />
+
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </androidx.cardview.widget.CardView>
@@ -199,7 +198,7 @@
                         android:id="@+id/tv_time_set_logo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/set_time_order_string"
+                        android:text="@string/fragment_create_order_time_order"
                         android:layout_marginTop="16dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="8dp"
@@ -209,7 +208,7 @@
                         android:visibility="gone"
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/cv_order_info"
+                        app:layout_constraintTop_toBottomOf="@+id/cv_notice_address"
                         app:layout_constraintBottom_toTopOf="@id/cv_time_set"
                         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -239,7 +238,7 @@
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="16dp"
                                 android:layout_marginBottom="16dp"
-                                android:text="@string/set_time_order_string"
+                                android:text="@string/fragment_create_order_time_order"
                                 android:textColor="@color/black"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/before_time_spinner"
@@ -269,7 +268,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="16dp"
-                        android:text="@string/info_order"
+                        android:text="@string/fragment_create_order_info_order"
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold"
@@ -325,7 +324,7 @@
                         android:layout_marginBottom="16dp"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="8dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/cv_notice_order"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent">
 
@@ -342,6 +341,57 @@
                             app:layout_constraintTop_toTopOf="parent" />
 
                     </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cv_notice_order"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        app:cardElevation="8dp"
+                        app:cardCornerRadius="16dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/cv_type_payment"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TextView
+                                android:id="@+id/tv_notice_order_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginEnd="16dp"
+                                android:text="@string/fragment_create_order_add_notice_to_driver"
+                                android:textColor="@color/black"
+                                app:layout_constraintBottom_toTopOf="@+id/tv_order_notice"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0.0"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tv_order_notice"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginEnd="16dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginBottom="8dp"
+                                android:text="@string/fragment_create_order_notice"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/tv_notice_order_label"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </androidx.cardview.widget.CardView>
+
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -372,7 +422,7 @@
                             android:layout_marginStart="16dp"
                             android:layout_marginEnd="16dp"
                             android:layout_marginBottom="16dp"
-                            android:text="@string/complete_order"
+                            android:text="@string/fragment_create_order_complete_order"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/tv_total_sum_cost" />
@@ -383,7 +433,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginBottom="16dp"
-                            android:text="@string/total_sum"
+                            android:text="@string/fragment_create_order_total_sum"
                             android:textColor="@color/black"
                             android:textSize="20sp"
                             android:textStyle="bold"
@@ -425,7 +475,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginEnd="16dp"
-                            android:text="@string/total_cost_order"
+                            android:text="@string/fragment_create_order_total_cost_order"
                             android:textColor="@color/black"
                             android:textStyle="bold"
                             android:visibility="gone"
@@ -439,7 +489,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="@string/total_sum_order"
+                            android:text="@string/fragment_create_order_total_sum_order"
                             android:textColor="@color/black"
                             android:textSize="14sp"
                             app:layout_constraintBaseline_toBaselineOf="@+id/tv_cost_order"
@@ -466,7 +516,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginEnd="16dp"
-                            android:text="@string/ball_per_order"
+                            android:text="@string/fragment_create_order_ball_per_order"
                             android:textColor="@color/black"
                             android:textSize="14sp"
                             android:visibility="gone"
