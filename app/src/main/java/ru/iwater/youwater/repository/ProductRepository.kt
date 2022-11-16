@@ -3,17 +3,14 @@ package ru.iwater.youwater.repository
 import ru.iwater.youwater.bd.FavoriteProductDao
 import ru.iwater.youwater.bd.ProductDao
 import ru.iwater.youwater.bd.YouWaterDB
-import ru.iwater.youwater.data.AuthClient
-import ru.iwater.youwater.data.FavoriteProduct
+import ru.iwater.youwater.data.*
 import ru.iwater.youwater.di.components.OnScreen
-import ru.iwater.youwater.data.Product
-import ru.iwater.youwater.data.TypeProduct
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.RetrofitFactory
 import timber.log.Timber
-import java.lang.Exception
 import javax.inject.Inject
+import kotlin.Exception
 
 @OnScreen
 class ProductRepository @Inject constructor(
@@ -25,38 +22,58 @@ class ProductRepository @Inject constructor(
     private val favoriteDao: FavoriteProductDao = youWaterDB.favoriteProductDao()
     private val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
 
-    suspend fun getProductList(): List<Product>? {
+    /**
+     * получить список продуктов добавленых в корзину
+     */
+    suspend fun getProductListOfCategory(): List<Product>? {
         return productDao.getAllProduct()
     }
 
+    /**
+     * получить продукт в корзину
+     */
     suspend fun addProductInBasket(product: Product) {
         productDao.save(product)
     }
 
+    /**
+     * получить продукт по id
+     */
     suspend fun getProductFromDB(id: Int): Product? {
         return productDao.getProduct(id)
     }
 
+    /**
+     * обновить продукт в корзине
+     */
     suspend fun updateProductInBasket(product: Product) {
         productDao.updateProductInBasked(product)
     }
 
+    /**
+     * добавить продукт в корзину
+     */
     suspend fun deleteProductFromBasket(product: Product) {
         productDao.delete(product)
     }
 
-    suspend fun getFavoriteProductFromDB(id: Int): FavoriteProduct? {
-        return favoriteDao.getFavoriteProduct(id)
-    }
-
+    /**
+     * добавить избранный товар
+     */
     suspend fun addToFavoriteProduct(favoriteProduct: FavoriteProduct) {
         favoriteDao.save(favoriteProduct)
     }
 
+    /**
+     * удалить избранный товар
+     */
     suspend fun deleteFavoriteProduct(favoriteProduct: FavoriteProduct) {
         favoriteDao.delete(favoriteProduct)
     }
 
+    /**
+     * получить список избранных товаров
+     */
     suspend fun getAllFavoriteProducts(): List<FavoriteProduct>{
         val favoriteProducts = favoriteDao.getAllProduct()
         return if (favoriteProducts.isNullOrEmpty()) {
@@ -64,22 +81,53 @@ class ProductRepository @Inject constructor(
         } else favoriteProducts
     }
 
+    /**
+     * получить список банеров по акциям
+     */
+    suspend fun getPromoBanners(): List<PromoBanner> {
+        return try {
+            val promoBanners = apiWater.getPromo()
+            if (promoBanners.isNullOrEmpty()) emptyList() else promoBanners
+        }catch (e: Exception) {
+            Timber.e("Error get promo banner: $e")
+            emptyList()
+        }
+    }
+
+
+    /**
+     * получить список продуктов
+     */
+    suspend fun getProductList(): List<Product> {
+        return try {
+            val productList = apiWater.getProductList()
+            if (productList.isNotEmpty()) {
+                productList.filter { it.app == 1 }
+            } else emptyList()
+        } catch (e: Exception) {
+            Timber.e("Error get product list: $e")
+            emptyList()
+        }
+    }
 
     /**
      * получить список товаров определённой категории
      */
-    suspend fun getProductList(category: Int): List<Product> {
+    suspend fun getProductListOfCategory(category: Int): List<Product> {
         return try {
             val productList = apiWater.getProductList()
             if (productList.isNotEmpty()) {
                 productList.filter { it.app == 1 && it.category == category }
             } else emptyList()
         }catch (e: Exception) {
-            Timber.e("Error getProductList: $e")
+            Timber.e("Error getProductListOfCategory: $e")
             emptyList()
         }
     }
 
+    /**
+     * загрузить информацию о товаре по id
+     */
     suspend fun getProduct(productId: Int): Product? {
         return try {
             apiWater.getProduct(productId)
@@ -112,5 +160,24 @@ class ProductRepository @Inject constructor(
         }
     }
 
+    /**
+     * получить id последней заявки
+     */
+    suspend fun getLastOrder(): Int? {
+        return try {
+            val listOrders = apiWater.getOrderClient(getAuthClient().clientId)
+            if (!listOrders.isNullOrEmpty()) {
+                val order = listOrders[0]
+                order.id
+            } else null
+        }catch (e:Exception) {
+            Timber.d("Error get last order: $e")
+            null
+        }
+    }
+
+    /**
+     * получить информацю о клиенте
+     */
     private fun getAuthClient(): AuthClient = authClient.get()
 }

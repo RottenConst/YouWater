@@ -2,11 +2,7 @@ package ru.iwater.youwater.vm
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import okhttp3.internal.notify
-import okhttp3.internal.notifyAll
-import ru.iwater.youwater.data.FavoriteProduct
-import ru.iwater.youwater.data.Product
-import ru.iwater.youwater.data.TypeProduct
+import ru.iwater.youwater.data.*
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.repository.ProductRepository
 import timber.log.Timber
@@ -16,6 +12,17 @@ import javax.inject.Inject
 class CatalogListViewModel @Inject constructor(
     private val productRepo: ProductRepository,
 ) : ViewModel() {
+
+    val promoBanners: LiveData<List<PromoBanner>> = liveData {
+        emit(productRepo.getPromoBanners())
+    }
+
+    private val _screenLoading: MutableLiveData<StatusLoading> = MutableLiveData()
+    val screenLoading: LiveData<StatusLoading> get() = _screenLoading
+
+    val lastOrder: LiveData<Int?> = liveData {
+        emit(getLastOrder())
+    }
 
     private val _favoriteProducts: MutableLiveData<List<FavoriteProduct>> = MutableLiveData()
     val favoriteProducts: LiveData<List<FavoriteProduct>>
@@ -29,13 +36,16 @@ class CatalogListViewModel @Inject constructor(
         emit(productRepo.getCategoryList())
     }
 
-    private val _navigateToSelectCategory: MutableLiveData<TypeProduct> = MutableLiveData()
-    val navigateToSelectCategory: LiveData<TypeProduct>
+    private val _navigateToSelectCategory: MutableLiveData<TypeProduct?> = MutableLiveData()
+    val navigateToSelectCategory: LiveData<TypeProduct?>
         get() = _navigateToSelectCategory
 
-    private val _navigateToSelectProduct: MutableLiveData<Int> = MutableLiveData()
-    val navigateToSelectProduct: LiveData<Int>
+    private val _navigateToSelectProduct: MutableLiveData<Int?> = MutableLiveData()
+    val navigateToSelectProduct: LiveData<Int?>
         get() = _navigateToSelectProduct
+
+    private val _navigateToSelectBanner: MutableLiveData<PromoBanner?> = MutableLiveData()
+    val navigateToSelectBanner: LiveData<PromoBanner?> get() = _navigateToSelectBanner
 
     fun getFavoriteProduct() {
         viewModelScope.launch {
@@ -44,6 +54,7 @@ class CatalogListViewModel @Inject constructor(
     }
 
     init {
+        _screenLoading.value = StatusLoading.LOADING
         getFavoriteProduct()
     }
 
@@ -51,8 +62,9 @@ class CatalogListViewModel @Inject constructor(
         val catalogMap = mutableMapOf<TypeProduct, List<Product>>()
         val catalogs = productRepo.getCategoryList()
         return if (catalogs.isNotEmpty()) {
-            catalogs.forEach {
-                val products = productRepo.getProductList(it.id)
+            val productsList = productRepo.getProductList()
+            catalogs.forEach { category ->
+                val products = productsList.filter { it.category == category.id }
                 products.forEach { product ->
                     for (favoriteProduct in favoriteProducts) {
                         if (favoriteProduct.id == product.id) {
@@ -60,8 +72,9 @@ class CatalogListViewModel @Inject constructor(
                         }
                     }
                 }
-                catalogMap[it] = products
+                catalogMap[category] = products
             }
+            _screenLoading.value = StatusLoading.DONE
             return catalogMap
         }
         else mutableMapOf()
@@ -71,9 +84,8 @@ class CatalogListViewModel @Inject constructor(
         viewModelScope.launch {
             val dbProduct = productRepo.getProductFromDB(productId)
             val product = productRepo.getProduct(productId)
-            val productStart = productRepo.getProductList()?.filter { it.category == 20 }
+            val productStart = productRepo.getProductListOfCategory()?.filter { it.category == 20 }
             val start = productStart.isNullOrEmpty()
-            Timber.d("STAAAAAAAAAAAAAART == $start")
             try {
                 if (dbProduct != null && dbProduct.category != 20) {
                     dbProduct.count += 1
@@ -136,10 +148,22 @@ class CatalogListViewModel @Inject constructor(
         }
     }
 
+    private suspend fun getLastOrder(): Int? {
+        return productRepo.getLastOrder()
+    }
+
     fun delFavoriteProduct(favoriteProduct: FavoriteProduct) {
         viewModelScope.launch {
             productRepo.deleteFavoriteProduct(favoriteProduct)
         }
+    }
+
+    fun displayPromoInfo(promoBanner: PromoBanner) {
+        _navigateToSelectBanner.value = promoBanner
+    }
+
+    fun displayPromoInfoComplete() {
+        _navigateToSelectBanner.value = null
     }
 
     fun displayProduct(productId: Int) {
