@@ -22,7 +22,8 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/til_city"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_city"
@@ -36,7 +37,8 @@
             app:hintTextAppearance="@style/TextAppearance.AppCompat.Body2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_add_address_label">
+            app:layout_constraintTop_toBottomOf="@+id/tv_add_address_label"
+            app:layout_constraintBottom_toTopOf="@id/til_street">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_city"
@@ -60,7 +62,8 @@
             app:hintTextAppearance="@style/TextAppearance.AppCompat.Body2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_city">
+            app:layout_constraintTop_toBottomOf="@+id/til_city"
+            app:layout_constraintBottom_toTopOf="@id/til_home">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_street"
@@ -84,7 +87,8 @@
             app:hintTextAppearance="@style/TextAppearance.AppCompat.Body2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_street">
+            app:layout_constraintTop_toBottomOf="@+id/til_street"
+            app:layout_constraintBottom_toTopOf="@id/til_structure">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_home"
@@ -106,7 +110,8 @@
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/til_home"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/til_apartment">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_structure"
@@ -129,7 +134,8 @@
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/til_structure"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/til_entrance">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_apartment"
@@ -152,13 +158,14 @@
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/til_apartment"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/til_floor">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_entrance"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="@string/address_entrance"
+                android:hint="@string/fragment_add_address_entrance"
                 android:inputType="numberDecimal"
                 android:minHeight="48dp"
                 android:textColor="@color/blue" />
@@ -175,7 +182,9 @@
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/til_entrance"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/til_note"
+            >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_floor"
@@ -195,10 +204,11 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/til_floor"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/til_contact"
+            app:layout_constraintVertical_bias="0.0">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_note"
@@ -207,6 +217,32 @@
                 android:hint="@string/address_note"
                 android:minHeight="48dp"
                 android:maxLines="1"
+                android:textColor="@color/blue" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_contact"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_save_address"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/til_note"
+            app:layout_constraintVertical_bias="0.0">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_contact"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/fragment_add_address_contact"
+                android:maxLines="1"
+                android:minHeight="48dp"
                 android:textColor="@color/blue" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -224,6 +260,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/til_contact"
             tools:ignore="DuplicateSpeakableTextCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

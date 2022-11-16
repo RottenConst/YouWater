@@ -75,14 +75,16 @@ class AddressViewModel @Inject constructor(
         coords: String,
         fullAddress: String,
         returnTare: Int,
-        addressJson: JsonObject
+        addressJson: JsonObject,
+        contact: String,
+        notice: String
     ) {
         viewModelScope.launch {
             val client = getClientInfo()
             if (client != null) {
                 val newAddress = addressRepo.createAddress(
                     client.client_id,
-                    client.email,
+                    contact,
                     region,
                     factAddress,
                     address,
@@ -91,7 +93,8 @@ class AddressViewModel @Inject constructor(
                     returnTare,
                     client.contact,
                     client.name,
-                    addressJson
+                    addressJson,
+                    notice
                 )
                 if (newAddress == "Адрес успешно добавлен.") {
                     _statusSend.value = StatusSendData.SUCCESS

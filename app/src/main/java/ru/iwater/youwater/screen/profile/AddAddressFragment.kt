@@ -70,10 +70,12 @@ class AddAddressFragment : BaseFragment() {
                 if (binding.etApartment.text.isNullOrEmpty()) "" else "${binding.etApartment.text}"
             //примичание
             val note = if (binding.etNote.text.isNullOrEmpty()) "" else "${binding.etNote.text}"
+            // доп контакт
+            val contact = if (binding.etContact.text.isNullOrEmpty()) "" else "${binding.etContact.text}"
 
             // перевод данных в формат для отправки в црм
             val addressJson =
-                getJsonAddress(region, city, street, house, building, entrance, floor, flat, note)
+                getJsonAddress(city, street, house, building, entrance, floor, flat)
             val factAddress = getFactAddress(city, street, house, building, entrance, floor, flat)
             val address = getAddress(street, house, building)
             val fullAddress = getFullAddress(region, street, house, building)
@@ -86,7 +88,9 @@ class AddAddressFragment : BaseFragment() {
                     "",
                     fullAddress,
                     0,
-                    addressJson
+                    addressJson,
+                    contact,
+                    note
                 )
 
                 viewModel.statusSend.observe(viewLifecycleOwner) { status ->
@@ -98,7 +102,7 @@ class AddAddressFragment : BaseFragment() {
                                 this.findNavController().navigate(
                                     //отправляем назад к созданию заявки
                                     AddAddressFragmentDirections.actionAddAddressFragmentToCreateOrderFragment(
-                                        false
+                                        false, 0
                                     )
                                 )
                             } else {
@@ -183,7 +187,6 @@ class AddAddressFragment : BaseFragment() {
     }
 
     private fun getJsonAddress(
-        region: String,
         city: String,
         street: String,
         house: String,
@@ -191,13 +194,11 @@ class AddAddressFragment : BaseFragment() {
         entrance: String,
         floor: String,
         flat: String,
-        note: String
     ): JsonObject? {
         val addressJson = JsonObject()
         if (street.isEmpty()) {
             return null
         } else {
-            addressJson.addProperty("region", region)
             addressJson.addProperty("street", street)
         }
         if (house.isEmpty()) {
@@ -210,7 +211,6 @@ class AddAddressFragment : BaseFragment() {
         addressJson.addProperty("entrance", entrance)
         addressJson.addProperty("floor", floor)
         addressJson.addProperty("flat", flat)
-        addressJson.addProperty("note", note)
         return addressJson
     }
 

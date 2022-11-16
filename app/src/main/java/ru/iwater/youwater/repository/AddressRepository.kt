@@ -1,15 +1,12 @@
 package ru.iwater.youwater.repository
 
 import com.google.gson.JsonObject
-import ru.iwater.youwater.bd.AddressDao
 import ru.iwater.youwater.bd.RawAddressDao
 import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
-import ru.iwater.youwater.network.GoogleMapApi
 import ru.iwater.youwater.network.RetrofitFactory
-import ru.iwater.youwater.network.RetrofitGoogleService
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -90,7 +87,8 @@ class AddressRepository @Inject constructor(
         returnTare: Int,
         phoneContact: String,
         nameContact: String,
-        addressJson: JsonObject
+        addressJson: JsonObject,
+        notice: String
     ): String? {
         return try {
             val response = waterApi.createNewAddress(
@@ -105,7 +103,8 @@ class AddressRepository @Inject constructor(
                 returnTare,
                 phoneContact,
                 nameContact,
-                addressJson
+                addressJson,
+                notice
             )
             if (response.isSuccessful) {
                 response.body()?.get("message")?.asString
