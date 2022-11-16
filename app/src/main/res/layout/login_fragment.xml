@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -25,7 +24,7 @@
                 android:id="@+id/et_tel_num"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/tel_number"
+                android:hint="@string/login_fragment_tel_number"
                 android:digits="1234567890+"
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -35,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="154dp"
-            android:text="@string/enter"
+            android:text="@string/login_fragment_enter_text"
             android:textColor="@color/black"
             android:textSize="34sp"
             android:textStyle="bold"
@@ -50,31 +49,16 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="52dp"
             android:layout_marginEnd="52dp"
-            android:layout_marginBottom="292dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="316dp"
             android:background="@drawable/bg_button"
-            android:text="@string/sent_code"
+            android:text="@string/login_fragment_sent_code"
             android:textColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/til_tel_num"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.517"
             app:layout_constraintStart_toStartOf="parent" />
-
-<!--        <Button-->
-<!--            android:id="@+id/btn_enter_home"-->
-<!--            style="@style/Widget.AppCompat.Button.Colored"-->
-<!--            android:layout_width="255dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="52dp"-->
-<!--            android:layout_marginEnd="52dp"-->
-<!--            android:layout_marginBottom="292dp"-->
-<!--            android:background="@drawable/bg_button"-->
-<!--            android:text="@string/next"-->
-<!--            android:textColor="@color/white"-->
-<!--            android:visibility="gone"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.517"-->
-<!--            app:layout_constraintStart_toStartOf="parent" />-->
 
         <TextView
             android:id="@+id/tv_login_assept"
@@ -83,62 +67,11 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/login_accept"
+            android:text="@string/login_fragment_login_accept"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_enter" />
-
-<!--        <ru.iwater.youwater.utils.PinEntryEditText-->
-<!--            android:id="@+id/et_pin_code"-->
-<!--            android:layout_width="217dp"-->
-<!--            android:layout_height="66dp"-->
-<!--            android:layout_marginStart="16dp"-->
-<!--            android:layout_marginTop="8dp"-->
-<!--            android:layout_marginEnd="16dp"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:cursorVisible="true"-->
-<!--            android:digits="1234567890"-->
-<!--            android:focusable="true"-->
-<!--            android:ems="10"-->
-<!--            android:inputType="number|numberPassword"-->
-<!--            android:maxLength="4"-->
-<!--            android:textColor="@color/lightGrey"-->
-<!--            android:textIsSelectable="false"-->
-<!--            android:textSize="20sp"-->
-<!--            android:visibility="gone"-->
-<!--            app:layout_constraintBottom_toTopOf="@+id/tv_info_code"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.497"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/tv_enter_pin"-->
-<!--            app:layout_constraintVertical_bias="0.0" />-->
-
-<!--        <TextView-->
-<!--            android:id="@+id/tv_info_code"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:text="@string/info_code"-->
-<!--            android:visibility="gone"-->
-<!--            app:layout_constraintBottom_toTopOf="@+id/btn_enter"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent" />-->
-
-<!--        <TextView-->
-<!--            android:id="@+id/tv_enter_pin"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="@dimen/left_right_tv"-->
-<!--            android:layout_marginTop="14dp"-->
-<!--            android:layout_marginEnd="@dimen/left_right_tv"-->
-<!--            android:text="@string/enter_code_on_sms"-->
-<!--            android:visibility="gone"-->
-<!--            app:layout_constraintBottom_toTopOf="@+id/btn_enter"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/tv_login"-->
-<!--            app:layout_constraintVertical_bias="0.0" />-->
 
         <ImageView
             android:id="@+id/imageView3"
@@ -146,11 +79,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="54dp"
             android:layout_marginBottom="24dp"
+            android:contentDescription="@string/description_image_logo"
             app:layout_constraintBottom_toTopOf="@+id/tv_login"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_youwater_logo" />
+            app:srcCompat="@drawable/ic_your_water_logo" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

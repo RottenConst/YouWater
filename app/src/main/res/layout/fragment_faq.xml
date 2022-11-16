@@ -18,7 +18,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/one_quest"
+            android:text="@string/fragment_faq_one_quest"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -30,7 +30,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/one_quest_answer_1_1"
+            android:text="@string/fragment_faq_one_quest_answer_1_1"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
@@ -41,7 +41,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/one_quest_answer_1_2"
+            android:text="@string/fragment_faq_one_quest_answer_1_2"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
@@ -52,7 +52,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/one_quest_answer_1_3"
+            android:text="@string/fragment_faq_one_quest_answer_1_3"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
@@ -63,7 +63,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/one_quest_answer_1_4"
+            android:text="@string/fragment_faq_one_quest_answer_1_4"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
@@ -74,7 +74,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/one_quest_answer_1_5"
+            android:text="@string/fragment_faq_one_quest_answer_1_5"
             android:textColor="@color/black"
             android:textSize="14sp" />
 

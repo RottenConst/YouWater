@@ -84,7 +84,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
                     android:backgroundTint="@color/white"
-                    android:contentDescription="@string/btn_сlose"
+                    android:contentDescription="@string/description_ic_delete"
                     android:onClick="@{() -> productItemClick.deleteProductClick(product)}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -93,7 +93,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0"
                     app:srcCompat="@drawable/ic_btn_close"
-                    tools:targetApi="lollipop" />
+                    />
 
                 <ImageButton
                     android:id="@+id/btn_minus"
@@ -117,7 +117,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="16dp"
-                    android:text="1"
+                    android:text="@string/general_zero"
                     android:textSize="18sp"
                     android:textStyle="bold"
 

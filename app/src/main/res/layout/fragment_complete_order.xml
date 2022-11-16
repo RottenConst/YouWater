@@ -16,7 +16,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/complete_order_pay"
+                android:text="@string/fragment_complete_order_complete_text"
                 android:textAlignment="center"
                 android:textColor="@color/blue"
                 android:textSize="20sp"
@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:contentDescription="@string/label_pay"
+                android:contentDescription="@string/fragment_complete_order_description_complete_order"
                 android:src="@drawable/ic_circle_ok"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -47,7 +47,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/comment_order_pay"
+                android:text="@string/fragment_complete_order_connect_order_delivery"
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -80,12 +80,12 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="16dp"
-                android:text="@string/go_to_home_text"
+                android:text="@string/fragment_complete_order_go_to_home"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/card_order_pay"
-                tools:text="@string/go_to_home_text" />
+                tools:text="@string/fragment_complete_order_go_to_home" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

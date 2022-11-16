@@ -19,11 +19,11 @@
             android:layout_marginTop="32dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp"
-            android:text="@string/finish"
+            android:text="@string/fragment_register_finish"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/et_mail_register"
+            app:layout_constraintTop_toBottomOf="@+id/til_email_register"
             app:layout_constraintVertical_bias="0.0" />
 
         <TextView
@@ -33,7 +33,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/register"
+            android:text="@string/fragment_register_register_text"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -41,60 +41,53 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/iv_logo_register" />
 
-        <TextView
-            android:id="@+id/tv_logo_name"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_name_register"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
-            android:text="@string/name"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_logo_register" />
+            app:layout_constraintTop_toBottomOf="@id/tv_logo_register"
+            app:layout_constraintVertical_bias="0.0">
 
-        <EditText
-            android:id="@+id/et_name_register"
-            android:layout_width="0dp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_name_register"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/fragment_register_name_lastname"
+                android:ems="10"
+                android:inputType="textAutoCorrect"
+                android:maxHeight="48dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_email_register"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:ems="10"
-            android:hint="@string/name_user"
-            android:inputType="textPersonName"
-            android:minHeight="48dp"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_logo_name" />
-
-        <TextView
-            android:id="@+id/tv_mail_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text="@string/email"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/et_name_register" />
-
-        <EditText
-            android:id="@+id/et_mail_register"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:ems="10"
-            android:hint="@string/email"
-            android:inputType="textPersonName"
-            android:minHeight="48dp"
-            android:textColor="@color/black"
-            android:textColorHint="#78909C"
-            android:textSize="16sp"
-            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_mail_logo" />
+            app:layout_constraintTop_toBottomOf="@+id/til_name_register"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_email_register"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textEmailAddress"
+                android:hint="@string/general_email"
+                android:ems="10"
+                android:maxHeight="48dp"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <ImageView
             android:id="@+id/iv_logo_register"
@@ -103,10 +96,11 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="8dp"
+            android:contentDescription="@string/description_your_watter_logo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_youwater_logo" />
+            app:srcCompat="@drawable/ic_your_water_logo" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

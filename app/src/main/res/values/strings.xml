@@ -1,17 +1,7 @@
 <resources>
     <string name="app_name">YourWater</string>
     <!--    экран входа-->
-    <string name="begin">Начать</string>
-    <string name="about_app_logo">Доставка питьевой воды в Санкт-Петербурге</string>
-    <string name="tel_number">Номер мобильного телефона</string>
-    <string name="enter">Вход</string>
-    <string name="sent_code">Отправить код</string>
-    <string name="next">Продолжить</string>
-    <string name="login_accept">Нажимая кнопку «Отправить код» вы принимаете условия «Пользовательского соглашения»</string>
-    <string name="info_code">Код отправлен на номер</string>
-    <string name="enter_code_on_sms">Введите код из СМС:</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
     <!--    sidebar-->
     <string name="delivery_text">Доставка</string>
@@ -19,7 +9,6 @@
     <string name="send_text">Связаться с нами</string>
 
     <!--    catalog names-->
-    <string name="drinking_water">Питьевая вода</string>
     <string name="related_products">Сопутствующие товары</string>
     <string name="disposable_tableware">Одноразовая посуда</string>
     <string name="pumps_for_water">Помпы для воды</string>
@@ -28,69 +17,13 @@
     <string name="new_containers_and_lids">Новая тара и крышки</string>
     <string name="racks_for_bottles">Стойки для бутылей</string>
 
-    <string name="str_name_product">«Классическая», в оборотной таре</string>
-    <string name="str_cost_product">от 230 ₽</string>
-
-    <!--    basket names-->
-    <string name="ball_per_order">Количество баллов за заказ:</string>
-    <string name="total_sum_order">Общая сумма заказа:</string>
-    <string name="total_cost_order">Итого с учётом скидок:</string>
-    <string name="total_sum">Итого:</string>
-    <string name="checkout_order">Оформить заказ</string>
-    <string name="sample_sum">3020 ₽</string>
-    <string name="sample_balls">0</string>
-    <string name="sample_total_sum">3220 ₽</string>
     <string name="after_string">До</string>
     <string name="before_time_string">Время C</string>
-    <string name="set_time_order_string">Укажите время доставки:</string>
 
-    <!--    profile-->
-    <string name="name">Имя Фамилия</string>
-    <string name="name_user">Имя</string>
-    <string name="last_name">Фамилия</string>
-    <string name="phone">Телефон</string>
-    <string name="email">Электронная почта</string>
-    <string name="my_orders">Мои заказы</string>
-    <string name="my_data">Мои данные</string>
-    <string name="favorite">Избранное</string>
-    <string name="address">Адреса</string>
-    <string name="bank_card">Банковская карта</string>
-    <string name="notifications">Уведомления</string>
-    <string name="balls">У вас </string>
-    <string name="tanks">Бутелей к возврату:</string>
-    <string name="nothing_favorite_text">Избранных товаров пока нет.</string>
-    <string name="nothing_order_text">У вас пока не было заказов</string>
-
-    <!--    notification setting-->
-    <string name="sms_notification">Получать SMS-уведомления</string>
-    <string name="PUSH_notification">Получать Push-уведомления</string>
-    <string name="email_notification">Получать E-mail рассылки</string>
-
-    <!--    other data-->
-    <string name="btn_add_desc">Добавить продукт</string>
-    <!--    add address-->
-    <string name="add_address">Добавить адрес</string>
-    <string name="address_city">Город/посёлок</string>
-    <string name="address_street">Улица</string>
-    <string name="address_home">Дом</string>
-    <string name="address_corp">Корпус</string>
-    <string name="address_structure">Строение</string>
-    <string name="address_entrance">Подьезд</string>
-    <string name="address_floor">Этаж</string>
-    <string name="address_apartment">Квартира</string>
-    <string name="address_note">Примечание для курьера</string>
-    <!-- add card-->
-    <string name="add_bank_card">Добавить карту</string>
-    <string name="number_bank_card">Номер банковской карты</string>
-    <string name="validity">Срок действия</string>
-    <string name="CVV">CVV</string>
-    <string name="this_card_use_next">Я хочу использовать эту карту для будущих заказов</string>
     <string name="btn_сlose">Удалить</string>
 
     <string name="confirmLogout">Вы уверены, что хотите выйти из своего аккаунта?</string>
-    <string name="yes">Да</string>
-    <string name="ok">Ок</string>
-    <string name="no">Нет</string>
+
 
     <string name="payment_on_card">Оплата по карте</string>
 
@@ -99,16 +32,205 @@
     <string name="basket">Карзина</string>
     <string name="profile">Личный кабинет</string>
     <string name="info_product">Информация о товаре</string>
-    <string name="description_ic_address">Адрес</string>
-    <string name="description_ic_close">Удалить</string>
-    <string name="info_order">Детали заказа:</string>
     <string name="complete_order_label">Оформление заказа</string>
-    <string name="complete_order">Оформить заявку</string>
-    <string name="label_pay">Оплата</string>
-    <string name="cancel">Отмена</string>
     <string name="Search">Искать</string>
 
-    <!-- more data-->
+    <string name="time_order">Время заказа</string>
+
+    <string name="to_suburbs">В пригороды</string>
+
+<!--    <string name="user_data_sent_for_moderation">Ваши данные отправлены на модерацию.  Мы проверим их корректность и внесём изменения. Спасибо вам за то, что предупреждаете нас.</string>-->
+    <string name="fragment_user_data_user_data_sent_for_moderation">Ваши данные изменены.</string>
+
+    <string-array name="order_pay">
+        <item>Оплата по карте курьеру</item>
+        <item>Оплата наличными</item>
+    </string-array>
+
+
+    <string name="default_notification_channel_name" translatable="true">hello</string>
+    <string name="default_notification_channel_id" translatable="false">hello</string>
+    <string name="msg_subscribed">Subscribed to weather topic</string>
+    <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
+    <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+    <string name="fcm_message">FCM Message</string>
+    <!-- fragment start -->
+    <string name="start_fragment_begin">Начать</string>
+    <string name="start_fragment_about_app_logo">Доставка питьевой воды в Санкт-Петербурге</string>
+
+    <!--fragment login -->
+    <string name="login_fragment_enter_text">Вход</string>
+    <string name="login_fragment_tel_number">Номер мобильного телефона</string>
+    <string name="login_fragment_sent_code">Отправить код</string>
+    <string name="login_fragment_login_accept">Нажимая кнопку «Отправить код» вы принимаете условия «Пользовательского соглашения»</string>
+
+    <!-- item order -->
+    <string name="item_order_number_order">Заказ #</string>
+    <string name="item_order_info_order">Детали заказа:</string>
+    <string name="item_order_total_sum">Итого:</string>
+    <string name="item_order_description_complete_order">Оформление заявки</string>
+    <string name="item_order_replay_order">Повторить заказ</string>
+
+
+    <!-- item category product -->
+    <string name="item_category_product_name_category">Название категории</string>
+
+    <!-- item card product -->
+    <string name="item_card_product_name_product">Название товара</string>
+    <string name="item_card_product_description_product">Описание товара</string>
+    <string name="item_card_product_cost_product">от - ₽</string>
+
+    <!-- item add card -->
+    <string name="item_add_card_add_bank_card">Добавить карту</string>
+    <string name="item_add_card_number_bank_card">Номер банковской карты</string>
+    <string name="item_add_card_validity">Срок действия</string>
+    <string name="item_add_card_CVV">CVV</string>
+    <string name="item_add_card_this_card_use_next">Я хочу использовать эту карту для будущих заказов</string>
+
+    <!-- item add address -->
+    <string name="item_add_address_label">Добавить адрес</string>
+    <string name="item_add_address_home">Дом</string>
+    <string name="item_add_address_structure">Строение</string>
+    <string name="item_add_address_entrance">Подьезд</string>
+    <string name="item_add_address_floor">Этаж</string>
+    <string name="item_add_address_apartment">Квартира</string>
+    <string name="item_add_address_notice">Примечание</string>
+    <string name="item_add_address_contact">Дополнительный контакт</string>
+    <string name="item_add_address_address_corp">Корпус</string>
+
+    <!-- fragment user data -->
+    <string name="fragment_user_data_name_user">Имя</string>
+    <string name="fragment_user_data_last_name">Фамилия</string>
+    <string name="fragment_user_data_phone">Телефон</string>
+    <string name="fragment_user_data_email">Электронная почта</string>
+
+    <!-- fragment register -->
+    <string name="fragment_register_register_text">Регистрация</string>
+    <string name="fragment_register_finish">Завершить</string>
+    <string name="fragment_register_name_lastname">Имя Фамилия</string>
+
+    <!-- fragment profile -->
+    <string name="fragment_profile_my_orders">Мои заказы</string>
+    <string name="fragment_profile_my_data">Мои данные</string>
+    <string name="fragment_profile_addresses">Адреса</string>
+    <string name="fragment_profile_bank_card">Банковская карта</string>
+    <string name="fragment_profile_notifications">Уведомления</string>
+    <string name="fragment_profile_balls">У вас </string>
+    <string name="fragment_profile_tanks">Бутелей к возврату:</string>
+    <string name="fragment_profile_name_client">Имя клиента</string>
+
+    <!-- fragment notification -->
+    <string name="fragment_notification_set_sms_notification">Получать SMS-уведомления</string>
+    <string name="fragment_notification_set_PUSH_notification">Получать Push-уведомления</string>
+    <string name="fragment_notification_set_email_notification">Получать E-mail рассылки</string>
+
+    <!-- fragment my orders" -->
+    <string name="fragment_my_order_nothing_order">У вас пока не было заказов</string>
+
+    <!-- fragment home -->
+    <string name="fragment_home_promo">Акции</string>
+    <string name="fragment_home_promo_info">Информация по акциям</string>
+    <string name="fragment_home_replay_last_order">Повторить заказ</string>
+
+    <!-- fragment favorite -->
+    <string name="fragment_favorite_nothing_text">Избранных товаров пока нет.</string>
+
+    <!-- fragment faq -->
+    <string name="fragment_faq_one_quest">В чем отличие воды?</string>
+    <string name="fragment_faq_one_quest_answer_1_1">Обе воды добываются в сердце Карельского перешейка. Около посёлка Стеклянный расположены скважины глубиной 185 метров — там же, прямо на месте добычы, происходит розлив. Вода доставляется в Санкт-Петербург и область, сохранив свежесть, чистоту и пользу.</string>
+    <string name="fragment_faq_one_quest_answer_1_2">Вода «Plesca Натуральная» — подходит для повседневного употребления в любом виде. Содержит комплекс веществ, необходимых для здоровья городских жителей.</string>
+    <string name="fragment_faq_one_quest_answer_1_3">• Глубина источника гарантирует неизменный состав воды.\n• Содержит природный комплекс полезных веществ: кальций, магний, калий, натрий.\n• Подходит для готовки, ежедневного употребления без ограничений. \n• Соответствует нормативам качества.</string>
+    <string name="fragment_faq_one_quest_answer_1_4">Вода «Plesca Классическая» — смягченная артезианская вода, оптимальный выбор для офисов и предприятий. Подходит для использования в кулерах, чайниках и кофе-машинах.</string>
+    <string name="fragment_faq_one_quest_answer_1_5">• Отсутствие накипи и осадка при кипячении, щадящее воздействие на бытовую технику.\n• Идеально подходит для использования в кулерах, чайниках и кофе-машинах.\n• Рекомендована для ежедневного употребления.\n• Имеет сертификаты качества.</string>
+
+    <!-- fragment enter pin code -->
+    <string name="fragment_enter_pin_code_info_code">Код отправлен на номер</string>
+    <string name="fragment_enter_pin_code_enter_code_on_sms">Введите код из СМС:</string>
+    <string name="fragment_enter_pin_code_enter_text">Вход</string>
+
+    <!-- fragment delivery two hour -->
+    <string name="fragment_delivery_two_hour_time_interval_text">Доставка возможна в один из интервалов:</string>
+    <string name="fragment_delivery_two_hour_time_interval_delivery">17:00–22:00\n в тот же день</string>
+    <string name="fragment_delivery_two_hour_delivery_sat_two_hour">19:00–22:00\nв тот же день</string>
+    <string name="fragment_delivery_two_hour_logo">Доставка в тот же день:</string>
+    <string name="fragment_delivery_two_hour_description_text">Доставляем воду в тот же день Санкт-Петербургу для заказов, сделанных до 12:00 этого дня.</string>
+
+    <!-- fragment delivery suburbs -->
+    <string name="fragment_delivery_suburbs_text_logo">Доставка воды в пригороды  Санкт-Петербурга</string>
+    <string name="fragment_delivery_suburbs_pushkin">Славянка, Пушкин, Коммунар, Павловск</string>
+    <string name="fragment_delivery_suburbs_pushkin_text">Доставка воды в Павловск, Пушкин, Коммунар и Славянку на дом и в офисы по расписанию:
+С Пн по Пт с 9 ч до 21 ч, мин. интервал 3 часа.
+В Субботу с 9 ч до 18 ч, мин. интервал 3 часа.
+</string>
+    <string name="fragment_delivery_suburbs_kolino">Колпино</string>
+    <string name="fragment_delivery_suburbs_kolino_text">
+        Доставка воды в Колпино на дом и в офисы по расписанию:
+С Пн по Пт с 9 до 21, минимальный интервал 3 часа.
+В Субботу с 9 до 18, минимальный интервал 3 часа.
+    </string>
+    <string name="fragment_delivery_suburbs_krondshtat">Кронштадт</string>
+    <string name="fragment_delivery_suburbs_krondshtat_text">
+Доставка воды 19 литров в Кронштадт на дом и в офисы по расписанию
+Пн и Чт. с 12ч до 18ч
+    </string>
+    <string name="fragment_delivery_suburbs_metalstroy">пос. Металлострой </string>
+    <string name="fragment_delivery_suburbs_metalstroy_text">
+        Доставка воды в пос. Металлострой на дом и в офисы по расписанию:
+С Пн по Пт с 9 до 21, минимальный интервал 3 часа.
+В Субботу с 9 до 18, минимальный интервал 3 часа.
+    </string>
+    <string name="fragment_delivery_suburbs_krasnoe_selo">Красное село и окрестные пункты</string>
+    <string name="fragment_delivery_suburbs_krasnoe_selo_text">
+        Доставка воды в Красное село и окрестные пункты. Заказать воду на дом и в офисы в Красное село можно по расписанию:
+Вт, Ср, Пт с 10ч до 18ч
+    </string>
+    <string name="fragment_delivery_suburbs_shushari">Шушары</string>
+    <string name="fragment_delivery_suburbs_shushari_text">
+        Доставка воды 19 литров в Шушары на дом и в офисы по расписанию:
+С Пн по Пт с 9 до 21, минимальный интервал 3 часа.
+В Субботу с 9 до 18, минимальный интервал 3 часа.
+    </string>
+    <string name="fragment_delivery_suburbs_petergof">Петергоф, Ломоносов, Стрельна </string>
+    <string name="fragment_delivery_suburbs_petergof_text">
+        Доставка питьевой воды в Петергоф, Ломоносов, Стрельну на дом и в офис по расписанию:
+Стандартная доставка на следующий день, при заказе с Пн по Пт с 10 до 18
+    </string>
+
+    <!--fragment delivery std -->
+    <string name="fragment_delivery_std_delivery_logo_stg">Доставка на следующий день:</string>
+    <string name="fragment_delivery_std_delivery_text_std">Доставляем воду по Санкт-Петербургу \nдля заказов, сделанных до 16:00 текущего дня.\nЗаказ, сделанный после 16:00, доставляется через 1 рабочий день.</string>
+    <string name="fragment_delivery_std_delivery_std_1_4">Пн.– Пт. \n9:00–16:00 \n17:00–22:00 \n19:00–22:00 </string>
+    <string name="fragment_delivery_std_delivery_std_5">Сб. \n9:00–16:00</string>
+    <string name="fragment_delivery_std_time_delivery">Доставка возможна в один из интервалов:</string>
+    <string name="fragment_delivery_std_description_delivery_time">Время доставка заказов</string>
+
+    <!-- fragment create order -->
+    <string name="fragment_create_order_add_address_to_order">Добавить адрес</string>
+    <string name="fragment_create_order_set_time_order">Выбрать время</string>
+    <string name="fragment_create_order_address_notice">Примичание к адресу</string>
+    <string name="fragment_create_order_notice">Примечание</string>
+    <string name="fragment_create_order_total_sum">Итого:</string>
+    <string name="fragment_create_order_total_sum_order">Общая сумма заказа:</string>
+    <string name="fragment_create_order_ball_per_order">Количество баллов за заказ:</string>
+    <string name="fragment_create_order_add_notice_to_driver">Добавить коментарий для курьера</string>
+    <string name="fragment_create_order_complete_order">Оформить заявку</string>
+    <string name="fragment_create_order_info_order">Детали заказа:</string>
+    <string name="fragment_create_order_total_cost_order">Итого с учётом скидок:</string>
+    <string name="fragment_create_order_time_order">Укажите время доставки:</string>
+
+    <string name="faq_label">Часто задаваемые вопросы </string>
+    <string name="one_quest_answer_2">Plesca Натуральная – это вода из артезианской скважины из Псковской области Печерского района. Этот вид воды отлично подходит для питья в сыром виде. В воде Plesca Натуральная много природных минералов полезных для здоровья, она обладает хорошими вкусовые качествами и безопасна для употребления взрослыми и детьми.</string>
+    <string name="one_quest_answer_3">Plesca Классическая – это вода из поверхностных источников Санкт-Петербурга, доочищенная  и ионизированная серебром. Она хорошо подходит  для горячих напитков, использования в кулерах, не оставляет накипи и осадка.</string>
+    <string name="two_quest">2. Кто производитель воды?  Есть сертификат?</string>
+    <string name="tree_quest">3. Есть ли залог за тару и нужно ли её возвращать?</string>
+    <string name="four_quest">4. Режим доставки: (когда и в какое время)?</string>
+    <string name="five_quest">5. Какие способы оплаты есть?</string>
+    <string name="six_quest">6</string>
+    <string name="seven_quest">7. Какие есть акции для новых  и постоянных клиентов?</string>
+    <string name="eight_quest">8. Как нужно обслуживать кулер?</string>
+    <string name="nine_quest">9</string>
+    <string name="ten_quest">10. У меня есть старая помпа, можно её поменять на новую?</string>
+
     <string name="about_company">На современном российском оборудовании мы добываем и разливаем свежую питьевую воду – «Plesca». Наша продукция имеет все необходимые сертификаты и технические документы. «Plesca» подходит для ежедневного потребления, ее полезно пить детям и взрослым.
 </string>
     <string name="why_choose_us">Почему нужно выбирать нас?</string>
@@ -123,110 +245,89 @@
     <string name="benefit">Польза: </string>
     <string name="benefit_text">благодаря бережной очистке воды в ней сохраняется оптимальный уровень солей и микроэлементов</string>
 
-    <string name="delivery_two_hour_logo">Доставка в тот же день:</string>
-    <string name="delivery_two_hour_text">Доставляем воду в тот же день Санкт-Петербургу для заказов, сделанных до 12:00 этого дня.</string>
-    <string name="time_order">Время заказа</string>
-    <string name="time_delivery">Доставка возможна в один из интервалов:</string>
-    <string name="time_delivery_two_hour">17:00-22:00\n в тот же день</string>
-    <string name="time_delivery_sat_two_hour">19:00-22:00\nв тот же день</string>
+    <!-- fragment contact -->
+    <string name="fragment_contact_call_me">Позвонить оператору</string>
+    <string name="fragment_contact_send_mail">Написать на почту</string>
+    <string name="fragment_contact_phone_bos">Связаться с руководством</string>
+    <string name="fragment_contact_telegram">Связаться c помощью Telegram</string>
+    <string name="fragment_contact_vk">Связаться c помощью VK</string>
+    <string name="fragment_contact_whats_app">Связаться c помощью WhatsApp</string>
+    <string name="fragment_contact_instagram">Связаться c помощью Instagram</string>
 
-    <string name="delivery_logo_stg">Доставка на следующий день:</string>
-    <string name="delivery_text_std">Доставляем воду по Санкт-Петербургу \nдля заказов, сделанных до 16:00 текущего дня.\nЗаказ, сделанный после 16:00, доставляется через 1 рабочий день.</string>
-    <string name="delivery_std_1_4">Пн.- Пт. \n9:00-16:00 \n17:00-22:00 \n19:00-22:00 </string>
-    <string name="delivery_std_5">Сб. \n9:00-16:00</string>
+    <!-- fragment complete order -->
+    <string name="fragment_complete_order_complete_text">Оформление прошло успешно</string>
+    <string name="fragment_complete_order_connect_order_delivery">Наши менеджеры с вами свяжуться, перед тем как заказ будет передан  в доставку</string>
+    <string name="fragment_complete_order_go_to_home">Перейти на главную</string>
+    <string name="fragment_complete_order_description_complete_order">Оформление заявки</string>
 
-    <string name="to_suburbs">В пригороды</string>
-    <string name="delivery_suburbs">Доставка воды в пригороды  Санкт-Петербурга</string>
-    <string name="pushkin">Славянка, Пушкин, Коммунар, Павловск</string>
-    <string name="pushkin_text">Доставка воды в Павловск, Пушкин, Коммунар и Славянку на дом и в офисы по расписанию:
-С Пн по Пт с 9 ч до 21 ч, мин. интервал 3 часа.
-В Субботу с 9 ч до 18 ч, мин. интервал 3 часа.
-</string>
-    <string name="kolino">Колпино</string>
-    <string name="kolino_text">
-        Доставка воды в Колпино на дом и в офисы по расписанию:
-С Пн по Пт с 9 до 21, минимальный интервал 3 часа.
-В Субботу с 9 до 18, минимальный интервал 3 часа.
-    </string>
-    <string name="krondshtat">Кронштадт</string>
-    <string name="krondshtat_text">
-Доставка воды 19 литров в Кронштадт на дом и в офисы по расписанию
-Пн и Чт. с 12ч до 18ч
-    </string>
-    <string name="metalstroy">пос. Металлострой </string>
-    <string name="metalstroy_text">
-        Доставка воды в пос. Металлострой на дом и в офисы по расписанию:
-С Пн по Пт с 9 до 21, минимальный интервал 3 часа.
-В Субботу с 9 до 18, минимальный интервал 3 часа.
-    </string>
-    <string name="krasnoe_selo">Красное село и окрестные пункты</string>
-    <string name="krasnoe_selo_text">
-        Доставка воды в Красное село и окрестные пункты. Заказать воду на дом и в офисы в Красное село можно по расписанию:
-Вт, Ср, Пт с 10ч до 18ч
-    </string>
-    <string name="shushari">Шушары</string>
-    <string name="shushari_text">
-        Доставка воды 19 литров в Шушары на дом и в офисы по расписанию:
-С Пн по Пт с 9 до 21, минимальный интервал 3 часа.
-В Субботу с 9 до 18, минимальный интервал 3 часа.
-    </string>
-    <string name="petergof">Петергоф, Ломоносов, Стрельна </string>
-    <string name="petergof_text">
-        Доставка питьевой воды в Петергоф, Ломоносов, Стрельну на дом и в офис по расписанию:
-Стандартная доставка на следующий день, при заказе с Пн по Пт с 10 до 18
-    </string>
+    <!-- fragment catalog product -->
+    <string name="fragment_catalog_product_name_category">Назватие категории</string>
+    
+    <!-- fragment basket names-->
+    <string name="fragment_basket_ball_per_order">Количество баллов за заказ:</string>
+    <string name="fragment_basket_total_sum_order">Общая сумма заказа:</string>
+    <string name="fragment_basket_total_sum">Итого:</string>
+    <string name="fragment_basket_checkout_order">Оформить заказ</string>
+    <string name="fragment_basket_sample_sum">3020 ₽</string>
+    <string name="fragment_basket_sample_total_sum">3220 ₽</string>
+    
+    <!-- fragment addresses -->
+    <string name="fragment_addresses_no_address_text">У вас не указано ни одного адреса</string>
 
-    <string name="faq_label">Часто задаваемые вопросы </string>
-    <string name="one_quest">В чем отличие воды?</string>
-    <string name="one_quest_answer_1_1">Обе воды добываются в сердце Карельского перешейка. Около посёлка Стеклянный расположены скважины глубиной 185 метров — там же, прямо на месте добычы, происходит розлив. Вода доставляется в Санкт-Петербург и область, сохранив свежесть, чистоту и пользу.</string>
-    <string name="one_quest_answer_1_2">Вода «Plesca Натуральная» — подходит для повседневного употребления в любом виде. Содержит комплекс веществ, необходимых для здоровья городских жителей.</string>
-    <string name="one_quest_answer_1_3">• Глубина источника гарантирует неизменный состав воды.\n• Содержит природный комплекс полезных веществ: кальций, магний, калий, натрий.\n• Подходит для готовки, ежедневного употребления без ограничений. \n• Соответствует нормативам качества.</string>
-    <string name="one_quest_answer_1_4">Вода «Plesca Классическая» — смягченная артезианская вода, оптимальный выбор для офисов и предприятий. Подходит для использования в кулерах, чайниках и кофе-машинах.</string>
-    <string name="one_quest_answer_1_5">• Отсутствие накипи и осадка при кипячении, щадящее воздействие на бытовую технику.\n• Идеально подходит для использования в кулерах, чайниках и кофе-машинах.\n• Рекомендована для ежедневного употребления.\n• Имеет сертификаты качества.</string>
-    <string name="one_quest_answer_2">Plesca Натуральная – это вода из артезианской скважины из Псковской области Печерского района. Этот вид воды отлично подходит для питья в сыром виде. В воде Plesca Натуральная много природных минералов полезных для здоровья, она обладает хорошими вкусовые качествами и безопасна для употребления взрослыми и детьми.</string>
-    <string name="one_quest_answer_3">Plesca Классическая – это вода из поверхностных источников Санкт-Петербурга, доочищенная  и ионизированная серебром. Она хорошо подходит  для горячих напитков, использования в кулерах, не оставляет накипи и осадка.</string>
-    <string name="two_quest">2. Кто производитель воды?  Есть сертификат?</string>
-    <string name="tree_quest">3. Есть ли залог за тару и нужно ли её возвращать?</string>
-    <string name="four_quest">4. Режим доставки: (когда и в какое время)?</string>
-    <string name="five_quest">5. Какие способы оплаты есть?</string>
-    <string name="six_quest">6</string>
-    <string name="seven_quest">7. Какие есть акции для новых  и постоянных клиентов?</string>
-    <string name="eight_quest">8. Как нужно обслуживать кулер?</string>
-    <string name="nine_quest">9</string>
-    <string name="ten_quest">10. У меня есть старая помпа, можно её поменять на новую?</string>
+    <!-- fragment add address-->
+    <string name="fragment_add_address_label">Добавить адрес</string>
+    <string name="fragment_add_address_city">Город/посёлок</string>
+    <string name="fragment_add_address_street">Улица</string>
+    <string name="fragment_add_address_home">Дом</string>
+    <string name="fragment_add_address_structure">Строение</string>
+    <string name="fragment_add_address_entrance">Подьезд</string>
+    <string name="fragment_add_address_floor">Этаж</string>
+    <string name="fragment_add_address_apartment">Квартира</string>
+    <string name="fragment_add_address_notice">Примечание</string>
+    <string name="fragment_add_address_contact">Дополнительный контакт</string>
 
-    <string name="call_me">Позвонить оператору</string>
-    <string name="send_mail">Написать на почту</string>
-    <string name="phone_bos">Связаться с руководством</string>
-    <string name="telegram">Связаться c помощью Telegram</string>
-    <string name="vk">Связаться c помощью VK</string>
-    <string name="whatsApp">Связаться c помощью WhatsApp</string>
-    <string name="instagram">Связаться c помощью Instagram</string>
-<!--    <string name="user_data_sent_for_moderation">Ваши данные отправлены на модерацию.  Мы проверим их корректность и внесём изменения. Спасибо вам за то, что предупреждаете нас.</string>-->
-    <string name="user_data_sent_for_moderation">Ваши данные изменены.</string>
-    <string name="complete_order_pay">Оформление прошло успешно</string>
-    <string name="comment_order_pay">Мы сообщим вам, когда заказ будет передан  в доставку</string>
-    <string name="go_to_home_text">Перейти на главную</string>
+    <!-- fragment about product-->
+    <string name="fragment_about_product_name_product">Название товара</string>
+    <string name="fragment_about_product_description_product">Описание товара</string>
+    <string name="fragment_about_product_cost_product">от - ₽</string>
 
-    <string-array name="order_pay">
-        <item>Оплата по карте курьеру</item>
-        <item>Оплата наличными</item>
-    </string-array>
+    <!-- bottom sheet price fragment-->
+    <string name="bottom_sheet_price_list_logo">Прайс лист</string>
 
-    <string name="price_list_logo">Прайс лист</string>
-    <string name="image_product">Изображение товара</string>
-    <string name="add_product_text">Добавить количество к покупке</string>
-    <string name="delete_product_text">Убрать количество к покупке</string>
-    <string name="add_product_to_basket">Добавить в корзину</string>
+    <!-- banner info sheet_fragment -->
+    <string name="banner_info_sheet_promo">Акции</string>
+    <string name="banner_info_sheet_promo_info">Информация по акциям</string>
 
+    <!--add notice dialog-->
+    <string name="add_notice_dialog_label">Добавить коментарий</string>
+    <string name="add_notice_dialog_comment_for_driver">Коментарий для курьера</string>
+    <string name="add_notice_dialog_add">Добавить</string>
+    <string name="add_notice_dialog_cancel">Отмена</string>
 
-    <string name="default_notification_channel_name" translatable="true">hello</string>
-    <string name="default_notification_channel_id" translatable="false">hello</string>
-    <string name="msg_subscribed">Subscribed to weather topic</string>
-    <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
-    <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
-    <string name="fcm_message">FCM Message</string>
-    <string name="register">Регистрация</string>
-    <string name="finish">Завершить</string>
-    <string name="no_address_string">У вас не указано ни одного адреса</string>
+    <!-- general -->
+    <string name="add">Добавить</string>
+    <string name="cancel">Отмена</string>
+    <string name="general_next_text">Продолжить</string>
+    <string name="general_favorite">Избранное</string>
+    <string name="general_zero">0</string>
+    <string name="general_name_user">Имя</string>
+    <string name="general_phone">Телефон</string>
+    <string name="general_email">Электронная почта</string>
+    <string name="general_yes">Да</string>
+    <string name="general_ok">Ок</string>
+    <string name="general_no">Нет</string>
+
+    <!-- description-->
+    <string name="description_image_product">Изображение товара</string>
+    <string name="description_image_logo">Изображение логотипа</string>
+    <string name="description_minus_product_count">Убрать количество к покупке</string>
+    <string name="description_add_product_count">Добавить количество к покупке</string>
+    <string name="description_add_product_to_basket">Добавить в корзину</string>
+    <string name="description_clear_text">Очистить текст</string>
+    <string name="description_your_watter_logo">YourWater</string>
+    <string name="description_ic_address">Адрес</string>
+    <string name="description_ic_time">Время_заказа</string>
+    <string name="description_ic_delete">Удалить</string>
+    <string name="description_add_product">Добавить продукт</string>
+    <string name="description_image_background">Изображение фона</string>
 </resources>

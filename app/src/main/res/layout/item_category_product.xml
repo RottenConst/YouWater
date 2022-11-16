@@ -25,7 +25,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:text="@string/drinking_water"
+            android:text="@string/item_category_product_name_category"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"

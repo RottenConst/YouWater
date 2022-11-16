@@ -25,24 +25,28 @@
         app:cardCornerRadius="8dp"
         android:onClick="@{() -> productItemClick.aboutProductClick(product)}" >
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <ImageView
                 android:id="@+id/iv_product"
-                android:layout_width="127dp"
+                android:layout_width="0dp"
                 android:layout_height="97dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
-                android:layout_marginStart="14dp"
-                android:layout_marginTop="11dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 android:adjustViewBounds="true"
                 android:background="@color/transparent"
-                android:contentDescription="@string/favorite"
+                android:contentDescription="@string/general_favorite"
                 app:imageUrl="@{product.gallery}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@tools:sample/avatars" />
 
             <ImageButton
@@ -51,26 +55,36 @@
                 android:layout_height="26dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
-                android:layout_marginTop="11dp"
-                android:layout_marginEnd="14dp"
-                android:contentDescription="@string/favorite"
-                />
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@string/general_favorite"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tv_name_product"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_above="@+id/tv_sum_no_discount"
                 android:layout_below="@+id/iv_product"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="2dp"
-                android:text="@string/str_name_product"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-black"
+                android:maxLines="3"
+                android:minLines="1"
+                android:text="@string/item_card_product_name_product"
+                android:textAlignment="center"
+                android:textAllCaps="false"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/tv_sum_no_discount"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_product"
+                app:layout_constraintVertical_bias="0.0"
                 app:nameProduct="@{product}" />
 
             <TextView
@@ -79,11 +93,17 @@
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/tv_cost_product"
                 android:layout_alignParentStart="true"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="0dp"
-                android:visibility="gone"
-                android:text=""
-                app:costProductNoDiscount="@{product}"/>
+                android:layout_marginStart="8dp"
+                android:text="@string/general_zero"
+                android:textSize="@dimen/_7ssp"
+                android:visibility="visible"
+                app:costProductNoDiscount="@{product}"
+                app:layout_constraintBottom_toTopOf="@+id/tv_cost_product"
+                app:layout_constraintEnd_toStartOf="@+id/iv_btn_plus"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/iv_btn_plus"
+                app:layout_constraintVertical_bias="1.0" />
 
             <TextView
                 android:id="@+id/tv_cost_product"
@@ -91,15 +111,21 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:layout_toStartOf="@+id/iv_btn_plus"
-                android:text="@string/str_cost_product"
+                android:text="@string/item_card_product_cost_product"
                 android:textColor="@color/blue"
-                android:textSize="16sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
-                app:costProduct="@{product}" />
+                app:costProduct="@{product}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/iv_btn_plus"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/iv_btn_plus"
+                app:layout_constraintVertical_bias="1.0" />
 
             <ImageButton
                 android:id="@+id/iv_btn_plus"
@@ -108,14 +134,16 @@
                 android:layout_height="28dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="@color/transparent"
-                android:contentDescription="@string/btn_add_desc"
+                android:contentDescription="@string/description_add_product"
                 android:onClick="@{() -> productItemClick.onProductItemClicked(product)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:srcCompat="@drawable/ic_btn_plus" />
 
 
-        </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </layout>

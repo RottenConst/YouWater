@@ -17,14 +17,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_youwater_logo" />
+            app:srcCompat="@drawable/ic_your_water_logo" />
 
         <TextView
             android:id="@+id/tv_login_pin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="154dp"
-            android:text="@string/enter"
+            android:text="@string/fragment_enter_pin_code_enter_text"
             android:textColor="@color/black"
             android:textSize="34sp"
             android:textStyle="bold"
@@ -61,7 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="@string/info_code"
+            android:text="@string/fragment_enter_pin_code_info_code"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -74,7 +74,7 @@
             android:layout_marginStart="@dimen/left_right_tv"
             android:layout_marginTop="14dp"
             android:layout_marginEnd="@dimen/left_right_tv"
-            android:text="@string/enter_code_on_sms"
+            android:text="@string/fragment_enter_pin_code_enter_code_on_sms"
             android:visibility="visible"
             app:layout_constraintBottom_toTopOf="@+id/btn_enter_pin"
             app:layout_constraintEnd_toEndOf="parent"
@@ -91,7 +91,7 @@
             android:layout_marginEnd="52dp"
             android:layout_marginBottom="292dp"
             android:background="@drawable/bg_button"
-            android:text="@string/next"
+            android:text="@string/general_next_text"
             android:textColor="@color/white"
             app:layout_constraintBottom_toTopOf="@+id/tv_info_code"
             app:layout_constraintEnd_toEndOf="parent"

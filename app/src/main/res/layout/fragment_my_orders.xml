@@ -20,7 +20,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="@string/nothing_order_text"
+                android:text="@string/fragment_my_order_nothing_order"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"

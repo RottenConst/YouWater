@@ -23,7 +23,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_profile"
-            android:text="@string/add_bank_card"
+            android:text="@string/item_add_card_add_bank_card"
             android:textAlignment="textStart"
             android:textColor="@color/black"
             android:textStyle="bold"

@@ -13,7 +13,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/delivery_suburbs"
+        android:text="@string/fragment_delivery_suburbs_text_logo"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="20sp"
@@ -43,7 +43,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/pushkin"
+                android:text="@string/fragment_delivery_suburbs_pushkin"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -55,7 +55,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/pushkin_text" />
+                android:text="@string/fragment_delivery_suburbs_pushkin_text" />
 
             <TextView
                 android:id="@+id/tv_kolino"
@@ -64,7 +64,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/kolino"
+                android:text="@string/fragment_delivery_suburbs_kolino"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
@@ -76,7 +76,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/kolino_text" />
+                android:text="@string/fragment_delivery_suburbs_kolino_text" />
 
             <TextView
                 android:id="@+id/tv_krondshtat"
@@ -85,7 +85,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/krondshtat"
+                android:text="@string/fragment_delivery_suburbs_krondshtat"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -97,7 +97,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/krondshtat_text" />
+                android:text="@string/fragment_delivery_suburbs_krondshtat_text" />
 
             <TextView
                 android:id="@+id/tv_metalstroy"
@@ -106,7 +106,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/metalstroy"
+                android:text="@string/fragment_delivery_suburbs_metalstroy"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -118,7 +118,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/metalstroy_text" />
+                android:text="@string/fragment_delivery_suburbs_metalstroy_text" />
 
             <TextView
                 android:id="@+id/tv_krasnoe_selo"
@@ -127,7 +127,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/krasnoe_selo"
+                android:text="@string/fragment_delivery_suburbs_krasnoe_selo"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -139,7 +139,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/krasnoe_selo_text" />
+                android:text="@string/fragment_delivery_suburbs_krasnoe_selo_text" />
 
             <TextView
                 android:id="@+id/tv_shushari"
@@ -148,7 +148,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/shushari"
+                android:text="@string/fragment_delivery_suburbs_shushari"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -160,7 +160,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/shushari_text" />
+                android:text="@string/fragment_delivery_suburbs_shushari_text" />
 
             <TextView
                 android:id="@+id/tv_petergof"
@@ -169,7 +169,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/petergof"
+                android:text="@string/fragment_delivery_suburbs_petergof"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -181,7 +181,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/petergof_text" />
+                android:text="@string/fragment_delivery_suburbs_petergof_text" />
         </LinearLayout>
     </ScrollView>
 

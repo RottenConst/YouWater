@@ -36,7 +36,7 @@
             android:layout_marginEnd="10dp"
             android:adjustViewBounds="true"
             android:background="@color/transparent"
-            android:contentDescription="@string/favorite"
+            android:contentDescription="@string/general_favorite"
             app:imageUrl="@{favorite.gallery}"
             tools:srcCompat="@tools:sample/avatars" />
 

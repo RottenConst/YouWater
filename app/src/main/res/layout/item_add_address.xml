@@ -23,7 +23,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            android:text="@string/add_address"
+            android:text="@string/fragment_add_address_label"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -75,7 +75,7 @@
                 android:id="@+id/et_home"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="@string/address_home"
+                android:hint="@string/fragment_add_address_home"
                 android:inputType="numberDecimal"
                 android:minHeight="48dp"
                 android:textColor="@color/blue" />
@@ -98,7 +98,7 @@
                 android:id="@+id/et_corp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="@string/address_corp"
+                android:hint="@string/item_add_address_address_corp"
                 android:inputType="numberDecimal"
                 android:minHeight="48dp"
                 android:textColor="@color/blue" />
@@ -123,7 +123,7 @@
                 android:id="@+id/et_structure"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="@string/address_structure"
+                android:hint="@string/item_add_address_structure"
                 android:inputType="numberDecimal"
                 android:minHeight="48dp"
                 android:textColor="@color/blue" />
@@ -147,7 +147,7 @@
                 android:id="@+id/et_entrance"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="@string/address_entrance"
+                android:hint="@string/item_add_address_entrance"
                 android:inputType="numberDecimal"
                 android:minHeight="48dp"
                 android:textColor="@color/blue" />
@@ -172,7 +172,7 @@
                 android:id="@+id/et_floor"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="@string/address_floor"
+                android:hint="@string/item_add_address_floor"
                 android:inputType="numberDecimal"
                 android:textColor="@color/blue" />
 
@@ -195,7 +195,7 @@
                 android:id="@+id/et_apartment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="@string/address_apartment"
+                android:hint="@string/item_add_address_apartment"
                 android:inputType="numberDecimal"
                 android:minHeight="48dp"
                 android:textColor="@color/blue" />
@@ -219,7 +219,7 @@
                 android:id="@+id/et_note"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="@string/address_note"
+                android:hint="@string/item_add_address_notice"
                 android:minHeight="48dp"
                 android:textColor="@color/blue" />
 
@@ -233,7 +233,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/add_address"
+            android:text="@string/item_add_address_label"
             android:textColor="#212121"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
