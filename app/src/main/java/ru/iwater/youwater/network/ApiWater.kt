@@ -1,6 +1,5 @@
 package ru.iwater.youwater.network
 
-import androidx.annotation.Nullable
 import com.google.gson.JsonObject
 import retrofit2.Response
 import retrofit2.http.*
@@ -61,6 +60,11 @@ interface ApiWater {
         @Body order: Order
     ): Response<JsonObject>
 
+    @POST("order-app/")
+    suspend fun createOrderApp(
+        @Body order: Order
+    ): Response<JsonObject>
+
     @GET("return_of_applications_client_id/{client_id}/")
     suspend fun getOrderClient(
         @Path("client_id") clientId: Int
@@ -82,6 +86,11 @@ interface ApiWater {
         @Path("client_id") clientId: Int
     ):List<RawAddress>
 
+    @GET("address_detail/{address_id}")
+    suspend fun getAddress(
+        @Path("address_id") addressId: Int
+    ): RawAddress?
+
     @FormUrlEncoded
     @POST("address/")
     suspend fun createNewAddress(
@@ -96,7 +105,8 @@ interface ApiWater {
         @Field("return_tare") returnTare: Int,
         @Field("phone_contact") phoneContact: String,
         @Field("name_contact") nameContact: String,
-        @Field("address_json") addressJson: JsonObject
+        @Field("address_json") addressJson: JsonObject,
+        @Field("notice") notice: String
     ): Response<JsonObject>
 
     @PUT("address_delete/{id}/")
@@ -119,4 +129,17 @@ interface ApiWater {
     suspend fun isStartPocket(
         @Path("client_id") client_id: Int
     ): Response<JsonObject>
+
+    @GET("promo/")
+    suspend fun getPromo(): List<PromoBanner>?
+
+    @GET("last_users_order/{client_id}/")
+    suspend fun isLastOrder(
+        @Path("client_id") clientId: Int
+    ): Response<JsonObject>
+
+    @GET("OrdersInfo/{lastOrderId}/")
+    suspend fun getLastOrderInfo(
+        @Path("lastOrderId") lastOrderId: Int
+    ): OrderFromCRM?
 }
