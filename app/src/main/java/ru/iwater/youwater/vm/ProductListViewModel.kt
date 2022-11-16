@@ -10,6 +10,7 @@ import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.TypeProduct
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.repository.ProductRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 @OnScreen
@@ -32,7 +33,7 @@ class ProductListViewModel @Inject constructor(
     fun setCatalogItem(catalogId: Int) {
         viewModelScope.launch {
             getFavoriteProduct()
-            val products = productRepo.getProductList(catalogId)
+            val products = productRepo.getProductListOfCategory(catalogId)
             products.forEach { product ->
                 for (favoriteProduct in favoriteProducts) {
                     if (favoriteProduct.id == product.id) {
@@ -46,7 +47,7 @@ class ProductListViewModel @Inject constructor(
 
     fun getBasket() {
         viewModelScope.launch {
-            _productsList.value = productRepo.getProductList()
+            _productsList.value = productRepo.getProductListOfCategory()
         }
     }
 
@@ -56,22 +57,29 @@ class ProductListViewModel @Inject constructor(
         }
     }
 
-    fun addProductInBasket(product: Product) {
+    fun addProductInBasket(productId: Int) {
         viewModelScope.launch {
-            val dbProduct = productRepo.getProductFromDB(product.id)
-            val productStart = productRepo.getProductList()?.filter { it.category == 20 }
+            val dbProduct = productRepo.getProductFromDB(productId)
+            val product = productRepo.getProduct(productId)
+            val productStart = productRepo.getProductListOfCategory()?.filter { it.category == 20 }
             val start = productStart.isNullOrEmpty()
-            if (dbProduct != null && dbProduct.category != 20) {
-                dbProduct.count += 1
-                productRepo.updateProductInBasket(dbProduct)
-            } else {
-                if (product.category == 20 && start) {
-                    product.count = 1
-                    productRepo.addProductInBasket(product)
-                } else if (product.category != 20) {
-                    product.count += 1
-                    productRepo.addProductInBasket(product)
+            try {
+                if (dbProduct != null && dbProduct.category != 20) {
+                    dbProduct.count += 1
+                    productRepo.updateProductInBasket(dbProduct)
+                } else {
+                    if (product?.category == 20 && start) {
+                        product.count = 1
+                        productRepo.addProductInBasket(product)
+                    } else if (product?.category != 20) {
+                        if (product != null) {
+                            product.count += 1
+                            productRepo.addProductInBasket(product)
+                        }
+                    }
                 }
+            } catch (e: Exception) {
+                Timber.e("Error add in basket: $e")
             }
         }
     }
@@ -89,7 +97,7 @@ class ProductListViewModel @Inject constructor(
                         productRepo.deleteProductFromBasket(productDB)
                     }
                 }
-                _productsList.value = productRepo.getProductList()
+                _productsList.value = productRepo.getProductListOfCategory()
             }
         }
     }

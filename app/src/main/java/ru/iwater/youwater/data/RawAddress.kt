@@ -16,5 +16,7 @@ data class RawAddress (
     @SerializedName("full_address")
     val fullAddress: String,
     @SerializedName("verified")
-    var verified: Boolean
+    var verified: Boolean,
+    @SerializedName("notice")
+    var notice: String?
 )

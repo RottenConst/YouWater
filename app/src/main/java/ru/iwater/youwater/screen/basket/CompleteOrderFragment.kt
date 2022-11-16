@@ -16,7 +16,7 @@ import ru.iwater.youwater.databinding.FragmentCompleteOrderBinding
 import ru.iwater.youwater.screen.adapters.MyOrderAdapter
 import javax.inject.Inject
 
-class CompleteOrderFragment : BaseFragment() {
+class CompleteOrderFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder {
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
@@ -36,7 +36,7 @@ class CompleteOrderFragment : BaseFragment() {
         val isPaid = CompleteOrderFragmentArgs.fromBundle(this.requireArguments()).isPaid
         val binding = FragmentCompleteOrderBinding.inflate(inflater)
         binding.lifecycleOwner = this
-        val adapter = MyOrderAdapter()
+        val adapter = MyOrderAdapter(this)
         binding.cardOrderPay.adapter = adapter
         viewModel.products.observe(viewLifecycleOwner) {
             viewModel.clearProduct(it)
@@ -71,5 +71,11 @@ class CompleteOrderFragment : BaseFragment() {
         @JvmStatic
         fun newInstance() =
             CompleteOrderFragment()
+    }
+
+    override fun onClickReplayButton(idOrder: Int) {
+        findNavController().navigate(
+            CompleteOrderFragmentDirections.actionCompleteOrderFragmentToCreateOrderFragment(false, idOrder)
+        )
     }
 }

@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.data.AuthViewModel
 import ru.iwater.youwater.data.StatusPhone
@@ -37,7 +36,7 @@ class RegisterFragment : Fragment() {
         val phoneNumber = RegisterFragmentArgs.fromBundle(requireArguments()).phoneNumber
         binding.btnRegister.setOnClickListener {
             val name = binding.etNameRegister.text.toString()
-            val email = binding.etMailRegister.text.toString()
+            val email = binding.etEmailRegister.text.toString()
             when {
                 name.isNullOrEmpty() -> {
                     Toast.makeText(context, "Введите ваше имя", Toast.LENGTH_LONG).show()

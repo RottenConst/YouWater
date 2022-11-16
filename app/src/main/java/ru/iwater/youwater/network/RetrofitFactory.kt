@@ -4,19 +4,24 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
-import retrofit2.http.Headers
 import java.util.concurrent.TimeUnit
+
+//const val ImageUrl = "https://crm.new.iwatercrm.ru/iwatercrm/images"//prod
+//const val BASE_URL_SBER = "https://securepayments.sberbank.ru/payment/rest/" //prod
+//const val BASE_URL_API = "https://app.iwatercrm.ru/iwater/" //prod
+
+const val BASE_URL_API = "https://api.iwatercrm.ru/iwater/" //test
+const val BASE_URL_SBER = "https://3dsec.sberbank.ru/payment/rest/" //test
+const val ImageUrl = "https://dev.new.iwatercrm.ru/iwatercrm/images"//test
+
 
 object RetrofitFactory {
     const val AUTH_KEY = "3OSkO8gl.puTQf56Hi8BuTRFTpEDZyNjkkOFkvlPX"
-    const val BASE_URL = "https://api.iwatercrm.ru/iwater/" //test
-//    const val BASE_URL = "https://app.iwatercrm.ru/iwater/" //prod
+
 
     fun makeRetrofit(): ApiWater {
         val httpLoggingInterceptor = HttpLoggingInterceptor()
         httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
@@ -32,39 +37,15 @@ object RetrofitFactory {
 
 
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BASE_URL_API)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build().create(ApiWater::class.java)
     }
 }
 
-object RetrofitGoogleService {
-    const val BASE_URL = "https://maps.googleapis.com/"
-
-
-    fun makeRetrofit(): GoogleMapApi {
-        val httpLoggingInterceptor = HttpLoggingInterceptor()
-        httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(httpLoggingInterceptor)
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .build()
-
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build().create(GoogleMapApi::class.java)
-
-    }
-}
-
 object RetrofitSberApi {
-a//    const val BASE_URL = "https://3dsec.sberbank.ru/payment/rest/" //test
-    const val BASE_URL = "https://securepayments.sberbank.ru/payment/rest/" //prod
+
 
     fun makeRetrofit(): SberPaymentApi {
         val httpLoggingInterceptor = HttpLoggingInterceptor()
@@ -84,7 +65,7 @@ a//    const val BASE_URL = "https://3dsec.sberbank.ru/payment/rest/" //test
             .build()
 
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BASE_URL_SBER)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build().create(SberPaymentApi::class.java)

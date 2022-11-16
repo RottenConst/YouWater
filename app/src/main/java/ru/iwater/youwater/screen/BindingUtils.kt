@@ -11,11 +11,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.*
+import ru.iwater.youwater.network.ImageUrl
 import ru.iwater.youwater.screen.adapters.AdapterCatalogList
 import ru.iwater.youwater.screen.adapters.AdapterProductList
 import ru.iwater.youwater.screen.adapters.OrderProductAdapter
 import timber.log.Timber
-import java.text.SimpleDateFormat
 
 /**
  * имя товара
@@ -292,15 +292,14 @@ fun TextView.bindAboutProduct(product: Product?) {
  */
 @BindingAdapter("imageUrl")
 fun bindImageProduct(imgView: ImageView, file: String?) {
-    val imgUrl = "https://dev.new.iwatercrm.ru/iwatercrm/images/$file" //test
-//    val imgUrl = "https://crm.new.iwatercrm.ru/iwatercrm/images/$file" //prod
+    val imgUrl = "$ImageUrl/$file"
     imgUrl.let {
         val imgUrl = imgUrl.toUri().buildUpon().build()
         Glide.with(imgView.context)
             .load(imgUrl)
             .apply(RequestOptions()
-                .placeholder(R.drawable.ic_youwater_logo)
-                .error(R.drawable.ic_youwater_logo))
+                .placeholder(R.drawable.ic_your_water_logo)
+                .error(R.drawable.ic_your_water_logo))
             .into(imgView)
     }
 
@@ -481,9 +480,7 @@ fun TextView.bindDateMyOrder(dateOrder: String?) {
     if (dateOrder != null) {
         val date = dateOrder.split(";")[0]
         val period = dateOrder.split(";")[1]
-        val format = SimpleDateFormat("dd.MM.yyyy")
-        val unixDate = date.toLong() * 1000
-        text = "${format.format(unixDate)}, $period"
+        text = "$date, $period"
     }
 
 
@@ -496,7 +493,7 @@ fun TextView.bindTypeCash(typeCash: String?) {
             "Оплата наличными"
         }
         "2" -> {
-            "Оплата по карте"
+            "Оплата онлайн"
         }
         "4" -> {
             "Оплата по карте курьеру"
@@ -540,7 +537,10 @@ fun TextView.bindRawAddress(rawAddress: RawAddress?) {
 
 @BindingAdapter("setAddress")
 fun TextView.bindAddressOrder(address: String?) {
-    if (address != null) text = address
+    if (address != null) {
+        Timber.d("ADRESS = $address")
+        text = address
+    }
 }
 
 @BindingAdapter("setTotalCost")

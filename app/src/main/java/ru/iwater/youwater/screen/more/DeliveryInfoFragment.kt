@@ -1,13 +1,11 @@
 package ru.iwater.youwater.screen.more
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
-import ru.iwater.youwater.R
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.databinding.FragmentDeliveryInfoBinding
 import ru.iwater.youwater.screen.adapters.AdapterDeliveryInfo
@@ -39,7 +37,7 @@ class DeliveryInfoFragment : BaseFragment() {
                     tab.text = "В этот же день"
                 }
                 1 -> {
-                    tab.text = "Доставка на следующий день"
+                    tab.text = "На следующий день"
                 }
                 2 -> {
                     tab.text = "В пригороды"

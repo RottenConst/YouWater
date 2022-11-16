@@ -48,11 +48,6 @@ abstract class ViewModelFactoryModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(FavoriteViewModel::class)
-    abstract fun bindingFavoriteViewModel(favoriteViewModel: FavoriteViewModel): ViewModel
-
-    @Binds
-    @IntoMap
     @ViewModelKey(OrderViewModel::class)
     abstract fun bindingOrderViewModel(orderViewModel: OrderViewModel): ViewModel
 

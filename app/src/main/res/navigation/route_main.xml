@@ -17,14 +17,20 @@
         <action
             android:id="@+id/action_homeFragment_to_basketFragment"
             app:destination="@id/basketFragment"
-            app:launchSingleTop="false"
+            app:launchSingleTop="true"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_homeFragment_to_favoriteFragment"
             app:destination="@id/favoriteFragment"
-            app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_homeFragment_to_bannerInfoBottomSheetFragment"
+            app:destination="@id/bannerInfoBottomSheetFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_homeFragment_to_createOrderFragment"
+            app:destination="@id/createOrderFragment" />
     </fragment>
     <fragment
         android:id="@+id/catalogFragment"
@@ -82,8 +88,7 @@
         <action
             android:id="@+id/action_catalogProductFragment_to_basketFragment"
             app:destination="@id/basketFragment"
-            app:popUpTo="@id/catalogProductFragment"
-            app:popUpToInclusive="true" />
+            app:popUpTo="@id/catalogProductFragment" />
         <action
             android:id="@+id/action_catalogProductFragment_to_aboutProductFragment"
             app:destination="@id/aboutProductFragment" />
@@ -101,7 +106,6 @@
         <action
             android:id="@+id/action_aboutProductFragment_to_basketFragment"
             app:destination="@id/basketFragment"
-            app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_aboutProductFragment_to_priceBottomSheetFragment"
@@ -111,7 +115,7 @@
     <fragment
         android:id="@+id/userDataFragment"
         android:name="ru.iwater.youwater.screen.profile.UserDataFragment"
-        android:label="@string/my_data"
+        android:label="@string/fragment_profile_my_data"
         tools:layout="@layout/fragment_user_data">
         <action
             android:id="@+id/action_userDataFragment_to_editUserDataFragment"
@@ -123,7 +127,7 @@
     <fragment
         android:id="@+id/addresessFragment"
         android:name="ru.iwater.youwater.screen.profile.AddressesFragment"
-        android:label="@string/address" >
+        android:label="@string/fragment_profile_addresses" >
         <action
             android:id="@+id/action_addresessFragment_to_addAddressFragment"
             app:destination="@id/addAddressFragment" />
@@ -131,15 +135,15 @@
     <fragment
         android:id="@+id/bankCardFragment"
         android:name="ru.iwater.youwater.screen.profile.BankCardFragment"
-        android:label="@string/bank_card" />
+        android:label="@string/fragment_profile_bank_card" />
     <fragment
         android:id="@+id/notificationFragment"
         android:name="ru.iwater.youwater.screen.profile.NotificationFragment"
-        android:label="@string/notifications" />
+        android:label="@string/fragment_profile_notifications" />
     <fragment
         android:id="@+id/favoriteFragment"
         android:name="ru.iwater.youwater.screen.profile.FavoriteFragment"
-        android:label="@string/favorite" >
+        android:label="@string/general_favorite" >
         <action
             android:id="@+id/action_favoriteFragment_to_basketFragment"
             app:destination="@id/basketFragment" />
@@ -150,12 +154,7 @@
     <fragment
         android:id="@+id/addAddressFragment"
         android:name="ru.iwater.youwater.screen.profile.AddAddressFragment"
-        android:label="@string/add_address" >
-        <action
-            android:id="@+id/action_addAddressFragment_to_addresessFragment"
-            app:destination="@id/addresessFragment"
-            app:popUpTo="@id/addresessFragment"
-            app:popUpToInclusive="true" />
+        android:label="@string/fragment_add_address_label" >
         <argument
             android:name="isFromOrder"
             app:argType="boolean" />
@@ -164,11 +163,16 @@
             app:destination="@id/createOrderFragment"
             app:popUpTo="@id/basketFragment"
             app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_addAddressFragment_to_addresessFragment"
+            app:destination="@id/addresessFragment"
+            app:popUpTo="@id/addAddressFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/createOrderFragment"
         android:name="ru.iwater.youwater.screen.basket.CreateOrderFragment"
-        android:label="@string/complete_order">
+        android:label="@string/fragment_create_order_complete_order">
         <action
             android:id="@+id/action_createOrderFragment_to_addAddressFragment"
             app:destination="@id/addAddressFragment"
@@ -191,11 +195,21 @@
         <argument
             android:name="isShowMessage"
             app:argType="boolean" />
+        <argument
+            android:name="lastOrderId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_createOrderFragment_to_addNoticeDialog"
+            app:destination="@id/addNoticeDialog" />
     </fragment>
     <fragment
         android:id="@+id/myOrdersFragment"
         android:name="ru.iwater.youwater.screen.profile.MyOrdersFragment"
-        android:label="@string/my_orders" />
+        android:label="@string/fragment_profile_my_orders" >
+        <action
+            android:id="@+id/action_myOrdersFragment_to_createOrderFragment"
+            app:destination="@id/createOrderFragment" />
+    </fragment>
     <fragment
         android:id="@+id/contactFragment"
         android:name="ru.iwater.youwater.screen.more.ContactFragment"
@@ -217,7 +231,7 @@
     <fragment
         android:id="@+id/editUserDataFragment"
         android:name="ru.iwater.youwater.screen.profile.EditUserDataFragment"
-        android:label="@string/my_data" >
+        android:label="@string/fragment_profile_my_data" >
         <action
             android:id="@+id/action_editUserDataFragment_to_userDataFragment2"
             app:destination="@id/userDataFragment"
@@ -262,6 +276,9 @@
         <argument
             android:name="isPaid"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_completeOrderFragment_to_createOrderFragment"
+            app:destination="@id/createOrderFragment" />
     </fragment>
     <dialog
         android:id="@+id/priceBottomSheetFragment"
@@ -271,6 +288,21 @@
             android:name="price_product"
             app:argType="string" />
     </dialog>
+    <dialog
+        android:id="@+id/bannerInfoBottomSheetFragment"
+        android:name="ru.iwater.youwater.screen.home.BannerInfoBottomSheetFragment"
+        android:label="BannerInfoBottomSheetFragment" >
+        <argument
+            android:name="name_promo"
+            app:argType="string" />
+        <argument
+            android:name="promo_description"
+            app:argType="string" />
+    </dialog>
+    <dialog
+        android:id="@+id/addNoticeDialog"
+        android:name="ru.iwater.youwater.screen.dialog.AddNoticeDialog"
+        android:label="AddNoticeDialog" />
 
 
 </navigation>

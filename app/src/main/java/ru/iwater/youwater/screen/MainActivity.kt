@@ -23,7 +23,6 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
-import androidx.room.DatabaseConfiguration
 import com.google.firebase.messaging.RemoteMessage
 import com.pusher.pushnotifications.*
 import com.pusher.pushnotifications.auth.AuthData
@@ -150,10 +149,6 @@ class MainActivity : BaseActivity() {
                     Timber.d("Beams login success")
                     PushNotifications.setOnMessageReceivedListenerForVisibleActivity(this@MainActivity, object : PushNotificationReceivedListener {
                         override fun onMessageReceived(remoteMessage: RemoteMessage) {
-                            val messagePayload = remoteMessage.data
-//                            if (messagePayload.isNotEmpty()) {
-//                                Timber.d("Error")
-//                            } else {
                             val intent = Intent(this@MainActivity, MainActivity::class.java)
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                             val pendingIntent = PendingIntent.getActivity(baseContext, 0 /* Request code */, intent,
@@ -162,7 +157,7 @@ class MainActivity : BaseActivity() {
                             val channelId = getString(R.string.default_notification_channel_id)
                             val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
                             val notificationBuilder = NotificationCompat.Builder(baseContext, channelId)
-                                .setSmallIcon(R.drawable.ic_youwater_logo)
+                                .setSmallIcon(R.drawable.ic_your_water_logo)
                                 .setContentTitle(remoteMessage.notification?.title)
                                 .setContentText(remoteMessage.notification?.body)
                                 .setAutoCancel(true)
@@ -179,15 +174,19 @@ class MainActivity : BaseActivity() {
                                     NotificationManager.IMPORTANCE_DEFAULT)
                                 channel.enableVibration(true)
                                 notificationManager.createNotificationChannel(channel)
-                            }
 
                             notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
-//                            }
+                            }
                         }
                     })
                 }
             }
         )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        YouWaterDB.getDestroyDataBase()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -201,7 +200,7 @@ class MainActivity : BaseActivity() {
                 AlertDialog.Builder(this)
                     .setMessage(R.string.confirmLogout)
                     .setPositiveButton(
-                        R.string.yes
+                        R.string.general_yes
                     ) { _, _ ->
                         val intent = Intent(applicationContext, StartActivity::class.java)
                         intent.flags =
@@ -214,7 +213,7 @@ class MainActivity : BaseActivity() {
                         authRepository.deleteClient()
                         startActivity(intent)
                     }
-                    .setNegativeButton(R.string.no) { dialog, _ ->
+                    .setNegativeButton(R.string.general_no) { dialog, _ ->
                         dialog.cancel()
                     }.create().show()
             }

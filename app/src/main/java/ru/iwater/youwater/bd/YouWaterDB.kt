@@ -8,7 +8,7 @@ import ru.iwater.youwater.data.*
 import ru.iwater.youwater.utils.ProductConverter
 
 @Database(
-    version = 1,
+    version = 2,
     entities = [
         Product::class,
         Address::class,
@@ -20,7 +20,7 @@ import ru.iwater.youwater.utils.ProductConverter
 //    autoMigrations = [
 //        AutoMigration(from = 1, to = 2)
 //    ],
-//    exportSchema = true
+    exportSchema = false
 )
 @TypeConverters(ProductConverter::class )
 abstract class YouWaterDB: RoomDatabase() {
@@ -42,7 +42,6 @@ abstract class YouWaterDB: RoomDatabase() {
                         YouWaterDB::class.java,
                         "database"
                     )
-//                        .addMigrations(MIGRATION_1_2)
                         .build()
                 }
             }
@@ -56,17 +55,10 @@ abstract class YouWaterDB: RoomDatabase() {
 }
 
 
-        private val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
-                    "CREATE TABLE 'RawAddress' " +
-                            "(" +
-                            "'id' INTEGER," +
-                            " 'factAddress' TEXT," +
-                            " 'fullAddress' TEXT," +
-                            " 'verified' INTEGER, " +
-                            "PRIMARY KEY ('id')" +
-                            ")"
-                )
-            }
-        }
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "ALTER TABLE RawAddress ADD COLUMN notice TEXT"
+        )
+    }
+}

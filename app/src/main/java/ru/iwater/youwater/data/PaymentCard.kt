@@ -2,19 +2,15 @@ package ru.iwater.youwater.data
 
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
+import java.io.FileInputStream
+import java.util.Properties
 
 @Keep
 data class PaymentCard(
-    //prod sber
     @SerializedName("userName")
-    val userName: String = "p602720481107-api",
+    val userName: String = UserNameSber,
     @SerializedName("password")
-    val password: String = "r6tMp1y78",
-//    test sber
-//    @SerializedName("userName")
-//    val userName: String = "t602720481107-api",
-//    @SerializedName("password")
-//    val password: String = "ZwUEyuso",
+    val password: String = passwordSber,
     @SerializedName("orderNumber")
     val orderNumber: String,
     @SerializedName("amount")
@@ -24,3 +20,10 @@ data class PaymentCard(
     @SerializedName("phone")
     val phone: String
 )
+
+//prod
+//const val UserNameSber = "p602720481107-api"
+//const val passwordSber = "r6tMp1y78"
+//test
+const val UserNameSber = "t602720481107-api"
+const val passwordSber = "ZwUEyuso"

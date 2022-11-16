@@ -7,8 +7,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.iwater.youwater.data.MyOrder
 import ru.iwater.youwater.databinding.ItemOrderBinding
+import timber.log.Timber
 
-class MyOrderAdapter() : ListAdapter<MyOrder, MyOrderAdapter.MyOrderHolder>(OrderDiffCallback) {
+class MyOrderAdapter(
+    private val onclickReplayButton: onReplayLastOrder
+) : ListAdapter<MyOrder, MyOrderAdapter.MyOrderHolder>(OrderDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyOrderHolder {
         return MyOrderHolder.from(parent)
@@ -16,15 +19,20 @@ class MyOrderAdapter() : ListAdapter<MyOrder, MyOrderAdapter.MyOrderHolder>(Orde
 
     override fun onBindViewHolder(holder: MyOrderHolder, position: Int) {
         val myOrder = getItem(position)
-        holder.bindingMyOrder(myOrder)
+        holder.bindingMyOrder(myOrder, onclickReplayButton)
     }
 
     class MyOrderHolder(val binding: ItemOrderBinding): RecyclerView.ViewHolder(binding.root) {
 
-        fun bindingMyOrder(myOrder: MyOrder) {
+        fun bindingMyOrder(myOrder: MyOrder, onReplayLastOrder: onReplayLastOrder) {
             binding.myOrder = myOrder
             val adapter = OrderProductAdapter()
             binding.rvProductOrder.adapter = adapter
+
+            binding.btnReplayOrder.setOnClickListener {
+                Timber.d("Click ??????")
+                onReplayLastOrder.onClickReplayButton(myOrder.id)
+            }
             adapter.submitList(myOrder.products)
             binding.executePendingBindings()
         }
@@ -48,5 +56,7 @@ class MyOrderAdapter() : ListAdapter<MyOrder, MyOrderAdapter.MyOrderHolder>(Orde
         }
     }
 
-
+    interface onReplayLastOrder {
+        fun onClickReplayButton(idOrder: Int)
+    }
 }
