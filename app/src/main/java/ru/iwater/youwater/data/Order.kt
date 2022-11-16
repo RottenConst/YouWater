@@ -3,6 +3,7 @@ package ru.iwater.youwater.data
 import androidx.annotation.Keep
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
+import java.sql.Date
 
 @Keep
 data class Order(
@@ -18,8 +19,8 @@ data class Order(
     var period: String,
     @SerializedName("order_cost")
     var orderCost: Int,
-    @SerializedName("address")
-    var address: String,
+//    @SerializedName("address")
+//    var address: String,
     @SerializedName("payment_type")
     var paymentType: String?,
     @SerializedName("status")
@@ -30,8 +31,12 @@ data class Order(
     var contact: String,
     @SerializedName("date")
     var date: String,
-    @SerializedName("address_json")
-    var addressJson: JsonObject,
+//    @SerializedName("address_json")
+//    var addressJson: JsonObject,
+    @SerializedName("address_id")
+    var addressId: Int,
     @SerializedName("name")
-    var name: String
+    var name: String,
+    @SerializedName("date_created")
+    var dateCreate: Date?
 )

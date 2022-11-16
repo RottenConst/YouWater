@@ -63,7 +63,7 @@
             app:layout_constraintEnd_toEndOf="@+id/iv_circle"
             app:layout_constraintStart_toStartOf="@+id/iv_circle"
             app:layout_constraintTop_toTopOf="@+id/iv_circle"
-            app:srcCompat="@drawable/ic_youwater_logo"
+            app:srcCompat="@drawable/ic_your_water_logo"
             tools:ignore="VectorDrawableCompat" />
 
         <TextView
