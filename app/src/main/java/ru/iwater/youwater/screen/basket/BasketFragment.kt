@@ -85,7 +85,7 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
         }
         binding.btnCheckoutOrder.setOnClickListener {
             this.findNavController().navigate(
-                BasketFragmentDirections.actionBasketFragmentToCreateOrderFragment(false)
+                BasketFragmentDirections.actionBasketFragmentToCreateOrderFragment(false, 0)
             )
         }
         return binding.root
@@ -97,7 +97,7 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
     }
 
     override fun addProduct(product: Product) {
-        viewModel.addProductInBasket(product)
+        viewModel.addProductInBasket(product.id)
         viewModel.getBasket()
     }
 

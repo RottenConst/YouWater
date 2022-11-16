@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.repository.ProductRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 class AboutProductViewModel @Inject constructor(
@@ -14,8 +15,8 @@ class AboutProductViewModel @Inject constructor(
     val product: LiveData<Product> get() = _product
 
     //подробная цена товара
-    private val _navigateToPriceProduct: MutableLiveData<String> = MutableLiveData()
-    val navigateToPriceProduct: LiveData<String> get() = _navigateToPriceProduct
+    private val _navigateToPriceProduct: MutableLiveData<String?> = MutableLiveData()
+    val navigateToPriceProduct: LiveData<String?> get() = _navigateToPriceProduct
 
     //+1 количество товара
     fun plusCountProduct(product: Product) {
@@ -34,13 +35,29 @@ class AboutProductViewModel @Inject constructor(
     }
 
     //сохранить(добавить в корзину)
-    fun addProductToBasket(product: Product) {
+    fun addProductToBasket(productId: Int) {
         viewModelScope.launch {
-            val dbProduct = productRepo.getProductFromDB(product.id)
-            if (dbProduct != null) {
-                productRepo.updateProductInBasket(product)
-            } else {
-                productRepo.addProductInBasket(product)
+            val dbProduct = productRepo.getProductFromDB(productId)
+            val product = productRepo.getProduct(productId)
+            val productStart = productRepo.getProductListOfCategory()?.filter { it.category == 20 }
+            val start = productStart.isNullOrEmpty()
+            try {
+                if (dbProduct != null && dbProduct.category != 20) {
+                    dbProduct.count += 1
+                    productRepo.updateProductInBasket(dbProduct)
+                } else {
+                    if (product?.category == 20 && start) {
+                        product.count = 1
+                        productRepo.addProductInBasket(product)
+                    } else if (product?.category != 20) {
+                        if (product != null) {
+                            product.count += 1
+                            productRepo.addProductInBasket(product)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e("Error add in basket: $e")
             }
         }
     }
@@ -48,15 +65,10 @@ class AboutProductViewModel @Inject constructor(
     //инициалезация товара
     fun initProduct(productId: Int) {
         viewModelScope.launch {
-            var product = productRepo.getProductFromDB(productId) //был ли уже добавлен товар
-            if (product != null) {
-                _product.value = product
-            } else { //загружаем товар из црм
-                product = productRepo.getProduct(productId)
+               val product = productRepo.getProduct(productId)
                 if (product != null) {
                     product.count = 1
                     _product.value = product
-                }
             }
         }
     }

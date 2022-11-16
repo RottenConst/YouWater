@@ -53,7 +53,7 @@ class AboutProductFragment : BaseFragment() {
 
                 //клик по кнопке "добавить в корзину"
                 binding.btnBuyProduct.setOnClickListener {
-                    viewModel.addProductToBasket(product)
+                    viewModel.addProductToBasket(product.id)
                     if (product.category != 20) { //является ли товар стартовым пакетом
                         Snackbar.make(
                             binding.constraintAboutProduct,

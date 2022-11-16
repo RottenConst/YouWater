@@ -1,7 +1,6 @@
 package ru.iwater.youwater.screen.profile
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +11,6 @@ import com.google.android.material.snackbar.Snackbar
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.FavoriteProduct
-import ru.iwater.youwater.vm.FavoriteViewModel
-import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.FragmentFavoriteBinding
 import ru.iwater.youwater.screen.adapters.FavoriteProductAdapter
 import ru.iwater.youwater.vm.CatalogListViewModel
@@ -60,15 +57,17 @@ class FavoriteFragment : BaseFragment(), FavoriteProductAdapter.OnFavoriteProduc
     override fun onLikeItemClick(favoriteProduct: FavoriteProduct) {
         viewModel.delFavoriteProduct(favoriteProduct)
         viewModel.getFavoriteProduct()
-        Snackbar.make(binding.constraintFavorite, "Товар ${favoriteProduct.app_name} удален", Snackbar.LENGTH_LONG)
-            .setAction("Отмена", View.OnClickListener {
+        Snackbar.make( binding.root, "Товар удален из избранного", Snackbar.LENGTH_SHORT)
+            .setAction("Отмена") {
                 viewModel.addFavoriteProduct(favoriteProduct)
-            }).show()
+                binding.tvNothingFavorite.visibility = View.VISIBLE
+                viewModel.getFavoriteProduct()
+            }.show()
     }
 
     override fun addItemInBasked(favoriteProduct: FavoriteProduct) {
         viewModel.addProductInBasket(favoriteProduct.id)
-        Snackbar.make(binding.constraintFavorite, "Товар ${favoriteProduct.app_name} добавлен в корзину", Snackbar.LENGTH_LONG)
+        Snackbar.make(binding.root, "Товар добавлен в корзину", Snackbar.LENGTH_SHORT)
             .setAction("Перейти в корзину", View.OnClickListener {
                 this.findNavController().navigate(FavoriteFragmentDirections.actionFavoriteFragmentToBasketFragment())
             }).show()

@@ -3,8 +3,8 @@ package ru.iwater.youwater.screen.adapters
 import android.graphics.Color
 import android.graphics.Paint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -41,6 +41,11 @@ class AdapterProductList(
             binding.productItemClick = onProductItemClickListener
             binding.tvSumNoDiscount.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
             binding.ivLike.setBackgroundColor(Color.TRANSPARENT)
+            if (product.category == 20) {
+                binding.ivLike.visibility = View.GONE
+            } else {
+                binding.ivLike.visibility = View.VISIBLE
+            }
             if (product.onFavoriteClick) {
                 binding.ivLike.setImageResource(R.drawable.ic_like_true)
             } else {

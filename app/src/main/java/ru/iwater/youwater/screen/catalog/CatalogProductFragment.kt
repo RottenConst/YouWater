@@ -46,7 +46,7 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
                 viewModel.deleteFavoriteProduct(it)
             } else {
                 viewModel.addProductInFavorite(it)
-                Snackbar.make(binding.constraintCatalogProduct, "Товар ${it.app_name} добавлен в избранное", Snackbar.LENGTH_LONG)
+                Snackbar.make(binding.constraintCatalogProduct, "Товар добавлен в избранное", Snackbar.LENGTH_LONG)
                     .setAction("Избранное") {
                         this.findNavController()
                             .navigate(CatalogProductFragmentDirections.actionCatalogProductFragmentToFavoriteFragment())
@@ -74,7 +74,7 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
     }
 
     override fun onProductItemClicked(product: Product) {
-        viewModel.addProductInBasket(product)
+        viewModel.addProductInBasket(product.id)
         if (product.category != 20) {
             Snackbar.make(
                 binding.constraintCatalogProduct,

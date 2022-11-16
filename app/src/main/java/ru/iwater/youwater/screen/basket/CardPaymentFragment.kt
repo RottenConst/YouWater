@@ -67,7 +67,7 @@ class CardPaymentFragment : BaseFragment() {
                                 findNavController().navigate(CardPaymentFragmentDirections.actionCardPaymentFragmentToCompleteOrderFragment(orderId, true))
                             }
                             PaymentStatus.ERROR -> {
-                                findNavController().navigate(CardPaymentFragmentDirections.actionCardPaymentFragmentToCreateOrderFragment(true))
+                                findNavController().navigate(CardPaymentFragmentDirections.actionCardPaymentFragmentToCreateOrderFragment(true, 0))
                             }
                         }
                     }
