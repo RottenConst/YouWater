@@ -50,7 +50,9 @@ class MyOrdersFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder, Swipe
     }
 
     override fun onRefresh() {
-        viewModel.getOrderFromCrm()
+        if (!binding.rvOrders.isFocused) {
+            viewModel.getOrderFromCrm()
+        }
     }
 
     override fun onClickReplayButton(idOrder: Int) {
