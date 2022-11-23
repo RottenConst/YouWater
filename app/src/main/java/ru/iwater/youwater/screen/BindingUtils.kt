@@ -535,6 +535,13 @@ fun TextView.bindRawAddress(rawAddress: RawAddress?) {
     text = "${rawAddress?.fullAddress?.split(",")?.get(0)}, ${rawAddress?.factAddress}"
 }
 
+@BindingAdapter("setNoticeAddress")
+fun TextView.bindSetNoticeAddress(notice: String?) {
+    if (notice != null) {
+        text = "$notice"
+    }
+}
+
 @BindingAdapter("setAddress")
 fun TextView.bindAddressOrder(address: String?) {
     if (address != null) {
