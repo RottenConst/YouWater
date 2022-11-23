@@ -169,7 +169,7 @@
                                 android:layout_marginTop="8dp"
                                 android:layout_marginEnd="8dp"
                                 android:layout_marginBottom="8dp"
-                                android:text="@string/fragment_create_order_address_notice"
+                                android:text="@string/fragment_add_address_notice"
                                 android:textColor="@color/black"
                                 android:textStyle="bold"
                                 app:layout_constraintBottom_toTopOf="@id/tv_address_notice"

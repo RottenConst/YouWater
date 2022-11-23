@@ -283,7 +283,7 @@
     <string name="fragment_add_address_entrance">Подьезд</string>
     <string name="fragment_add_address_floor">Этаж</string>
     <string name="fragment_add_address_apartment">Квартира</string>
-    <string name="fragment_add_address_notice">Примечание</string>
+    <string name="fragment_add_address_notice">Примечание к адресу</string>
     <string name="fragment_add_address_contact">Дополнительный контакт</string>
 
     <!-- fragment about product-->
@@ -316,6 +316,7 @@
     <string name="general_yes">Да</string>
     <string name="general_ok">Ок</string>
     <string name="general_no">Нет</string>
+    <string name="general_notice">Примичание</string>
 
     <!-- description-->
     <string name="description_image_product">Изображение товара</string>
