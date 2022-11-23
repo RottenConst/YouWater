@@ -12,52 +12,90 @@
             type="ru.iwater.youwater.screen.adapters.AdapterAddresses.OnAddressItemListener" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cv_address_card"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        android:elevation="8dp">
 
-        <ImageView
-            android:id="@+id/ic_place_address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:contentDescription="@string/description_ic_address"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_place" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tv_full_address"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/description_ic_address"
-            android:textColor="#1976D2"
-            android:textSize="14sp"
-            app:setRawAddress="@{address}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/iv_delete_address"
-            app:layout_constraintStart_toEndOf="@+id/ic_place_address"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="@sample/sample_title[4]" />
+            <ImageView
+                android:id="@+id/ic_place_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/description_ic_address"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_place" />
 
-        <ImageButton
-            android:id="@+id/iv_delete_address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="@string/description_ic_delete"
-            android:onClick="@{() -> onAddressItemClick.onDeleteAddressClick(address)}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_cancel_24" />
+            <TextView
+                android:id="@+id/tv_full_address"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/description_ic_address"
+                android:textColor="#1976D2"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/ic_place_address"
+                app:layout_constraintEnd_toStartOf="@+id/iv_delete_address"
+                app:layout_constraintStart_toEndOf="@+id/ic_place_address"
+                app:layout_constraintTop_toTopOf="@+id/ic_place_address"
+                app:setRawAddress="@{address}"
+                tools:text="@sample/sample_title[4]" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <View
+                android:id="@+id/grey_line"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ic_place_address"/>
+
+            <TextView
+                android:id="@+id/tv_address_notice_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/blue"
+                android:textStyle="italic"
+                app:setNoticeAddress="@{address.notice}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ic_place_address"
+                app:layout_constraintTop_toBottomOf="@id/grey_line"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="@string/general_notice" />
+
+            <ImageButton
+                android:id="@+id/iv_delete_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/description_ic_delete"
+                android:onClick="@{() -> onAddressItemClick.onDeleteAddressClick(address)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                app:srcCompat="@drawable/ic_cancel_24" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 </layout>

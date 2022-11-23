@@ -2,11 +2,11 @@ package ru.iwater.youwater.screen.adapters
 
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import ru.iwater.youwater.data.Address
 import ru.iwater.youwater.data.RawAddress
 import ru.iwater.youwater.databinding.ItemAddressBinding
 import ru.iwater.youwater.screen.adapters.AdapterAddresses.*
@@ -30,6 +30,13 @@ class AdapterAddresses(private val onAddressItemListener: OnAddressItemListener)
             binding.address = address
             binding.onAddressItemClick = onAddressItemListener
             binding.ivDeleteAddress.setBackgroundColor(Color.TRANSPARENT)
+            if (address.notice.isNullOrEmpty()) {
+                binding.greyLine.visibility = View.GONE
+                binding.tvAddressNoticeLabel.visibility = View.GONE
+            } else {
+                binding.greyLine.visibility = View.VISIBLE
+                binding.tvAddressNoticeLabel.visibility = View.VISIBLE
+            }
             binding.executePendingBindings()
         }
 
