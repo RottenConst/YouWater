@@ -38,10 +38,10 @@ class RegisterFragment : Fragment() {
             val name = binding.etNameRegister.text.toString()
             val email = binding.etEmailRegister.text.toString()
             when {
-                name.isNullOrEmpty() -> {
+                name.isEmpty() -> {
                     Toast.makeText(context, "Введите ваше имя", Toast.LENGTH_LONG).show()
                 }
-                email.isNullOrEmpty() -> {
+                email.isEmpty() -> {
                     Toast.makeText(context, "Введите адрес электронной почты", Toast.LENGTH_LONG).show()
                 }
                 else -> {

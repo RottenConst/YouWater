@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import ru.iwater.youwater.databinding.BottomSheetPriceFragmentBinding
 import ru.iwater.youwater.screen.adapters.PriceProductAdapter
-import timber.log.Timber
 
 class PriceBottomSheetFragment : BottomSheetDialogFragment() {
 

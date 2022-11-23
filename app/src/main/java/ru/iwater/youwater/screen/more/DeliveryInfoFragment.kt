@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.databinding.FragmentDeliveryInfoBinding
@@ -12,13 +11,7 @@ import ru.iwater.youwater.screen.adapters.AdapterDeliveryInfo
 
 class DeliveryInfoFragment : BaseFragment() {
     private lateinit var adapter: AdapterDeliveryInfo
-    private lateinit var pagerDelivery: ViewPager2
     private val binding: FragmentDeliveryInfoBinding by lazy { initBind(LayoutInflater.from(this.context)) }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +43,7 @@ class DeliveryInfoFragment : BaseFragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance() =
             DeliveryInfoFragment()
     }
 }

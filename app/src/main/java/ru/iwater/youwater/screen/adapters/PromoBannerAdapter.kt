@@ -10,6 +10,7 @@ import com.bumptech.glide.request.RequestOptions
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.PromoBanner
 import ru.iwater.youwater.databinding.ItemPromoBinding
+import ru.iwater.youwater.network.ImageUrl
 
 class PromoBannerAdapter(
     private val onClickListener: OnBannerItemClickListener
@@ -27,8 +28,7 @@ class PromoBannerAdapter(
     class PromoBannerHolder(val binding: ItemPromoBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bindingBanner(banner: PromoBanner, onClickListener: OnBannerItemClickListener) {
-//            val imgUrl = "https://dev.new.iwatercrm.ru/iwatercrm/images/${banner.picture}"//test
-            val imgUrl = "https://crm.new.iwatercrm.ru/iwatercrm/images/${banner.picture}"//prod
+            val imgUrl = "$ImageUrl/${banner.picture}"//prod
             Glide.with(binding.ivPromo)
                 .load(imgUrl)
                 .apply(RequestOptions()

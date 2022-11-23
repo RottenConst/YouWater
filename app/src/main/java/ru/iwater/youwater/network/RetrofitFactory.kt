@@ -14,7 +14,6 @@ const val BASE_URL_API = "https://api.iwatercrm.ru/iwater/" //test
 const val BASE_URL_SBER = "https://3dsec.sberbank.ru/payment/rest/" //test
 const val ImageUrl = "https://dev.new.iwatercrm.ru/iwatercrm/images"//test
 
-
 object RetrofitFactory {
     const val AUTH_KEY = "3OSkO8gl.puTQf56Hi8BuTRFTpEDZyNjkkOFkvlPX"
 

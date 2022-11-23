@@ -14,10 +14,6 @@ class BankCardRepo @Inject constructor(
         return bankCardDao.getMyBankCard() ?: emptyList()
     }
 
-    suspend fun getBankCard(numberCard: Int): BankCard {
-        return bankCardDao.getBankCard(numberCard)
-    }
-
     suspend fun saveBankCard(bankCard: BankCard) {
         bankCardDao.saveCard(bankCard)
     }

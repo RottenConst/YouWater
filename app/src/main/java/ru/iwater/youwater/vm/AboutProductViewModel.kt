@@ -11,8 +11,8 @@ class AboutProductViewModel @Inject constructor(
     private val productRepo: ProductRepository
 ): ViewModel() {
     //продукт
-    private val _product: MutableLiveData<Product> = MutableLiveData()
-    val product: LiveData<Product> get() = _product
+    private val _product: MutableLiveData<Product?> = MutableLiveData()
+    val product: LiveData<Product?> get() = _product
 
     //подробная цена товара
     private val _navigateToPriceProduct: MutableLiveData<String?> = MutableLiveData()

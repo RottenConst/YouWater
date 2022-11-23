@@ -16,7 +16,6 @@ class AuthorisationRepository @Inject constructor(
 ) {
 
     private val apiAuth: ApiWater = RetrofitFactory.makeRetrofit()
-    private val authClient = AuthClient()
 
     suspend fun authPhone(phone: String): PhoneStatusClient? {
         val phoneAnswer = JsonObject()
@@ -81,20 +80,6 @@ class AuthorisationRepository @Inject constructor(
             val client = apiAuth.register(phone, name, email)
             if (client.isSuccessful) {
                client.body()
-            } else {
-                null
-            }
-        }catch (e: Exception) {
-            Timber.e("Register error: $e")
-            null
-        }
-    }
-
-    suspend fun singUpClient(id: Int, phone: String, name: String, email: String): JsonObject? {
-        return try {
-            val client = apiAuth.singUp(id, phone, name, email)
-            if (client.isSuccessful) {
-                client.body()
             } else {
                 null
             }

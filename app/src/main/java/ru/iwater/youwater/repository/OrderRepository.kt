@@ -19,7 +19,6 @@ class OrderRepository @Inject constructor(
     private val sberApi: SberPaymentApi = RetrofitSberApi.makeRetrofit()
     private val addressDao: RawAddressDao = youWaterDB.rawAddressDao()
     private val productDao: ProductDao = youWaterDB.productDao()
-    private val myOrderDao: MyOrderDao = youWaterDB.myOrderDao()
 
     suspend fun getClientInfo(clientId: Int): Client? {
         try {
@@ -52,9 +51,7 @@ class OrderRepository @Inject constructor(
     suspend fun getAllFactAddress(): List<RawAddress> {
         return try {
             val rawAddress = apiAuth.getAllAddresses(authClient.get().clientId)
-            if (!rawAddress.isNullOrEmpty()) {
-                rawAddress
-            } else emptyList()
+            rawAddress.ifEmpty { emptyList() }
         } catch (e: Exception) {
             Timber.e("Error get address $e")
             emptyList()
@@ -130,10 +127,6 @@ class OrderRepository @Inject constructor(
         }
     }
 
-    suspend fun saveMyOrder(myOrder: MyOrder) {
-        myOrderDao.save(myOrder)
-    }
-
     suspend fun getOrder(clientId: Int, orderId: Int): List<OrderFromCRM> {
         try {
             val listOrder = apiAuth.getOrderClient(clientId)
@@ -148,14 +141,6 @@ class OrderRepository @Inject constructor(
         return emptyList()
     }
 
-    suspend fun getMyAllOrder(): List<MyOrder>? {
-        return myOrderDao.getAllMyOrder()
-    }
-
-    suspend fun getMyOrder(id: Int): List<MyOrder?> {
-        return listOf(myOrderDao.getMyOrder(id))
-    }
-
     suspend fun getLastOrderInfo(lastOrderId: Int): OrderFromCRM? {
         return try {
             val lastOrder = apiAuth.getLastOrderInfo(lastOrderId)
@@ -164,18 +149,6 @@ class OrderRepository @Inject constructor(
             Timber.e("Error get info last order: $e")
             null
         }
-    }
-
-    suspend fun createOrder(order: Order): String {
-        try {
-            val orderCreate = apiAuth.createOrder(order)
-            return if (orderCreate.isSuccessful) {
-                orderCreate.body().toString()
-            } else "error"
-        } catch (e: Exception) {
-            Timber.e("error create order: $e")
-        }
-        return "error"
     }
 
     suspend fun createOrderApp(order: Order): String {
@@ -203,11 +176,11 @@ class OrderRepository @Inject constructor(
                 phone = paymentCard.phone
             )
             val dataPayment = mutableListOf<String>()
-            return if (answer != null) {
+            return run {
                 dataPayment.add(answer["orderId"].toString())
                 dataPayment.add(answer["formUrl"].toString())
                 dataPayment
-            } else emptyList()
+            }
         } catch (e: Exception) {
             Timber.e("error pay: $e")
         }
@@ -218,12 +191,10 @@ class OrderRepository @Inject constructor(
         try {
             val answer = sberApi.getOrderStatus(UserNameSber, passwordSber, orderId)
 //            val answer = sberApi.getOrderStatus("p602720481107-api", "r6tMp1y78", orderId) //prod
-            if (answer != null) {
-                return Pair(
-                    answer["orderNumber"].toString().removePrefix("\"").removeSuffix("\"").toInt(),
-                    answer["orderStatus"].toString().toInt()
-                )
-            }
+            return Pair(
+                answer["orderNumber"].toString().removePrefix("\"").removeSuffix("\"").toInt(),
+                answer["orderStatus"].toString().toInt()
+            )
         }catch (e: Exception) {
             Timber.e("error get status pay: $e")
         }

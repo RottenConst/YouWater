@@ -46,9 +46,8 @@ class AddAddressDialog : DialogFragment() {
                     id = listAddress[witch].id
                     addressString = addressesString[witch]
                     notice = listAddress[witch].note
-                    Timber.d("NOTICE + $notice")
                 }
-                .setPositiveButton("Выбрать") { _, which ->
+                .setPositiveButton("Выбрать") { _, _ ->
                     listener.choiceAddress(this, id, addressString, notice)
                 }
                 .setNegativeButton("Отмена") { _,_ ->
@@ -69,11 +68,11 @@ class AddAddressDialog : DialogFragment() {
 
     companion object {
         private const val TAG = "AddAddress"
-        fun getAddressDialog(childFramentManager: FragmentManager, listAddress: List<Address>, addressString: List<String>) {
+        fun getAddressDialog(childFragmentManager: FragmentManager, listAddress: List<Address>, addressString: List<String>) {
             val dialog = AddAddressDialog()
             dialog.listAddress = listAddress
             dialog.addressesString = addressString
-            dialog.show(childFramentManager, TAG)
+            dialog.show(childFragmentManager, TAG)
         }
     }
 }

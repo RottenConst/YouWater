@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.iwater.youwater.data.FavoriteProduct
-import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.ItemFavoriteProductBinding
 
 class FavoriteProductAdapter(private val onFavoriteProductClickListener: OnFavoriteProductClickListener) :

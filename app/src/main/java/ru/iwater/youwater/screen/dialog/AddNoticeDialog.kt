@@ -60,10 +60,10 @@ class AddNoticeDialog: DialogFragment() {
 
     companion object {
         private const val TAG = "AddNotice"
-        fun getAddNoticeDialog(chaildFragmentManager: FragmentManager, notice: String?) {
+        fun getAddNoticeDialog(childFragmentManager: FragmentManager, notice: String?) {
             val dialog = AddNoticeDialog()
             dialog.notice = notice
-            dialog.show(chaildFragmentManager, TAG)
+            dialog.show(childFragmentManager, TAG)
         }
     }
 }

@@ -6,9 +6,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.iwater.youwater.databinding.ItemPriceBinding
-import timber.log.Timber
 
-class PriceProductAdapter() : ListAdapter<String, PriceProductAdapter.PriceProductHolder> (PriceProductDiffCallback) {
+class PriceProductAdapter : ListAdapter<String, PriceProductAdapter.PriceProductHolder> (PriceProductDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PriceProductHolder {
         return PriceProductHolder.from(parent)
