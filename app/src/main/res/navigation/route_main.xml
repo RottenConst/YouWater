@@ -88,7 +88,8 @@
         <action
             android:id="@+id/action_catalogProductFragment_to_basketFragment"
             app:destination="@id/basketFragment"
-            app:popUpTo="@id/catalogProductFragment" />
+            app:popUpTo="@id/catalogFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_catalogProductFragment_to_aboutProductFragment"
             app:destination="@id/aboutProductFragment" />
