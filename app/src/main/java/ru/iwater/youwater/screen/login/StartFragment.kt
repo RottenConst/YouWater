@@ -4,17 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
-import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.AuthViewModel
-import ru.iwater.youwater.data.StatusSession
 import ru.iwater.youwater.databinding.StartFragmentBinding
-import ru.iwater.youwater.screen.MainActivity
 import javax.inject.Inject
 
 class StartFragment : BaseFragment() {
@@ -36,25 +34,17 @@ class StartFragment : BaseFragment() {
     ): View {
         val binding = StartFragmentBinding.inflate(inflater)
         val navController = NavHostFragment.findNavController(this)
-        binding.btnStart.visibility = View.GONE
-        viewModel.checkSession()
-        viewModel.statusSession.observe(viewLifecycleOwner) { statusSession ->
-            when (statusSession) {
-                StatusSession.TRY -> {
-                    MainActivity.start(this.context)
-                    this.activity?.finish()
+        val fragmentActivity = this.requireActivity()
+        binding.composeViewSplash.apply {
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            )
+
+            setContent {
+                MaterialTheme {
+                    StartAppScreen(fragmentActivity, viewModel, navController)
                 }
-                StatusSession.FALSE -> binding.btnStart.visibility = View.VISIBLE
-                StatusSession.ERROR -> Toast.makeText(context,
-                    "ОШИБКА СОЕДИНЕНИЯ",
-                    Toast.LENGTH_LONG).show()
-                else -> Toast.makeText(context,
-                    "НЕ ИЗВЕСНАЯ ОШИБКА",
-                    Toast.LENGTH_LONG).show()
             }
-        }
-        binding.btnStart.setOnClickListener {
-            navController.navigate(R.id.loginFragment)
         }
 
         return binding.root
