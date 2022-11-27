@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +12,7 @@ import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.AuthViewModel
 import ru.iwater.youwater.databinding.StartFragmentBinding
+import ru.iwater.youwater.theme.YourWaterTheme
 import javax.inject.Inject
 
 class StartFragment : BaseFragment() {
@@ -41,7 +41,7 @@ class StartFragment : BaseFragment() {
             )
 
             setContent {
-                MaterialTheme {
+                YourWaterTheme {
                     StartAppScreen(fragmentActivity, viewModel, navController)
                 }
             }

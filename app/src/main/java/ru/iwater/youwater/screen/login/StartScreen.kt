@@ -11,19 +11,20 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.AuthViewModel
 import ru.iwater.youwater.data.StatusSession
+import ru.iwater.youwater.theme.Blue500
+import ru.iwater.youwater.theme.YouWaterTypography
+import ru.iwater.youwater.theme.YourWaterTheme
 
 @Composable
 fun StartAppScreen(
@@ -81,26 +82,22 @@ private fun StartLogoContent(visibleStartButton: Boolean, navigateToLoginScreen:
         }
         Text(
             text = stringResource(id = R.string.start_fragment_about_app_logo),
-            color = colorResource(id = R.color.blue),
-            style = MaterialTheme.typography.subtitle1,
+            color = Blue500,
+            style = YouWaterTypography.h6,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(16.dp),
-            fontSize = 18.sp
         )
         if (visibleStartButton) {
             Button(
                 onClick = navigateToLoginScreen,
-                colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.blue)),
                 modifier = Modifier
                     .padding(start = 52.dp, top = 32.dp, end = 52.dp)
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(id = R.string.start_fragment_begin),
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    text = stringResource(id = R.string.start_fragment_begin)
                 )
             }
         }
@@ -136,7 +133,9 @@ private fun Background(
 @Preview
 @Composable
 private fun StartAppScreenPreview() {
-    Background(idImageBottom = R.drawable.splash_bottom, idImageTop = R.drawable.splash_top, idContentDescription = R.string.description_image_background)
-    StartLogoContent(visibleStartButton = true) {
+    YourWaterTheme {
+        Background(idImageBottom = R.drawable.splash_bottom, idImageTop = R.drawable.splash_top, idContentDescription = R.string.description_image_background)
+        StartLogoContent(visibleStartButton = true) {
+        }
     }
 }
