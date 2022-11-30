@@ -73,6 +73,16 @@ class AddressRepository @Inject constructor(
         }
     }
 
+    suspend fun getFactAddress(addressId: Int): RawAddress? {
+        return try {
+            val rawAddress = waterApi.getAddress(addressId)
+            rawAddress
+        } catch (e: Exception) {
+            Timber.e("Error get address $e")
+            null
+        }
+    }
+
     /**
      * отправить запрос на создание адреса
      */

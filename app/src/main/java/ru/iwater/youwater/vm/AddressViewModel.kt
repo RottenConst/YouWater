@@ -43,16 +43,21 @@ class AddressViewModel @Inject constructor(
         viewModelScope.launch {
             _statusLoad.value = StatusLoading.LOADING
             val listNetAddress = addressRepo.getAllFactAddress()
+            val listAddress = mutableListOf<RawAddress>()
             for (rawAddress in listNetAddress) {
-                val address = addressRepo.getAddress(rawAddress.id)
-                if (address == null) {
-                    addressRepo.saveAddress(rawAddress)
+                val address = addressRepo.getFactAddress(rawAddress.id)
+                when (address?.active) {
+                    true -> {
+                        listAddress.add(address)
+                    }
+                    else -> {
+                    }
                 }
             }
-            if (addressRepo.getAddressList().isEmpty()) {
+            if (listAddress.isEmpty()) {
                 _statusLoad.value = StatusLoading.EMPTY
             } else {
-                _rawAddressList.value = addressRepo.getAddressList()
+                _rawAddressList.value = listAddress
                 _statusLoad.value = StatusLoading.DONE
             }
         }

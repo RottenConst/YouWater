@@ -87,14 +87,7 @@ class OrderViewModel @Inject constructor(
     }
 
     private suspend fun getRawAddress(): List<RawAddress> {
-        val listNetAddress = orderRepo.getAllFactAddress()
-        for (rawAddress in listNetAddress) {
-            val address = orderRepo.getAddress(rawAddress.id)
-            if (address == null) {
-                orderRepo.saveAddress(rawAddress)
-            }
-        }
-        return orderRepo.getAllAddress()
+        return orderRepo.getAllFactAddress()
     }
 
     fun getAddressFromString(rawAddress: List<String>, region: String, id: Int, notice: String?): Address {
@@ -103,7 +96,7 @@ class OrderViewModel @Inject constructor(
         var building = ""
         var entrance: Int? = null
         var floor: Int? = null
-        var flat: Int? = null
+        val flat: Int? = null
         rawAddress.forEachIndexed { index, s ->
             if (index == 0) street = s.removePrefix("\"").removeSuffix(",")
             if (index > 0) {
@@ -366,9 +359,13 @@ class OrderViewModel @Inject constructor(
             if (orderId != 0) {
                 val lastOrder = orderRepo.getLastOrderInfo(orderId)
                 if (lastOrder != null) {
-                    Timber.d("ADRESS ID = ${lastOrder.address_id}")
                     if (lastOrder.address_id != 0) {
-                        _address.value = orderRepo.getFactAddress(lastOrder.address_id)?.factAddress
+                        val address = orderRepo.getFactAddress(lastOrder.address_id)
+                        _address.value = if (address != null && address.active != false) {
+                            address.factAddress
+                        } else {
+                            "Адрес устарел, выберете другой"
+                        }
                     } else {
                         _address.value = "Адрес устарел, выберете другой"
                     }

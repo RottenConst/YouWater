@@ -96,9 +96,6 @@ class CreateOrderFragment : BaseFragment(),
         // выбор адреса доставки
         viewModel.rawAddress.observe(viewLifecycleOwner) { listRawAddress ->
             if (!listRawAddress.isNullOrEmpty()) {
-                for (rawAddress in listRawAddress) {
-                    Timber.d("Note in address ${rawAddress.id} ${rawAddress.notice}")
-                }
                 binding.btnSetAddress.text = "Выбрать адрес доставки"
                 val listAddress = mutableListOf<Address>()
                 val addresses = mutableListOf<String>()
