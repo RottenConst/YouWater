@@ -47,6 +47,12 @@
         <item>Оплата наличными</item>
     </string-array>
 
+    <string-array name="regions">
+        <item>Выберете регион</item>
+        <item>Санкт-Петербург</item>
+        <item>Ленинградская область</item>
+    </string-array>
+
 
     <string name="default_notification_channel_name" translatable="true">hello</string>
     <string name="default_notification_channel_id" translatable="false">hello</string>

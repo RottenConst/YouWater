@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.gson.JsonObject
+import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.vm.AddressViewModel
@@ -46,9 +49,49 @@ class AddAddressFragment : BaseFragment() {
         //true - перешли в добавление адреса из создание заявки, false - из меню адреса
         val isFromOrder = AddAddressFragmentArgs.fromBundle(this.requireArguments()).isFromOrder
 
+        var regionName = ""
+        val context = this.context
+        if (context != null) {
+            val listRegion = mutableListOf(
+                "Санкт-Петербург",
+                "Ленинградская область",
+                "Выберете регион"
+            )
+
+            val spinnerAdapter = ArrayAdapter(
+                context,
+                R.layout.spinner_item_layout_resource,
+                R.id.TextView,
+                listRegion
+            )
+            binding.spinnerSetRegion.adapter = spinnerAdapter
+            binding.spinnerSetRegion.setSelection(2)
+
+            val itemRegionListener: AdapterView.OnItemSelectedListener =
+                object: AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                      regionName = parent?.getItemAtPosition(position) as String
+                      listRegion.remove("Выберете регион")
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                    }
+                }
+
+            binding.spinnerSetRegion.onItemSelectedListener = itemRegionListener
+            if (binding.spinnerSetRegion.isFocused) {
+                spinnerAdapter.notifyDataSetChanged()
+            }
+        }
+
         binding.btnSaveAddress.setOnClickListener {
             //регион
-            val region = "Санкт-Петербург"
+            val region = regionName
             // город поселок
             val city =
                 if (binding.etCity.text.isNullOrEmpty()) "" else binding.etCity.text.toString()
@@ -80,7 +123,7 @@ class AddAddressFragment : BaseFragment() {
             val address = getAddress(street, house, building)
             val fullAddress = getFullAddress(region, street, house, building)
 
-            if (addressJson != null) {
+            if (addressJson != null && region != "Выберете регион") {
                 viewModel.createNewAddress(
                     region,
                     factAddress,
