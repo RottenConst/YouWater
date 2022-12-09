@@ -4,16 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.AuthViewModel
-import ru.iwater.youwater.data.StatusPhone
 import ru.iwater.youwater.databinding.LoginFragmentBinding
-import ru.iwater.youwater.utils.PhoneTextFormatter
+import ru.iwater.youwater.theme.YourWaterTheme
 import javax.inject.Inject
 
 /**
@@ -37,48 +36,19 @@ class LoginFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = LoginFragmentBinding.inflate(inflater)
-        binding.btnEnter.isEnabled = false
-        binding.apply {
-            etTelNum.addTextChangedListener(
-                PhoneTextFormatter(
-                    etTelNum,
-                    "+7(###) ###-####",
-                    btnEnter
-                )
+        val navController = NavHostFragment.findNavController(this)
+        binding.composeViewLogin.apply {
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
             )
-            btnEnter.setOnClickListener {
-                val tel = etTelNum.text.toString()
-                viewModel.authPhone(tel)
-                viewModel.statusPhone.observe(viewLifecycleOwner) { status ->
-                    when (status) {
-                        StatusPhone.LOAD -> {
 
-                        }
-                        StatusPhone.DONE -> {
-                            viewModel.clientId.observe(viewLifecycleOwner) { id ->
-                                if (id != null) {
-                                    it.findNavController().navigate(
-                                        LoginFragmentDirections.actionLoginFragmentToEnterPinCodeFragment(
-                                            tel, id
-                                        )
-                                    )
-                                } else {
-                                    Toast.makeText(context, "Что-то пошло не так", Toast.LENGTH_LONG).show()
-                                }
-                            }
-                        }
-                        StatusPhone.ERROR -> {
-                            it.findNavController().navigate(
-                                LoginFragmentDirections.actionLoginFragmentToRegisterFragment(tel)
-                            )
-                        }
-                        StatusPhone.NET_ERROR -> {
-                            Toast.makeText(context, "ошибка соединения", Toast.LENGTH_LONG).show()
-                        }
-                    }
+            setContent {
+                YourWaterTheme {
+                    LoginScreen(viewModel, navController)
                 }
             }
         }
+
         return binding.root
     }
 

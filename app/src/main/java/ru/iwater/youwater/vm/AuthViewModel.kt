@@ -6,9 +6,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.repository.AuthorisationRepository
 import ru.iwater.youwater.screen.MainActivity
+import ru.iwater.youwater.screen.login.LoginFragmentDirections
+import timber.log.Timber
 import javax.inject.Inject
 
 enum class StatusPhone {LOAD, ERROR, NET_ERROR, DONE}
@@ -39,25 +42,32 @@ class AuthViewModel @Inject constructor(
 
 
 
-    fun authPhone(phone: String) {
+    fun authPhone(phone: String, navController: NavController) {
         viewModelScope.launch {
+            Timber.d("auth")
             _statusPhone.value = StatusPhone.LOAD
             val authPhone = authorisationRepository.authPhone(phone)
             when {
                 authPhone == null -> {
-                    _statusPhone.value = StatusPhone.NET_ERROR
+                    Toast.makeText(navController.context, "ошибка соединения", Toast.LENGTH_LONG).show()
                 }
                 authPhone.status -> {
-                    _statusPhone.value = StatusPhone.DONE
-                    _clientId.value = authPhone.clientId
-                    clientAuth.clientId = authPhone.clientId
+                    navController.navigate(
+                        LoginFragmentDirections.actionLoginFragmentToEnterPinCodeFragment(phone, authPhone.clientId)
+                    )
+//                    _clientId.value = authPhone.clientId
+//                    clientAuth.clientId = authPhone.clientId
                 }
                 !authPhone.status -> {
-                    _statusPhone.value = StatusPhone.ERROR
+                    navController.navigate(
+                        LoginFragmentDirections.actionLoginFragmentToRegisterFragment(phone)
+                    )
                 }
             }
         }
     }
+
+
 
     fun checkPin(context: Context?, pinCode: String, clientId: Int) {
         viewModelScope.launch {
@@ -98,10 +108,10 @@ class AuthViewModel @Inject constructor(
             )
             if (registerClient != null) {
                 val status = registerClient.get("status").asBoolean
-                if (status) {
+//                if (status) {
 //                    _clientId.value = registerClient.get("client_id").asInt
-                    authPhone(phone)
-                }
+//                    authPhone(phone)
+//                }
             }
         }
     }
@@ -113,10 +123,10 @@ class AuthViewModel @Inject constructor(
             )
             if (registerClient != null) {
                 val status = registerClient.get("status").asBoolean
-                if (status) {
+//                if (status) {
 //                    _clientId.value = registerClient.get("client_id").asInt
-                    authPhone(phone)
-                }
+//                    authPhone(phone)
+//                }
             }
         }
     }

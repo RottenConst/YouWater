@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.AuthViewModel
 import ru.iwater.youwater.data.StatusSession
+import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
@@ -43,7 +44,7 @@ fun StartAppScreen(
         when(status) {
             StatusSession.TRY -> {
                 StartLogoContent(visibleStartButton = false) { navController.navigate(StartFragmentDirections.actionStartFragmentToLoginFragment()) }
-                navController.navigate(StartFragmentDirections.actionStartFragmentToMainActivity())
+                MainActivity.start(navController.context)
                 fragmentActivity.finish()
             }
             StatusSession.FALSE -> {
