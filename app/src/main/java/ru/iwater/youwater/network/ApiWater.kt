@@ -15,7 +15,7 @@ interface ApiWater {
         @Path("product_id") productId: Int
     ): Product?
 
-    @GET("categoryProducts_list/")
+    @GET("category/")
     suspend fun getCategoryList():List<TypeProduct>?
 
     @POST("auth-phone/")
@@ -33,7 +33,7 @@ interface ApiWater {
         @Body jsonObject: JsonObject
     ): JsonObject?
 
-    @GET("client_detail/{client_id}/")
+    @GET("client-detail/{client_id}/")
     suspend fun getClientDetail(
         @Path("client_id") clientId: Int
     ): Client?
@@ -55,7 +55,7 @@ interface ApiWater {
         @Field("email") email: String
     ): Response<JsonObject>
 
-    @POST("OrderCreate/")
+    @POST("order-app/")
     suspend fun createOrder(
         @Body order: Order
     ): Response<JsonObject>
@@ -65,7 +65,7 @@ interface ApiWater {
         @Body order: Order
     ): Response<JsonObject>
 
-    @GET("return_of_applications_client_id/{client_id}/")
+    @GET("client-orders-app/{client_id}/")
     suspend fun getOrderClient(
         @Path("client_id") clientId: Int
     ): List<OrderFromCRM>?
@@ -75,7 +75,7 @@ interface ApiWater {
         @Body editClientData: ClientUserData
     ): AutoTaskData?
 
-    @PUT("client_detail/{client_id}/")
+    @PUT("client-detail/{client_id}/")
     suspend fun editUserData(
         @Path("client_id") clientId: Int,
         @Body clientData: JsonObject
@@ -86,7 +86,7 @@ interface ApiWater {
         @Path("client_id") clientId: Int
     ):List<RawAddress>
 
-    @GET("address_detail/{address_id}")
+    @GET("address-detail/{address_id}")
     suspend fun getAddress(
         @Path("address_id") addressId: Int
     ): RawAddress?
@@ -109,12 +109,12 @@ interface ApiWater {
         @Field("notice") notice: String
     ): Response<JsonObject>
 
-    @PUT("address_delete/{id}/")
+    @PUT("address-delete/{id}/")
     suspend fun deleteAddress(
         @Path("id") idAddress: Int
     ): Response<JsonObject>
 
-    @POST("OrdersInfo/{orderNumber}/")
+    @PUT("order-app-detail/{orderNumber}/")
     suspend fun setStatusPayment(
         @Path("orderNumber") orderNumber: Int,
         @Body parameters: JsonObject,
@@ -133,12 +133,12 @@ interface ApiWater {
     @GET("promo/")
     suspend fun getPromo(): List<PromoBanner>?
 
-    @GET("last_users_order/{client_id}/")
+    @GET("last-client-order/{client_id}/")
     suspend fun isLastOrder(
         @Path("client_id") clientId: Int
     ): Response<JsonObject>
 
-    @GET("OrdersInfo/{lastOrderId}/")
+    @GET("order-app-detail/{lastOrderId}/")
     suspend fun getLastOrderInfo(
         @Path("lastOrderId") lastOrderId: Int
     ): OrderFromCRM?
