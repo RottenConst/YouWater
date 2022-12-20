@@ -1,6 +1,5 @@
 package ru.iwater.youwater.repository
 
-import ru.iwater.youwater.bd.FavoriteProductDao
 import ru.iwater.youwater.bd.ProductDao
 import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.data.*
@@ -19,7 +18,6 @@ class ProductRepository @Inject constructor(
 ) {
 
     private val productDao: ProductDao = youWaterDB.productDao()
-    private val favoriteDao: FavoriteProductDao = youWaterDB.favoriteProductDao()
     private val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
 
     /**
@@ -60,25 +58,58 @@ class ProductRepository @Inject constructor(
     /**
      * добавить избранный товар
      */
-    suspend fun addToFavoriteProduct(favoriteProduct: FavoriteProduct) {
-        favoriteDao.save(favoriteProduct)
+    suspend fun addToFavorite(productId: Int): Boolean? {
+        return try {
+            val clientId = getAuthClient().clientId
+            val status = apiWater.addToFavoriteProduct(clientId, productId)
+            if (status != null) {
+                status["status"].asBoolean
+            } else false
+        } catch (e: Exception) {
+            Timber.e("Error add to favorite : $e")
+            null
+        }
     }
 
     /**
      * удалить избранный товар
      */
-    suspend fun deleteFavoriteProduct(favoriteProduct: FavoriteProduct) {
-        favoriteDao.delete(favoriteProduct)
+    suspend fun deleteFavoriteProduct(productId: Int): Boolean? {
+        return try {
+            val status = apiWater.deleteFavoriteProduct(getAuthClient().clientId, productId)
+            if (status != null) {
+                status["status"].asBoolean
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            Timber.e("Error delete favorite product: $e")
+            null
+        }
+
     }
 
     /**
      * получить список избранных товаров
      */
-    suspend fun getAllFavoriteProducts(): List<FavoriteProduct>{
-        val favoriteProducts = favoriteDao.getAllProduct()
-        return if (favoriteProducts.isNullOrEmpty()) {
-            emptyList()
-        } else favoriteProducts
+    suspend fun getFavoriteProducts(): List<Int>? {
+        return try {
+            val products = apiWater.getFavoriteProduct(getAuthClient().clientId)
+            if (products != null) {
+
+                val favorite = mutableListOf<Int>()
+                products["favorites_list"].asJsonArray.forEach {
+                    favorite.add(it.asInt)
+                }
+                Timber.d("favorite $favorite")
+                favorite
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Timber.e("Error get favorite product: $e")
+            null
+        }
     }
 
     /**

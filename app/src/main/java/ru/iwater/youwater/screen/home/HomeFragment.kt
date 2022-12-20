@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
@@ -142,18 +143,14 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
 
     override fun onResume() {
         super.onResume()
-        viewModel.getFavoriteProduct()
+        viewModel.getFavoriteProductId()
     }
 
     override fun onProductItemClicked(product: Product) {
         viewModel.addProductInBasket(product.id)
         if (product.category != 20) {
-            Snackbar.make(
-                binding.root,
-                "Товар ${product.app_name} добавлен в корзину",
-                Snackbar.LENGTH_LONG
-            )
-                .setAction("Перейти в корзину") {
+            getMessage("Товар ${product.app_name} добавлен в корзину")
+                .setAction("Корзина") {
                     this.findNavController()
                         .navigate(HomeFragmentDirections.actionHomeFragmentToBasketFragment())
                 }.show()
@@ -173,18 +170,26 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
     private fun getCatalogWaterAdapter(): CatalogWaterAdapter {
         return CatalogWaterAdapter(CatalogWaterAdapter.OnClickListener{
             if (!it.onFavoriteClick) {
-                viewModel.deleteFavoriteProduct(it)
+                viewModel.viewModelScope.launch {
+                    if (viewModel.deleteFavoriteProduct(it)) {
+                        getMessage("Товар удален из избранного").show()
+                    } else getMessage("Ошибка").show()
+                }
             } else {
-                viewModel.addProductInFavorite(it)
-                Snackbar.make(binding.root, "Товар добавлен в избранное", Snackbar.LENGTH_LONG)
-                    .setAction("Избранное") {
-                        this.findNavController()
-                            .navigate(HomeFragmentDirections.actionHomeFragmentToFavoriteFragment())
-                    }.show()
-
+                viewModel.viewModelScope.launch{
+                    if (viewModel.addProductInFavorite(it)) {
+                        getMessage("Товар добавлен в избранное")
+                            .setAction("Избранное") {
+                                findNavController()
+                                    .navigate(HomeFragmentDirections.actionHomeFragmentToFavoriteFragment())
+                        }.show()
+                    } else getMessage("Ошибка").show()
+                }
             }
         }, this)
     }
+
+    private fun getMessage(message: String) = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
 
     companion object {
         @JvmStatic

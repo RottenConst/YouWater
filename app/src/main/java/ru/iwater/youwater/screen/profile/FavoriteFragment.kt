@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.FavoriteProduct
@@ -35,6 +37,7 @@ class FavoriteFragment : BaseFragment(), FavoriteProductAdapter.OnFavoriteProduc
         binding.lifecycleOwner = this
         val adapter = FavoriteProductAdapter(this)
         binding.rvFavoriteProduct.adapter = adapter
+        viewModel.getFavoriteProduct()
         viewModel.favoriteProducts.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             if (it.isEmpty()) {
@@ -55,27 +58,32 @@ class FavoriteFragment : BaseFragment(), FavoriteProductAdapter.OnFavoriteProduc
     }
 
     override fun onLikeItemClick(favoriteProduct: FavoriteProduct) {
-        viewModel.delFavoriteProduct(favoriteProduct)
-        viewModel.getFavoriteProduct()
-        Snackbar.make( binding.root, "Товар удален из избранного", Snackbar.LENGTH_SHORT)
-            .setAction("Отмена") {
-                viewModel.addFavoriteProduct(favoriteProduct)
-                binding.tvNothingFavorite.visibility = View.VISIBLE
-                viewModel.getFavoriteProduct()
-            }.show()
+        viewModel.viewModelScope.launch {
+            if (viewModel.delFavoriteProduct(favoriteProduct)) {
+                getMessage("Товар удален из избранного")
+                    .setAction("Отмена") {
+                        viewModel.addFavoriteProduct(favoriteProduct, it)
+                    }.show()
+            } else {
+                getMessage("Ошибка").show()
+            }
+        }
     }
 
     override fun addItemInBasked(favoriteProduct: FavoriteProduct) {
         viewModel.addProductInBasket(favoriteProduct.id)
-        Snackbar.make(binding.root, "Товар добавлен в корзину", Snackbar.LENGTH_SHORT)
-            .setAction("Перейти в корзину", View.OnClickListener {
-                this.findNavController().navigate(FavoriteFragmentDirections.actionFavoriteFragmentToBasketFragment())
-            }).show()
+        getMessage("Товар добавлен в корзину")
+            .setAction("корзина") {
+                this.findNavController()
+                    .navigate(FavoriteFragmentDirections.actionFavoriteFragmentToBasketFragment())
+            }.show()
     }
 
     override fun aboutFavoriteClick(favoriteProduct: FavoriteProduct) {
         viewModel.displayProduct(favoriteProduct.id)
     }
+
+    private fun getMessage(message: String) = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
 
     companion object {
         @JvmStatic

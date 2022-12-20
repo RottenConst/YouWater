@@ -1,6 +1,8 @@
 package ru.iwater.youwater.vm
 
+import android.view.View
 import androidx.lifecycle.*
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.di.components.OnScreen
@@ -28,7 +30,11 @@ class CatalogListViewModel @Inject constructor(
     val favoriteProducts: LiveData<List<FavoriteProduct>>
         get() = _favoriteProducts
 
-    val catalogProductMap: LiveData<MutableMap<TypeProduct, List<Product>>> = Transformations.switchMap(favoriteProducts) {
+    private val _favorite: MutableLiveData<List<Int>> = MutableLiveData()
+    val favorite: LiveData<List<Int>>
+        get() = _favorite
+
+    val catalogProductMap: LiveData<MutableMap<TypeProduct, List<Product>>> = Transformations.switchMap(favorite) {
         liveData { emit(getAllProducts(it)) }
     }
 
@@ -47,18 +53,27 @@ class CatalogListViewModel @Inject constructor(
     private val _navigateToSelectBanner: MutableLiveData<PromoBanner?> = MutableLiveData()
     val navigateToSelectBanner: LiveData<PromoBanner?> get() = _navigateToSelectBanner
 
-    fun getFavoriteProduct() {
+    fun getFavoriteProductId() {
         viewModelScope.launch {
-            _favoriteProducts.value = productRepo.getAllFavoriteProducts()
+            _favorite.value = productRepo.getFavoriteProducts()
+        }
+    }
+
+    fun getFavoriteProduct(){
+        viewModelScope.launch {
+            val favoriteId = productRepo.getFavoriteProducts()
+            if (favoriteId != null) {
+                _favoriteProducts.value = getFavoriteProducts(favoriteId)
+            }
         }
     }
 
     init {
         _screenLoading.value = StatusLoading.LOADING
-        getFavoriteProduct()
+        getFavoriteProductId()
     }
 
-    private suspend fun getAllProducts(favoriteProducts: List<FavoriteProduct>): MutableMap<TypeProduct, List<Product>> {
+    private suspend fun getAllProducts(favoriteProducts: List<Int>): MutableMap<TypeProduct, List<Product>> {
         val catalogMap = mutableMapOf<TypeProduct, List<Product>>()
         val catalogs = productRepo.getCategoryList()
         return if (catalogs.isNotEmpty()) {
@@ -67,7 +82,7 @@ class CatalogListViewModel @Inject constructor(
                 val products = productsList.filter { it.category == category.id }
                 products.forEach { product ->
                     for (favoriteProduct in favoriteProducts) {
-                        if (favoriteProduct.id == product.id) {
+                        if (favoriteProduct == product.id) {
                             product.onFavoriteClick = true
                         }
                     }
@@ -78,6 +93,29 @@ class CatalogListViewModel @Inject constructor(
             return catalogMap
         }
         else mutableMapOf()
+    }
+
+    private suspend fun getFavoriteProducts(favoriteProductsId: List<Int>): List<FavoriteProduct> {
+        val favorite = mutableListOf<FavoriteProduct>()
+        for (productId in favoriteProductsId) {
+            val product = productRepo.getProduct(productId)
+            if (product != null) {
+                favorite.add(
+                    FavoriteProduct(
+                        about = product.about,
+                        app = product.app,
+                        app_name = product.app_name,
+                        category = product.category,
+                        company_id = product.company_id,
+                        gallery = product.gallery,
+                        id = product.id,
+                        name = product.name,
+                        price = product.price
+                    )
+                )
+            }
+        }
+        return favorite
     }
 
     fun addProductInBasket(productId: Int) {
@@ -108,54 +146,34 @@ class CatalogListViewModel @Inject constructor(
         }
     }
 
-    fun addProductInFavorite(product: Product) {
+    suspend fun addProductInFavorite(product: Product): Boolean {
+        return productRepo.addToFavorite(product.id) == true
+    }
+
+    fun addFavoriteProduct(favoriteProduct: FavoriteProduct, view: View) {
         viewModelScope.launch {
-            productRepo.addToFavoriteProduct(
-                FavoriteProduct(product.about,
-                                product.app,
-                                product.app_name,
-                                product.category,
-                                product.company_id,
-                                product.gallery,
-                                product.id,
-                                product.name,
-                                product.price)
-            )
+            if (productRepo.addToFavorite(favoriteProduct.id) == true) {
+                getFavoriteProduct()
+            } else {
+                Snackbar.make(view, "Ошибка", Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 
-    fun addFavoriteProduct(favoriteProduct: FavoriteProduct) {
-        viewModelScope.launch {
-            productRepo.addToFavoriteProduct(favoriteProduct)
-        }
-    }
-
-    fun deleteFavoriteProduct(product: Product) {
-        viewModelScope.launch {
-            productRepo.deleteFavoriteProduct(
-                FavoriteProduct(
-                    product.about,
-                    product.app,
-                    product.app_name,
-                    product.category,
-                    product.company_id,
-                    product.gallery,
-                    product.id,
-                    product.name,
-                    product.price
-                )
-            )
-        }
+    suspend fun deleteFavoriteProduct(product: Product): Boolean {
+        return productRepo.deleteFavoriteProduct(product.id) == true
     }
 
     private suspend fun getLastOrder(): Int? {
         return productRepo.getLastOrder()
     }
 
-    fun delFavoriteProduct(favoriteProduct: FavoriteProduct) {
-        viewModelScope.launch {
-            productRepo.deleteFavoriteProduct(favoriteProduct)
-        }
+    suspend fun delFavoriteProduct(favoriteProduct: FavoriteProduct): Boolean {
+        val status = productRepo.deleteFavoriteProduct(favoriteProduct.id)
+        return if (status == true) {
+            getFavoriteProduct()
+            true
+        } else false
     }
 
     fun displayPromoInfo(promoBanner: PromoBanner) {

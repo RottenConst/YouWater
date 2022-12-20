@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.databinding.FragmentCatalogProductBinding
@@ -25,11 +27,12 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     private val screenComponent = App().buildScreenComponent()
-    val viewModel: ProductListViewModel by viewModels { factory }
-    val binding: FragmentCatalogProductBinding by lazy { FragmentCatalogProductBinding.inflate(
+    private val viewModel: ProductListViewModel by viewModels { factory }
+    private val binding: FragmentCatalogProductBinding by lazy { FragmentCatalogProductBinding.inflate(
         LayoutInflater.from(this.context)) }
+    private val adapterProductList: AdapterProductList by lazy { getAdapterProduct() }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+        override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         screenComponent.inject(this)
     }
@@ -41,19 +44,6 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
         binding.lifecycleOwner = this
         val catalogId = CatalogProductFragmentArgs.fromBundle(requireArguments()).typeId
         val catalogTitle = CatalogProductFragmentArgs.fromBundle(requireArguments()).typeString
-        val adapterProductList = AdapterProductList(AdapterProductList.OnClickListener {
-            if (!it.onFavoriteClick) {
-                viewModel.deleteFavoriteProduct(it)
-            } else {
-                viewModel.addProductInFavorite(it)
-                Snackbar.make(binding.constraintCatalogProduct, "Товар добавлен в избранное", Snackbar.LENGTH_LONG)
-                    .setAction("Избранное") {
-                        this.findNavController()
-                            .navigate(CatalogProductFragmentDirections.actionCatalogProductFragmentToFavoriteFragment())
-                    }.show()
-
-            }
-        }, this)
         viewModel.setCatalogItem(catalogId)
         binding.tvLabelCatalog.text = catalogTitle
         binding.rvProductList.adapter = adapterProductList
@@ -76,12 +66,8 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
     override fun onProductItemClicked(product: Product) {
         viewModel.addProductInBasket(product.id)
         if (product.category != 20) {
-            Snackbar.make(
-                binding.constraintCatalogProduct,
-                "Товар ${product.app_name} добавлн в корзину",
-                Snackbar.LENGTH_LONG
-            )
-                .setAction("Перейти в корзину") {
+            getMessage("Товар ${product.app_name} добавлен в корзину")
+                .setAction("Корзина") {
                     findNavController().navigate(CatalogProductFragmentDirections.actionCatalogProductFragmentToBasketFragment())
                 }.show()
         } else {
@@ -92,6 +78,30 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
     override fun aboutProductClick(product: Product) {
         viewModel.displayProduct(product.id)
     }
+
+    private fun getAdapterProduct(): AdapterProductList {
+        return AdapterProductList(AdapterProductList.OnClickListener {
+            if (!it.onFavoriteClick) {
+                viewModel.viewModelScope.launch {
+                    if (viewModel.deleteFavoriteProduct(it)) {
+                        getMessage("Товар удален из избранного").show()
+                    } else getMessage("Ошибка").show()
+                }
+            } else {
+                viewModel.viewModelScope.launch {
+                    if (viewModel.addProductInFavorite(it)) {
+                        getMessage("Товар добавлен в избранное")
+                            .setAction("Избранное") {
+                                findNavController()
+                                    .navigate(CatalogProductFragmentDirections.actionCatalogProductFragmentToFavoriteFragment())
+                            }.show()
+                    } else getMessage("Ошибка").show()
+                }
+            }
+        }, this)
+    }
+
+    private fun getMessage(message: String) = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
 
     companion object {
         @JvmStatic

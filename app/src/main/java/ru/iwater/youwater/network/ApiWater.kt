@@ -18,6 +18,25 @@ interface ApiWater {
     @GET("category/")
     suspend fun getCategoryList():List<TypeProduct>?
 
+    @FormUrlEncoded
+    @PUT("favorites-list/{client_id}/")
+    suspend fun addToFavoriteProduct(
+        @Path("client_id") clientId: Int,
+        @Field("product_id") productId: Int
+    ): JsonObject?
+
+    @GET("favorites-list/{client_id}/")
+    suspend fun getFavoriteProduct(
+        @Path("client_id") clientId: Int
+    ): JsonObject?
+
+    @FormUrlEncoded
+    @HTTP(method = "DELETE", path = "favorites-list/{client_id}/", hasBody = true)
+    suspend fun deleteFavoriteProduct(
+        @Path("client_id") client_id: Int,
+        @Field("product_id") productId: Int
+    ): JsonObject?
+
     @POST("auth-phone/")
     suspend fun authPhone(
         @Body phone: JsonObject
@@ -40,24 +59,10 @@ interface ApiWater {
 
     @FormUrlEncoded
     @POST("sign-up/")
-    suspend fun singUp(
-        @Field("id") id: Int,
-        @Field("phone") phone: String,
-        @Field("name") name: String,
-        @Field("email") email: String
-    ): Response<JsonObject>
-
-    @FormUrlEncoded
-    @POST("sign-up/")
     suspend fun register(
         @Field("phone") phone: String,
         @Field("name") name: String,
         @Field("email") email: String
-    ): Response<JsonObject>
-
-    @POST("order-app/")
-    suspend fun createOrder(
-        @Body order: Order
     ): Response<JsonObject>
 
     @POST("order-app/")
@@ -132,11 +137,6 @@ interface ApiWater {
 
     @GET("promo/")
     suspend fun getPromo(): List<PromoBanner>?
-
-    @GET("last-client-order/{client_id}/")
-    suspend fun isLastOrder(
-        @Path("client_id") clientId: Int
-    ): Response<JsonObject>
 
     @GET("order-app-detail/{lastOrderId}/")
     suspend fun getLastOrderInfo(
