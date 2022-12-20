@@ -8,11 +8,10 @@ import ru.iwater.youwater.data.*
 import ru.iwater.youwater.utils.ProductConverter
 
 @Database(
-    version = 3,
+    version = 4,
     entities = [
         Product::class,
         Address::class,
-        FavoriteProduct::class,
         MyOrder::class,
         BankCard::class,
         RawAddress::class
@@ -26,7 +25,6 @@ import ru.iwater.youwater.utils.ProductConverter
 abstract class YouWaterDB: RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun addressDao(): AddressDao
-    abstract fun favoriteProductDao(): FavoriteProductDao
     abstract fun myOrderDao(): MyOrderDao
     abstract fun bankCard(): BankCardDao
     abstract fun rawAddressDao(): RawAddressDao
@@ -67,6 +65,14 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             "ALTER TABLE RawAddress ADD COLUMN active INTEGER"
+        )
+    }
+}
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "DROP TABLE FavoriteProduct"
         )
     }
 }
