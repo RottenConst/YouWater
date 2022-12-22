@@ -79,10 +79,10 @@ fun InputTelNumberField(textButton: String, authViewModel: AuthViewModel, navCon
                     telNum = if (number.text.length == 1) {
                         TextFieldValue("+7(${number.text}", TextRange(4))
                     }
-                    else if (telNum.text.length == 6) {
+                    else if (telNum.text.length == 5) {
                         TextFieldValue("${number.text}) ", TextRange(8))
                     }
-                    else if (telNum.text.length == 11) {
+                    else if (telNum.text.length == 10) {
                         TextFieldValue("${number.text}-", TextRange(12))
                     }
                     else number
