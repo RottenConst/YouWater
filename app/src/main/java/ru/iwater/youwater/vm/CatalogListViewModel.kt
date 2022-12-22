@@ -1,8 +1,6 @@
 package ru.iwater.youwater.vm
 
-import android.view.View
 import androidx.lifecycle.*
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.di.components.OnScreen
@@ -148,16 +146,6 @@ class CatalogListViewModel @Inject constructor(
 
     suspend fun addProductInFavorite(product: Product): Boolean {
         return productRepo.addToFavorite(product.id) == true
-    }
-
-    fun addFavoriteProduct(favoriteProduct: FavoriteProduct, view: View) {
-        viewModelScope.launch {
-            if (productRepo.addToFavorite(favoriteProduct.id) == true) {
-                getFavoriteProduct()
-            } else {
-                Snackbar.make(view, "Ошибка", Snackbar.LENGTH_SHORT).show()
-            }
-        }
     }
 
     suspend fun deleteFavoriteProduct(product: Product): Boolean {

@@ -59,12 +59,7 @@ class FavoriteFragment : BaseFragment(), FavoriteProductAdapter.OnFavoriteProduc
 
     override fun onLikeItemClick(favoriteProduct: FavoriteProduct) {
         viewModel.viewModelScope.launch {
-            if (viewModel.delFavoriteProduct(favoriteProduct)) {
-                getMessage("Товар удален из избранного")
-                    .setAction("Отмена") {
-                        viewModel.addFavoriteProduct(favoriteProduct, it)
-                    }.show()
-            } else {
+            if (!viewModel.delFavoriteProduct(favoriteProduct)) {
                 getMessage("Ошибка").show()
             }
         }

@@ -171,9 +171,9 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
         return CatalogWaterAdapter(CatalogWaterAdapter.OnClickListener{
             if (!it.onFavoriteClick) {
                 viewModel.viewModelScope.launch {
-                    if (viewModel.deleteFavoriteProduct(it)) {
-                        getMessage("Товар удален из избранного").show()
-                    } else getMessage("Ошибка").show()
+                    if (!viewModel.deleteFavoriteProduct(it)) {
+                        getMessage("Ошибка").show()
+                    }
                 }
             } else {
                 viewModel.viewModelScope.launch{
