@@ -267,6 +267,7 @@ class CreateOrderFragment : BaseFragment(),
                 order.period.isNotEmpty() &&
                 order.period != "**:**-**:**" &&
                 order.paymentType == "4") {
+                binding.btnCreateOrder.isEnabled = false
                 viewModel.sendAndSaveOrder(order)
                 createOrder(viewModel)
 
@@ -279,6 +280,7 @@ class CreateOrderFragment : BaseFragment(),
                 order.period.isNotEmpty() &&
                 order.period != "**:**-**:**" &&
                 order.paymentType == "0") {
+                binding.btnCreateOrder.isEnabled = false
                 viewModel.sendAndSaveOrder(order)
                 createOrder(viewModel)
             }
@@ -289,6 +291,7 @@ class CreateOrderFragment : BaseFragment(),
                 order.period.isNotEmpty() &&
                 order.period != "**:**-**:**" &&
                 order.paymentType == "2") {
+                binding.btnCreateOrder.isEnabled = false
                 viewModel.sendAndSaveOrder(order)
                 viewModel.statusOrder.observe(this.viewLifecycleOwner) { status ->
                     when(status) {
