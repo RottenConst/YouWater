@@ -102,5 +102,22 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_your_water_logo" />
 
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:buttonTint="@color/blue"
+            android:checked="true"
+            android:text="@string/distributionAnswer"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_register" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

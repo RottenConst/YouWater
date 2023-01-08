@@ -23,6 +23,7 @@
     <string name="btn_сlose">Удалить</string>
 
     <string name="confirmLogout">Вы уверены, что хотите выйти из своего аккаунта?</string>
+    <string name="distributionAnswer">Получать уведомления о новых\n предложениях и акциях</string>
 
 
     <string name="payment_on_card">Оплата по карте</string>
