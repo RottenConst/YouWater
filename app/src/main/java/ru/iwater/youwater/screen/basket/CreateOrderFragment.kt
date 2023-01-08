@@ -342,7 +342,7 @@ class CreateOrderFragment : BaseFragment(),
         if (id != null) {
             order.addressId = id
         }
-        if (notice != null) {
+        if (!notice.isNullOrEmpty()) {
             binding.cvNoticeAddress.visibility = View.VISIBLE
             binding.tvAddressNotice.text = notice
         } else {
