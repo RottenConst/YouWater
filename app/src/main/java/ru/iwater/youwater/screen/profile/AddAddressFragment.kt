@@ -99,26 +99,26 @@ class AddAddressFragment : BaseFragment() {
             val street =
                 if (binding.etStreet.text.isNullOrEmpty()) "" else binding.etStreet.text.toString()
             //дои
-            val house = if (binding.etHome.text.isNullOrEmpty()) "" else "${binding.etHome.text}"
+            val house = if (binding.etHome.text.isNullOrEmpty()) "" else binding.etHome.text.toString()
             //строение
             val building =
-                if (binding.etStructure.text.isNullOrEmpty()) "" else "${binding.etStructure.text}"
+                if (binding.etStructure.text.isNullOrEmpty()) "" else binding.etStructure.text.toString()
             //подъезд
             val entrance =
-                if (binding.etEntrance.text.isNullOrEmpty()) "" else "${binding.etEntrance.text}"
+                if (binding.etEntrance.text.isNullOrEmpty()) "" else binding.etEntrance.text.toString()
             //этаж
-            val floor = if (binding.etFloor.text.isNullOrEmpty()) "" else "${binding.etFloor.text}"
+            val floor = if (binding.etFloor.text.isNullOrEmpty()) "" else binding.etFloor.text.toString()
             //квартира
             val flat =
-                if (binding.etApartment.text.isNullOrEmpty()) "" else "${binding.etApartment.text}"
+                if (binding.etApartment.text.isNullOrEmpty()) "" else binding.etApartment.text.toString()
             //примичание
-            val note = if (binding.etNote.text.isNullOrEmpty()) "" else "${binding.etNote.text}"
+            val note = if (binding.etNote.text.isNullOrEmpty()) "" else binding.etNote.text.toString()
             // доп контакт
-            val contact = if (binding.etContact.text.isNullOrEmpty()) "" else "${binding.etContact.text}"
+            val contact = if (binding.etContact.text.isNullOrEmpty()) "" else binding.etContact.text.toString()
 
             // перевод данных в формат для отправки в црм
             val addressJson =
-                getJsonAddress(city, street, house, building, entrance, floor, flat)
+                getJsonAddress(region, city, street, house, building, entrance, floor, flat)
             val factAddress = getFactAddress(city, street, house, building, entrance, floor, flat)
             val address = getAddress(street, house, building)
             val fullAddress = getFullAddress(region, street, house, building)
@@ -230,6 +230,7 @@ class AddAddressFragment : BaseFragment() {
     }
 
     private fun getJsonAddress(
+        region: String,
         city: String,
         street: String,
         house: String,
@@ -239,6 +240,11 @@ class AddAddressFragment : BaseFragment() {
         flat: String,
     ): JsonObject? {
         val addressJson = JsonObject()
+        if (region.isNotEmpty()) {
+            addressJson.addProperty("region", region)
+        } else {
+            return null
+        }
         if (street.isEmpty()) {
             return null
         } else {

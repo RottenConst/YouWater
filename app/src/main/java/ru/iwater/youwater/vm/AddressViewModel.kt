@@ -86,37 +86,32 @@ class AddressViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val client = getClientInfo()
+            val newAddressParameters = JsonObject()
             if (client != null) {
+                newAddressParameters.apply {
+                    this.addProperty("client_id", client.client_id)
+                    this.addProperty("name_contact", client.name)
+                    this.addProperty("phone_contact", client.contact)
+                    this.addProperty("notice", notice)
+                    this.addProperty("region", region)
+                    this.addProperty("address", address)
+                    this.addProperty("fact_address", factAddress)
+                    this.addProperty("full_address", fullAddress)
+                    this.addProperty("return_tare", returnTare)
+                    this.addProperty("coords", coords)
+                    this.addProperty("active", 1)
+                    this.add("address_json", addressJson)
+                }
                 val newAddress =
                 if (contact.isEmpty()){
+                    newAddressParameters.addProperty("contact", client.contact)
                     addressRepo.createAddress(
-                        client.client_id,
-                        client.contact,
-                        region,
-                        factAddress,
-                        address,
-                        coords,
-                        fullAddress,
-                        returnTare,
-                        client.contact,
-                        client.name,
-                        addressJson,
-                        notice
+                        newAddressParameters
                     )
                 } else {
+                    newAddressParameters.addProperty("contact", contact)
                     addressRepo.createAddress(
-                        client.client_id,
-                        contact,
-                        region,
-                        factAddress,
-                        address,
-                        coords,
-                        fullAddress,
-                        returnTare,
-                        client.contact,
-                        client.name,
-                        addressJson,
-                        notice
+                        newAddressParameters
                     )
                 }
                 if (newAddress == "Адрес успешно добавлен.") {

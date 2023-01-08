@@ -87,35 +87,10 @@ class AddressRepository @Inject constructor(
      * отправить запрос на создание адреса
      */
     suspend fun createAddress(
-        clientId: Int,
-        contact: String,
-        region: String,
-        factAddress: String,
-        address: String,
-        coords: String,
-        fullAddress: String,
-        returnTare: Int,
-        phoneContact: String,
-        nameContact: String,
-        addressJson: JsonObject,
-        notice: String
+        newAddressParameters: JsonObject
     ): String? {
         return try {
-            val response = waterApi.createNewAddress(
-                clientId,
-                contact,
-                region,
-                factAddress,
-                address,
-                coords,
-                1,
-                fullAddress,
-                returnTare,
-                phoneContact,
-                nameContact,
-                addressJson,
-                notice
-            )
+            val response = waterApi.createNewAddress(newAddressParameters)
             if (response.isSuccessful) {
                 response.body()?.get("message")?.asString
             } else null
