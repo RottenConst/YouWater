@@ -313,6 +313,7 @@
 
     <!-- general -->
     <string name="add">Добавить</string>
+    <string name="minus">Убрать</string>
     <string name="cancel">Отмена</string>
     <string name="general_next_text">Продолжить</string>
     <string name="general_favorite">Избранное</string>

@@ -62,6 +62,16 @@ class OrderRepository @Inject constructor(
         return productDao.getAllProduct() ?: emptyList()
     }
 
+    suspend fun deleteAllProduct() {
+        val productList = productDao.getAllProduct() ?: emptyList()
+        if (productList.isNotEmpty()) {
+            productList.forEach {
+                Timber.d("Delete product ${it.id}")
+                productDao.delete(it)
+            }
+        }
+    }
+
     suspend fun isFirstOrder(): Boolean? {
         return try {
             val isStartPocket = apiAuth.isStartPocket(getAuthClient().clientId)

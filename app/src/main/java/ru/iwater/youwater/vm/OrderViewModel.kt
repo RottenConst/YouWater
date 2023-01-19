@@ -1,4 +1,4 @@
-package ru.iwater.youwater.data
+package ru.iwater.youwater.vm
 
 import androidx.lifecycle.*
 import com.google.gson.JsonObject
@@ -153,6 +153,23 @@ class OrderViewModel @Inject constructor(
         }
     }
 
+    suspend fun addProductCount(product: Product) {
+        product.count += 1
+        getProducts()
+        orderRepo.updateProduct(product)
+    }
+
+    suspend fun minusProductCount(product: Product) {
+        product.count -= 1
+        if (product.count != 0) {
+            orderRepo.updateProduct(product)
+            getProducts()
+        } else {
+            orderRepo.deleteProduct(product)
+            getProducts()
+        }
+    }
+
     fun clearProduct(products: List<Product>) {
         viewModelScope.launch {
             for (product in products) {
@@ -296,10 +313,12 @@ class OrderViewModel @Inject constructor(
                     }
                     _myOrder.value = lastOrder
                     val products = mutableListOf<Product>()
+                    orderRepo.deleteAllProduct()
                     lastOrder.water_equip.forEach {
                         val product = orderRepo.getProduct(it.id)
                         if (product != null) {
                             product.count = it.amount
+                            orderRepo.saveProduct(product)
                             products.add(product)
                         }
                     }

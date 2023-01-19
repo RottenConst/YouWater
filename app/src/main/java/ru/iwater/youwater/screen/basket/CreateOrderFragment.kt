@@ -11,17 +11,22 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.JsonObject
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.databinding.FragmentCreateOrderBinding
+import ru.iwater.youwater.screen.adapters.AdapterBasketList
 import ru.iwater.youwater.screen.adapters.OrderProductAdapter
 import ru.iwater.youwater.screen.dialog.AddAddressDialog
 import ru.iwater.youwater.screen.dialog.AddNoticeDialog
+import ru.iwater.youwater.vm.OrderViewModel
+import ru.iwater.youwater.vm.Status
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,12 +36,16 @@ import javax.inject.Inject
  * Фрагмент оформления заказа
  */
 class CreateOrderFragment : BaseFragment(),
-    DatePickerDialog.OnDateSetListener, AddNoticeDialog.AddNoticeDialogListener, AddAddressDialog.ChoiceAddressDialog {
+    DatePickerDialog.OnDateSetListener,
+    AddNoticeDialog.AddNoticeDialogListener,
+    AddAddressDialog.ChoiceAddressDialog,
+    AdapterBasketList.OnProductItemListener{
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     private val screenComponent = App().buildScreenComponent()
     val viewModel: OrderViewModel by viewModels { factory }
+    private val adapterOrder = OrderProductAdapter(this)
 
     private val productClear = mutableListOf<Product>()
     private var order =
@@ -148,6 +157,7 @@ class CreateOrderFragment : BaseFragment(),
         viewModel.products.observe(viewLifecycleOwner) { products ->
             adapterOrder.submitList(products)
             productClear.addAll(products)
+            order.waterEquip.clear()
             var priceTotal = 0
             var priceCompleteDiscount = 0
             var priceComplete = 0
@@ -383,6 +393,27 @@ class CreateOrderFragment : BaseFragment(),
                 }
             }
         }
+    }
+
+    override fun addProduct(product: Product) {
+        viewModel.viewModelScope.launch {
+            if (product.category != 20) {
+                viewModel.addProductCount(product)
+                adapterOrder.notifyDataSetChanged()
+            } else {
+                Toast.makeText(context, "Стартовый пакет можно заказать один", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun minusProduct(product: Product) {
+        viewModel.viewModelScope.launch {
+            viewModel.minusProductCount(product)
+            adapterOrder.notifyDataSetChanged()
+        }
+    }
+
+    override fun deleteProductClick(product: Product) {
     }
 
     //выбор периода доставки

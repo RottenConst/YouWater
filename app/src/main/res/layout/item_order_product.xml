@@ -7,6 +7,9 @@
         <variable
             name="product"
             type="ru.iwater.youwater.data.Product" />
+        <variable
+            name="itemProductClick"
+            type="ru.iwater.youwater.screen.adapters.AdapterBasketList.OnProductItemListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,34 +34,52 @@
         <TextView
             android:id="@+id/tv_name_product_order"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
+            android:gravity="center|clip_vertical|center_horizontal"
             android:text=""
             android:textColor="@color/black"
             android:textSize="12sp"
-            app:nameProduct="@{product}"
             app:layout_constraintBottom_toTopOf="@+id/line_bottom"
-            app:layout_constraintEnd_toStartOf="@+id/tv_cost_order_product"
+            app:layout_constraintEnd_toStartOf="@+id/img_btn_minus"
             app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@sample/sample_title[1]"/>
+            app:nameProduct="@{product}"
+            tools:text="@sample/sample_title[1]" />
 
         <TextView
             android:id="@+id/tv_cost_order_no_discount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:textSize="11sp"
             android:visibility="gone"
-            app:setCostNoDiscount="@{product}"
             app:layout_constraintBottom_toTopOf="@+id/tv_cost_order_product"
-            app:layout_constraintEnd_toStartOf="@+id/tv_count_of_product_order"
+            app:layout_constraintEnd_toEndOf="@+id/tv_cost_order_product"
+            app:layout_constraintStart_toStartOf="@id/tv_cost_order_product"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintVertical_bias="1.0"
+            app:setCostNoDiscount="@{product}" />
+
+        <ImageButton
+            android:id="@+id/img_btn_minus"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/ic_btn_minus"
+            android:contentDescription="@string/minus"
+            android:text="@string/minus"
+            android:onClick="@{() -> itemProductClick.minusProduct(product)}"
+            app:layout_constraintBottom_toTopOf="@+id/line_bottom"
+            app:layout_constraintEnd_toStartOf="@+id/tv_cost_order_product"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_cost_order_product"
@@ -66,31 +87,45 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
             android:text=""
             android:textColor="@color/blue"
             android:textSize="12sp"
             android:textStyle="bold"
-            app:setCostProduct="@{product}"
-            app:layout_constraintBottom_toTopOf="@+id/line_bottom"
-            app:layout_constraintEnd_toStartOf="@+id/tv_count_of_product_order"
+            app:layout_constraintEnd_toStartOf="@+id/img_btn_plus"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@sample/sample_cost[2]"/>
+            app:setCostProduct="@{product}"
+            tools:text="@sample/sample_cost[2]" />
 
         <TextView
             android:id="@+id/tv_count_of_product_order"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
             android:text=""
             android:textColor="@color/black"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@+id/line_bottom"
+            app:layout_constraintEnd_toEndOf="@+id/tv_cost_order_product"
+            app:layout_constraintStart_toStartOf="@+id/tv_cost_order_product"
+            app:layout_constraintTop_toBottomOf="@+id/tv_cost_order_product"
+            app:layout_constraintVertical_bias="1.0"
+            tools:text="@sample/sample_other_data[2]" />
+
+        <ImageButton
+            android:id="@+id/img_btn_plus"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/ic_btn_plus"
+            android:contentDescription="@string/add"
+            android:text="@string/add"
+            android:onClick="@{() -> itemProductClick.addProduct(product)}"
+            app:layout_constraintBottom_toTopOf="@+id/line_bottom"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="@sample/sample_other_data[2]"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <View
             android:id="@+id/line_bottom"
