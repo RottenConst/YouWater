@@ -34,18 +34,8 @@ class OrderRepository @Inject constructor(
 
     fun getAuthClient(): AuthClient = authClient.get()
 
-    // получить все адреса из бд
-    suspend fun getAllAddress(): List<RawAddress> {
-        val address = addressDao.getAddresses()
-        return if (address.isNullOrEmpty()) emptyList() else address
-    }
-
     suspend fun getAddress(id: Int): RawAddress? {
         return addressDao.getAddress(id)
-    }
-
-    suspend fun saveAddress(rawAddress: RawAddress) {
-        addressDao.save(rawAddress)
     }
 
     suspend fun getAllFactAddress(): List<RawAddress> {
@@ -86,14 +76,23 @@ class OrderRepository @Inject constructor(
     }
 
     suspend fun getProduct(productId: Int): Product? {
-        try {
+        return try {
             val product = apiAuth.getProduct(productId)
-            if (product != null)
-                return product
+            if (product?.id != 0 && product != null) {
+                product
+            } else null
         } catch (e: java.lang.Exception) {
             Timber.e("Exception get product $e")
+            null
         }
-        return null
+    }
+
+    suspend fun saveProduct(product: Product) {
+        productDao.save(product)
+    }
+
+    suspend fun updateProduct(product: Product) {
+        productDao.updateProductInBasked(product)
     }
 
     suspend fun deleteProduct(product: Product) {
@@ -101,15 +100,15 @@ class OrderRepository @Inject constructor(
     }
 
     suspend fun getAllOrder(clientId: Int): List<OrderFromCRM> {
-        try {
+        return try {
             val listOrder = apiAuth.getOrderClient(clientId)
-            return if (listOrder.isNullOrEmpty()) {
-                emptyList()
-            } else listOrder.take(15)
+            if (!listOrder.isNullOrEmpty()) {
+                listOrder.take(15)
+            } else emptyList()
         } catch (e: Exception) {
             Timber.e("error get order: $e")
+            emptyList()
         }
-        return emptyList()
     }
 
     suspend fun getStatusOrder(orderId: Int): Int? {

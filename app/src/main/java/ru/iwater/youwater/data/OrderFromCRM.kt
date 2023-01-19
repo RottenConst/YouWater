@@ -6,7 +6,6 @@ import androidx.annotation.Keep
 data class OrderFromCRM(
     val acq_order_id: String,
     val address: String,
-    val address_json: AddressJson,
     val address_id: Int,
     val checked: Int,
     val client_id: Int,

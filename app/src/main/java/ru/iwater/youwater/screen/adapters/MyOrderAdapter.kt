@@ -26,7 +26,7 @@ class MyOrderAdapter(
 
         fun bindingMyOrder(myOrder: MyOrder, onReplayLastOrder: onReplayLastOrder) {
             binding.myOrder = myOrder
-            val adapter = OrderProductAdapter()
+            val adapter = OrderProductNoEditAdapter()
             binding.rvProductOrder.adapter = adapter
 
             binding.btnReplayOrder.setOnClickListener {

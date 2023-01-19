@@ -82,13 +82,15 @@ class CreateOrderFragment : BaseFragment(),
         /**
          * информация о клиенте
          */
-        viewModel.client.observe(viewLifecycleOwner) {
-            binding.tvNameClient.text = it.name
-            binding.tvTelNumber.text = it.contact
-            order.clientId = it.client_id
-            order.name = it.name
-            order.contact = it.contact
-            if (it.email.isNotEmpty()) order.email = it.email
+        viewModel.client.observe(viewLifecycleOwner) { client ->
+            if (client != null) {
+                binding.tvNameClient.text = client.name
+                binding.tvTelNumber.text = client.contact
+                order.clientId = client.client_id
+                order.name = client.name
+                order.contact = client.contact
+                if (client.email.isNotEmpty()) order.email = client.email
+            }
         }
 
         viewModel.getInfoLastOrder(lastOrder)
@@ -140,8 +142,8 @@ class CreateOrderFragment : BaseFragment(),
             }
         }
         // детали заказа
-        val adapterOrder = OrderProductAdapter()
-        val product = mutableListOf<Product>()
+
+//        val product = mutableListOf<Product>()
         binding.rvOrderProduct.adapter = adapterOrder
         viewModel.products.observe(viewLifecycleOwner) { products ->
             adapterOrder.submitList(products)
@@ -152,7 +154,6 @@ class CreateOrderFragment : BaseFragment(),
             var priceTotalDiscount = 0
             var discount = 0
             var price = 0
-            product.addAll(products)
             products.forEach { product ->
                 val prices = product.price.removeSuffix(";")
                 val priceList = prices.split(";")
@@ -243,6 +244,9 @@ class CreateOrderFragment : BaseFragment(),
                     "2" -> binding.spinnerPaymentType.setSelection(2)
                     "4" -> binding.spinnerPaymentType.setSelection(0)
                     else -> {}
+                }
+                if (binding.btnSetAddress.text != "Адрес устарел, выберете другой") {
+                    order.addressId = myOrder.address_id
                 }
                 if (myOrder.notice.isNotEmpty()) {
                     order.notice = myOrder.notice

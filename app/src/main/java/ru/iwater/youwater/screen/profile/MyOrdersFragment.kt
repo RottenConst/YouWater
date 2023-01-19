@@ -11,8 +11,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.StatusLoading
-import ru.iwater.youwater.data.OrderViewModel
+import ru.iwater.youwater.vm.StatusLoading
+import ru.iwater.youwater.vm.OrderViewModel
 import ru.iwater.youwater.databinding.FragmentMyOrdersBinding
 import ru.iwater.youwater.screen.adapters.MyOrderAdapter
 import javax.inject.Inject

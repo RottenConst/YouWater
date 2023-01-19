@@ -10,8 +10,8 @@ import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.OrderViewModel
-import ru.iwater.youwater.data.PaymentStatus
+import ru.iwater.youwater.vm.OrderViewModel
+import ru.iwater.youwater.vm.PaymentStatus
 import ru.iwater.youwater.databinding.FragmentCompleteOrderBinding
 import ru.iwater.youwater.screen.adapters.MyOrderAdapter
 import javax.inject.Inject
