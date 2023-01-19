@@ -24,7 +24,27 @@ class ProductRepository @Inject constructor(
      * получить список продуктов добавленых в корзину
      */
     suspend fun getProductListOfCategory(): List<Product>? {
-        return productDao.getAllProduct()
+        return try {
+            val clientFirst = apiWater.isStartPocket(getAuthClient().clientId)
+            if (clientFirst.isSuccessful) {
+                val isFirst = clientFirst.body()?.get("status")?.asBoolean
+                if (isFirst == true) {
+                    productDao.getAllProduct()
+                } else {
+                    val startProductList = productDao.getAllProduct()?.filter { product -> product.category == 20 }
+                    startProductList?.forEach {
+                        productDao.delete(it)
+                    }
+                    productDao.getAllProduct()
+                }
+            } else {
+                Timber.d("error start pocket api")
+                null
+            }
+        } catch (e: Exception) {
+            Timber.e("Get product error: $e")
+            null
+        }
     }
 
     /**
