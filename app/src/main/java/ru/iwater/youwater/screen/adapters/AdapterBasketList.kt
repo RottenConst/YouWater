@@ -2,6 +2,7 @@ package ru.iwater.youwater.screen.adapters
 
 import android.graphics.Paint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -34,6 +35,13 @@ class AdapterBasketList(
                 binding.tvSumProduct.text = product.count.toString()
                 binding.tvSumDiscount.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
                 binding.executePendingBindings()
+                if (product.category == 20) {
+                    binding.btnPlusProduct.isEnabled = false
+                    binding.btnMinus.isEnabled = false
+                } else {
+                    binding.btnPlusProduct.isEnabled = true
+                    binding.btnMinus.isEnabled = true
+                }
             }
 
             companion object {

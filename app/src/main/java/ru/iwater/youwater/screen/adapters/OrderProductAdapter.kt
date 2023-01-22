@@ -37,6 +37,13 @@ class OrderProductAdapter (
                 binding.imgBtnMinus.isEnabled = true
                 binding.imgBtnMinus.visibility = View.VISIBLE
             }
+            if (product.category == 20) {
+                binding.imgBtnPlus.isEnabled = false
+                binding.imgBtnPlus.visibility = View.GONE
+            } else {
+                binding.imgBtnPlus.isEnabled = true
+                binding.imgBtnPlus.visibility = View.VISIBLE
+            }
             binding.executePendingBindings()
         }
 
