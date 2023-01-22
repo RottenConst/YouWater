@@ -15,16 +15,16 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.vm.CatalogListViewModel
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.PromoBanner
-import ru.iwater.youwater.data.StatusLoading
 import ru.iwater.youwater.data.TypeProduct
 import ru.iwater.youwater.databinding.FragmentHomeBinding
 import ru.iwater.youwater.screen.adapters.AdapterProductList
 import ru.iwater.youwater.screen.adapters.CatalogWaterAdapter
 import ru.iwater.youwater.screen.adapters.PromoBannerAdapter
 import ru.iwater.youwater.utils.ExtendedFloatingActionButtonScrollListener
+import ru.iwater.youwater.vm.CatalogListViewModel
+import ru.iwater.youwater.vm.StatusLoading
 import javax.inject.Inject
 
 /**
@@ -73,6 +73,8 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
                     binding.rvPromo.visibility = View.GONE
                     binding.tvLabelPromo.visibility = View.GONE
                     binding.rvTypeProductList.visibility = View.GONE
+                    binding.btnNext.visibility = View.GONE
+                    binding.btnPrevious.visibility = View.GONE
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressBar.progress
                 }
@@ -80,17 +82,23 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
                     binding.rvPromo.visibility = View.VISIBLE
                     binding.tvLabelPromo.visibility = View.VISIBLE
                     binding.rvTypeProductList.visibility = View.VISIBLE
+                    binding.btnNext.visibility = View.VISIBLE
+                    binding.btnPrevious.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.GONE
                 }
-                else -> {Toast.makeText(this.context, "Error", Toast.LENGTH_LONG)}
+                else -> {Toast.makeText(this.context, "Error", Toast.LENGTH_LONG).show()}
             }
         }
 
         viewModel.promoBanners.observe(viewLifecycleOwner) { banners ->
             if (banners.isNotEmpty()) {
+                if (banners.size == 1) {
+                    binding.btnNext.visibility = View.GONE
+                    binding.btnPrevious.visibility = View.GONE
+                }
                 adapterPromo.submitList(banners)
+                var itemBanner = 0
                 lifecycleScope.launch(Dispatchers.Main) {
-                    var itemBanner = 0
                     while (itemBanner <= banners.size) {
                         delay(5000)
                         if (itemBanner != banners.size) {
@@ -102,9 +110,29 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
                         }
                     }
                 }
+                binding.btnNext.setOnClickListener {
+                    if (itemBanner != banners.size) {
+                        itemBanner++
+                        binding.rvPromo.scrollToPosition(itemBanner)
+                    } else {
+                        itemBanner = 0
+                        binding.rvPromo.scrollToPosition(itemBanner)
+                    }
+                }
+                binding.btnPrevious.setOnClickListener {
+                    if (itemBanner != 0) {
+                        itemBanner--
+                        binding.rvPromo.scrollToPosition(itemBanner)
+                    } else {
+                        itemBanner = banners.size
+                        binding.rvPromo.scrollToPosition(itemBanner)
+                    }
+                }
             } else {
                 binding.tvLabelPromo.visibility = View.GONE
                 binding.rvPromo.visibility = View.GONE
+                binding.btnNext.visibility = View.GONE
+                binding.btnPrevious.visibility = View.GONE
             }
         }
 
@@ -152,10 +180,13 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
             getMessage("Товар ${product.app_name} добавлен в корзину")
                 .setAction("Корзина") {
                     this.findNavController()
-                        .navigate(HomeFragmentDirections.actionHomeFragmentToBasketFragment())
+                    .navigate(HomeFragmentDirections.actionHomeFragmentToBasketFragment())
                 }.show()
         } else {
-            Toast.makeText(this.context, "Стартовый пакет возможно заказать только 1", Toast.LENGTH_LONG).show()
+            getMessage("Стартовый пакет добавлен").setAction("Корзина") {
+                this.findNavController()
+                    .navigate(HomeFragmentDirections.actionHomeFragmentToBasketFragment())
+            }.show()
         }
     }
 

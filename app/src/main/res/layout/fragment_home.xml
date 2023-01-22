@@ -28,16 +28,40 @@
             android:id="@+id/rv_promo"
             android:layout_width="0dp"
             android:layout_height="120dp"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
             android:contentDescription="@string/fragment_home_promo_info"
             android:orientation="horizontal"
             android:paddingBottom="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/rv_type_product_list"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_next"
+            app:layout_constraintStart_toEndOf="@id/btn_previous"
+            app:layout_constraintTop_toBottomOf="@id/tv_label_promo" />
+
+        <ImageButton
+            android:id="@+id/btn_previous"
+            android:layout_width="20dp"
+            android:layout_height="120dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/transparent"
+            android:src="@drawable/ic_arrow_back_24"
+            app:layout_constraintBottom_toTopOf="@id/rv_type_product_list"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_label_promo" />
+
+        <ImageButton
+            android:id="@+id/btn_next"
+            android:layout_width="20dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/transparent"
+            android:src="@drawable/ic_arrow_next_24"
+            app:layout_constraintBottom_toTopOf="@id/rv_type_product_list"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_label_promo" />
 
         <androidx.recyclerview.widget.RecyclerView

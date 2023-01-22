@@ -29,14 +29,14 @@ class PromoBannerAdapter(
 
         fun bindingBanner(banner: PromoBanner, onClickListener: OnBannerItemClickListener) {
             val imgUrl = "$ImageUrl/${banner.picture}"//prod
-            Glide.with(binding.ivPromo)
+            Glide.with(binding.ivPromoOne)
                 .load(imgUrl)
                 .apply(RequestOptions()
                     .placeholder(R.drawable.ic_your_water_logo)
                     .error(R.drawable.ic_your_water_logo)
                 )
-                .into(binding.ivPromo)
-            binding.ivPromo.setOnClickListener {
+                .into(binding.ivPromoOne)
+            binding.ivPromoOne.setOnClickListener {
                 onClickListener.onBannerItemClicked(banner)
             }
             binding.executePendingBindings()
