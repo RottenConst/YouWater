@@ -1,6 +1,5 @@
 package ru.iwater.youwater.screen.login
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,12 +16,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.AuthViewModel
 import ru.iwater.youwater.theme.YourWaterTheme
 
 @Composable
-fun RegisterScreen(viewModel: AuthViewModel) {
+fun RegisterScreen(viewModel: AuthViewModel, phone: String, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -30,12 +32,12 @@ fun RegisterScreen(viewModel: AuthViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LoginTitle(title = stringResource(id = R.string.fragment_register_register_text))
-        InputRegisterData()
+        InputRegisterData(viewModel, phone, navController)
     }
 }
 
 @Composable
-fun InputRegisterData() {
+fun InputRegisterData(viewModel: AuthViewModel, phone: String, navController: NavController) {
     var nameClient by remember { mutableStateOf(TextFieldValue("")) }
     var emailClient by remember { mutableStateOf(TextFieldValue("")) }
     val isEnabled = nameClient.text.isNotEmpty() && emailClient.text.isNotEmpty()
@@ -74,7 +76,11 @@ fun InputRegisterData() {
                     top = 52.dp
                 ),
             enabled = isEnabled,
-            onClick = {  }) {
+            onClick = {
+                viewModel.viewModelScope.launch {
+                        viewModel.registerClient(phone, nameClient.text, emailClient.text, navController)
+                }
+            }) {
                 Text(text = stringResource(id = R.string.fragment_register_finish))
         }
     }
@@ -92,7 +98,7 @@ private fun InputRegisterDataPreview() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoginTitle(title = stringResource(id = R.string.fragment_register_register_text))
-            InputRegisterData()
+//            InputRegisterData()
         }
     }
 

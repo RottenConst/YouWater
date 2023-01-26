@@ -5,14 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.data.AuthViewModel
-import ru.iwater.youwater.data.StatusPhone
 import ru.iwater.youwater.databinding.FragmentRegisterBinding
 import ru.iwater.youwater.theme.YourWaterTheme
 import javax.inject.Inject
@@ -44,52 +42,10 @@ class RegisterFragment : Fragment() {
 
             setContent {
                 YourWaterTheme {
-                    RegisterScreen(viewModel)
+                    RegisterScreen(viewModel, phoneNumber, this@RegisterFragment.findNavController())
                 }
             }
         }
-//        binding.btnRegister.setOnClickListener {
-//            val name = binding.etNameRegister.text.toString()
-//            val email = binding.etEmailRegister.text.toString()
-//            when {
-//                name.isEmpty() -> {
-//                    Toast.makeText(context, "Введите ваше имя", Toast.LENGTH_LONG).show()
-//                }
-//                email.isEmpty() -> {
-//                    Toast.makeText(context, "Введите адрес электронной почты", Toast.LENGTH_LONG).show()
-//                }
-//                else -> {
-//                    viewModel.registerClient(phoneNumber, name, email)
-//                }
-//            }
-//            viewModel.statusPhone.observe(viewLifecycleOwner) { status ->
-//                when (status) {
-//                    StatusPhone.LOAD -> {
-//
-//                    }
-//                    StatusPhone.DONE -> {
-//                        viewModel.clientId.observe(viewLifecycleOwner) { id ->
-//                            if (id != null) {
-//                                this.findNavController().navigate(
-//                                    RegisterFragmentDirections.actionRegisterFragmentToEnterPinCodeFragment(
-//                                        phoneNumber, id
-//                                    )
-//                                )
-//                            } else {
-//                                Toast.makeText(context, "Что-то пошло не так", Toast.LENGTH_LONG)
-//                                    .show()
-//                            }
-//                        }
-//                    }
-//                    StatusPhone.ERROR -> {
-//                        Toast.makeText(context, "Ошибка", Toast.LENGTH_LONG).show()
-//                    }
-//                    StatusPhone.NET_ERROR -> {
-//                        Toast.makeText(context, "ошибка соединения", Toast.LENGTH_LONG).show()
-//                    }
-//                }
-//            }
-//        }
         return binding.root
     }
 

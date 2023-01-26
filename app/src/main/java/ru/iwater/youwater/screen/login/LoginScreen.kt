@@ -35,7 +35,6 @@ fun LoginScreen(authViewModel: AuthViewModel, navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally)
     {
         LoginTitle(stringResource(id = R.string.login_fragment_enter_text))
-
         InputTelNumberField(stringResource(id = R.string.login_fragment_sent_code), authViewModel, navController)
     }
 }
@@ -66,7 +65,6 @@ fun LoginTitle(title: String) {
 
 @Composable
 fun InputTelNumberField(textButton: String, authViewModel: AuthViewModel, navController: NavController) {
-//    var telNum by remember { mutableStateOf(TextFieldValue("")) }
     var phone by remember {
         mutableStateOf("")
     }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import ru.iwater.youwater.repository.AuthorisationRepository
 import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.screen.login.LoginFragmentDirections
+import ru.iwater.youwater.screen.login.RegisterFragmentDirections
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,13 +41,10 @@ class AuthViewModel @Inject constructor(
 
     private val clientAuth = authorisationRepository.getAuthClient()
 
-
-
     fun authPhone(phone: String, navController: NavController) {
         val telNum = StringBuilder(phone).insert(0, "+7(").insert(6, ") ").insert(11, '-').toString()
         viewModelScope.launch {
             Timber.d("auth")
-            _statusPhone.value = StatusPhone.LOAD
             val authPhone = authorisationRepository.authPhone(telNum)
             when {
                 authPhone == null -> {
@@ -102,35 +100,39 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun registerClient(phone: String, name: String, email: String) {
-        viewModelScope.launch {
-            val registerClient = authorisationRepository.registerClient(
-                phone, name, email
-            )
-            if (registerClient != null) {
-                val status = registerClient.get("status").asBoolean
-//                if (status) {
-//                    _clientId.value = registerClient.get("client_id").asInt
-//                    authPhone(phone)
-//                }
-            }
+    suspend fun registerClient(phone: String, name: String, email: String, navController: NavController) {
+        val registerClient = authorisationRepository.registerClient(
+            phone, name, email
+        )
+        if (registerClient != null) {
+            isRegisteredClient(registerClient["status"].asBoolean, phone, registerClient["client_id"].asInt, navController)
+        } else {
+            Toast.makeText(navController.context, "ошибка соединения", Toast.LENGTH_SHORT).show()
         }
     }
 
-    fun singUpClient(phone: String, name: String, email: String) {
-        viewModelScope.launch {
-            val registerClient = authorisationRepository.registerClient(
-                phone, name, email
-            )
-            if (registerClient != null) {
-                val status = registerClient.get("status").asBoolean
-//                if (status) {
-//                    _clientId.value = registerClient.get("client_id").asInt
-//                    authPhone(phone)
-//                }
-            }
+    private fun isRegisteredClient(status: Boolean, phone: String, clientId: Int, navController: NavController) {
+        if (status) {
+            navController.navigate(RegisterFragmentDirections.actionRegisterFragmentToEnterPinCodeFragment(phone, clientId))
+        } else {
+            Toast.makeText(navController.context, "Ошибка регистрации", Toast.LENGTH_SHORT).show()
         }
     }
+
+//    fun singUpClient(phone: String, name: String, email: String) {
+//        viewModelScope.launch {
+//            val registerClient = authorisationRepository.registerClient(
+//                phone, name, email
+//            )
+//            if (registerClient != null) {
+//                val status = registerClient.get("status").asBoolean
+////                if (status) {
+////                    _clientId.value = registerClient.get("client_id").asInt
+////                    authPhone(phone)
+////                }
+//            }
+//        }
+//    }
 
     private fun saveClient(clientAuth: AuthClient) {
         viewModelScope.launch {
