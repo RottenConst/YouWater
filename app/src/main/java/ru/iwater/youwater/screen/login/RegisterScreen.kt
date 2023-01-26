@@ -1,5 +1,6 @@
 package ru.iwater.youwater.screen.login
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +18,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.iwater.youwater.R
+import ru.iwater.youwater.data.AuthViewModel
 import ru.iwater.youwater.theme.YourWaterTheme
 
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(viewModel: AuthViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -28,6 +30,7 @@ fun RegisterScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LoginTitle(title = stringResource(id = R.string.fragment_register_register_text))
+        InputRegisterData()
     }
 }
 
@@ -35,6 +38,7 @@ fun RegisterScreen() {
 fun InputRegisterData() {
     var nameClient by remember { mutableStateOf(TextFieldValue("")) }
     var emailClient by remember { mutableStateOf(TextFieldValue("")) }
+    val isEnabled = nameClient.text.isNotEmpty() && emailClient.text.isNotEmpty()
 
     Column(
         Modifier.padding(vertical = 16.dp)
@@ -69,7 +73,8 @@ fun InputRegisterData() {
                     end = 52.dp,
                     top = 52.dp
                 ),
-            onClick = { /*TODO*/ }) {
+            enabled = isEnabled,
+            onClick = {  }) {
                 Text(text = stringResource(id = R.string.fragment_register_finish))
         }
     }
