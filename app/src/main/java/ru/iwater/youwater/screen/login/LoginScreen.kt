@@ -12,10 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,6 +23,8 @@ import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.AuthViewModel
 import ru.iwater.youwater.theme.YouWaterTypography
+import timber.log.Timber
+import kotlin.math.absoluteValue
 
 @Composable
 fun LoginScreen(authViewModel: AuthViewModel, navController: NavController) {
@@ -65,7 +66,10 @@ fun LoginTitle(title: String) {
 
 @Composable
 fun InputTelNumberField(textButton: String, authViewModel: AuthViewModel, navController: NavController) {
-    var telNum by remember { mutableStateOf(TextFieldValue("")) }
+//    var telNum by remember { mutableStateOf(TextFieldValue("")) }
+    var phone by remember {
+        mutableStateOf("")
+    }
     var buttonEnabled by remember { mutableStateOf(false) }
 
     Column {
@@ -73,24 +77,18 @@ fun InputTelNumberField(textButton: String, authViewModel: AuthViewModel, navCon
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            value = telNum,
+            value = phone,
             onValueChange = {number ->
-                if (number.text.length <= 16) {
-                    telNum = if (number.text.length == 1) {
-                        TextFieldValue("+7(${number.text}", TextRange(4))
-                    }
-                    else if (telNum.text.length == 5) {
-                        TextFieldValue("${number.text}) ", TextRange(8))
-                    }
-                    else if (telNum.text.length == 10) {
-                        TextFieldValue("${number.text}-", TextRange(12))
-                    }
-                    else number
+                if (number.length <= NumberDefaults.INPUT_LENGTH) {
+                    phone = number
+                    Timber.d("TEXT = $phone")
                 }
-                buttonEnabled = telNum.text.length == 16
+                buttonEnabled = phone.length == NumberDefaults.INPUT_LENGTH
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             label = { Text(text = stringResource(id = R.string.login_fragment_tel_number))},
+            visualTransformation =
+                MaskVisualTransformation(NumberDefaults.MASK),
             maxLines = 1
         )
 
@@ -105,7 +103,7 @@ fun InputTelNumberField(textButton: String, authViewModel: AuthViewModel, navCon
             shape = RoundedCornerShape(8.dp),
             enabled = buttonEnabled,
             onClick = {
-                authViewModel.authPhone(telNum.text, navController)
+                authViewModel.authPhone(phone, navController)
             }
         ) {
             Text(
@@ -120,6 +118,45 @@ fun InputTelNumberField(textButton: String, authViewModel: AuthViewModel, navCon
             style = YouWaterTypography.body2,
             text = stringResource(id = R.string.login_fragment_login_accept)
         )
+    }
+}
+
+object NumberDefaults {
+    const val MASK = "+7(###) ###-####"
+    const val INPUT_LENGTH = 10
+}
+
+class MaskVisualTransformation(private val mask: String) : VisualTransformation {
+
+    private val specialSymbolsIndices = mask.indices.filter { mask[it] != '#'}
+    override fun filter(text: AnnotatedString): TransformedText {
+        var out = ""
+        var maskIndex = 0
+        text.forEach { char ->
+            while (specialSymbolsIndices.contains(maskIndex)) {
+                out += mask[maskIndex]
+                maskIndex++
+            }
+            out += char
+            maskIndex++
+        }
+        return TransformedText(AnnotatedString(out), offsetTranslator())
+    }
+    private fun offsetTranslator() = object : OffsetMapping {
+        override fun originalToTransformed(offset: Int): Int {
+            val offsetValue = offset.absoluteValue
+            if (offsetValue == 0) return 0
+            var numberOfHashtags = 0
+            val masked = mask.takeWhile {
+                if (it == '#') numberOfHashtags++
+                numberOfHashtags < offsetValue
+            }
+            return masked.length + 1
+        }
+
+        override fun transformedToOriginal(offset: Int): Int {
+            return mask.take(offset.absoluteValue).count { it == '#' }
+        }
     }
 }
 

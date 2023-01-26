@@ -43,10 +43,11 @@ class AuthViewModel @Inject constructor(
 
 
     fun authPhone(phone: String, navController: NavController) {
+        val telNum = StringBuilder(phone).insert(0, "+7(").insert(6, ") ").insert(11, '-').toString()
         viewModelScope.launch {
             Timber.d("auth")
             _statusPhone.value = StatusPhone.LOAD
-            val authPhone = authorisationRepository.authPhone(phone)
+            val authPhone = authorisationRepository.authPhone(telNum)
             when {
                 authPhone == null -> {
                     Toast.makeText(navController.context, "ошибка соединения", Toast.LENGTH_LONG).show()

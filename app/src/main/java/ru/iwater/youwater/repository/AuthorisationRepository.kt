@@ -20,15 +20,13 @@ class AuthorisationRepository @Inject constructor(
     suspend fun authPhone(phone: String): PhoneStatusClient? {
         val phoneAnswer = JsonObject()
         phoneAnswer.addProperty("phone", phone)
-        try {
+        return try {
             val phoneStatus = apiAuth.authPhone(phoneAnswer)
-            if (phoneStatus != null) {
-                return phoneStatus
-            }
+            phoneStatus
         }catch (e: Exception) {
             Timber.e("error auth phone: $e")
+            null
         }
-        return null
     }
 
     suspend fun checkCode(clientId: Int, pinCode: String): AuthClient? {
