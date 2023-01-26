@@ -2,6 +2,7 @@ package ru.iwater.youwater.data
 
 import android.content.Context
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,7 +16,7 @@ import ru.iwater.youwater.screen.login.RegisterFragmentDirections
 import timber.log.Timber
 import javax.inject.Inject
 
-enum class StatusPhone {LOAD, ERROR, NET_ERROR, DONE}
+//enum class StatusPhone {LOAD, ERROR, NET_ERROR, DONE}
 enum class StatusPinCode{LOAD, ERROR, DONE}
 enum class StatusSession{TRY, FALSE, ERROR}
 
@@ -23,13 +24,20 @@ class AuthViewModel @Inject constructor(
     private val authorisationRepository: AuthorisationRepository
 ): ViewModel() {
 
-    private val _statusPhone: MutableLiveData<StatusPhone> = MutableLiveData()
-    val statusPhone: LiveData<StatusPhone>
-        get() = _statusPhone
+//    private val _statusPhone: MutableLiveData<StatusPhone> = MutableLiveData()
+//    val statusPhone: LiveData<StatusPhone>
+//        get() = _statusPhone
+
+    private val _pinCode: MutableLiveData<String> = MutableLiveData()
+    val pinCode: LiveData<String> get() =_pinCode
 
     private val _statusPinCode: MutableLiveData<StatusPinCode> = MutableLiveData()
     val statusPinCode: LiveData<StatusPinCode>
         get() = _statusPinCode
+
+    private val _isFullPinCode: MutableLiveData<Boolean> = MutableLiveData()
+    val isFullPinCode: LiveData<Boolean>
+        get() = _isFullPinCode
 
     private val _statusSession: MutableLiveData<StatusSession> = MutableLiveData()
     val statusSession: LiveData<StatusSession>
@@ -54,37 +62,40 @@ class AuthViewModel @Inject constructor(
                     navController.navigate(
                         LoginFragmentDirections.actionLoginFragmentToEnterPinCodeFragment(phone, authPhone.clientId)
                     )
-//                    _clientId.value = authPhone.clientId
-//                    clientAuth.clientId = authPhone.clientId
-                }
-                !authPhone.status -> {
+                } else -> {
                     navController.navigate(
-                        LoginFragmentDirections.actionLoginFragmentToRegisterFragment(phone)
+                        LoginFragmentDirections.actionLoginFragmentToRegisterFragment(telNum)
                     )
                 }
             }
         }
     }
 
+    fun setFullPinCode(isEnabled: Boolean, pinCode: String) {
+        _isFullPinCode.value = isEnabled
+        if (isEnabled) _pinCode.value = pinCode
+    }
 
 
-    fun checkPin(context: Context?, pinCode: String, clientId: Int) {
+
+    fun checkPin(fragmentActivity: FragmentActivity?, pinCode: String, clientId: Int) {
         viewModelScope.launch {
             _statusPinCode.value = StatusPinCode.LOAD
             val clientFullAuth = authorisationRepository.checkCode(clientId, pinCode)
             when {
                 clientFullAuth == null -> {
                     _statusPinCode.value = StatusPinCode.ERROR
-                    Toast.makeText(context, "Ошибка соединения", Toast.LENGTH_LONG).show()
+                    Toast.makeText(fragmentActivity?.applicationContext, "Ошибка соединения", Toast.LENGTH_LONG).show()
                 }
                 clientFullAuth.session.isNotEmpty() -> {
                     _statusPinCode.value = StatusPinCode.DONE
                     saveClient(clientFullAuth)
-                    MainActivity.start(context)
+                    MainActivity.start(fragmentActivity?.applicationContext)
+                    fragmentActivity?.finish()
                 }
                 clientFullAuth.session.isEmpty() -> {
                     _statusPinCode.value = StatusPinCode.ERROR
-                    Toast.makeText(context, "Неверный пин код", Toast.LENGTH_LONG).show()
+                    Toast.makeText(fragmentActivity?.applicationContext, "Неверный пин код", Toast.LENGTH_LONG).show()
                 }
             }
         }
