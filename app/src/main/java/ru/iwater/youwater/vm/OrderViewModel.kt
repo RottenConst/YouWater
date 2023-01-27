@@ -316,7 +316,7 @@ class OrderViewModel @Inject constructor(
                     orderRepo.deleteAllProduct()
                     lastOrder.water_equip.forEach {
                         val product = orderRepo.getProduct(it.id)
-                        if (product != null) {
+                        if (product != null && product.category != 20) {
                             product.count = it.amount
                             orderRepo.saveProduct(product)
                             products.add(product)
