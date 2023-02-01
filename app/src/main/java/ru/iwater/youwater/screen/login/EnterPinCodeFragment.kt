@@ -5,17 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import ru.iwater.youwater.base.App
-import ru.iwater.youwater.data.AuthViewModel
-import ru.iwater.youwater.data.StatusPinCode
+import ru.iwater.youwater.vm.AuthViewModel
 import ru.iwater.youwater.databinding.FragmentEnterPinCodeBinding
-import ru.iwater.youwater.screen.StartActivity
 import ru.iwater.youwater.theme.YourWaterTheme
 import javax.inject.Inject
 
@@ -45,31 +40,10 @@ class EnterPinCodeFragment : Fragment() {
             )
             setContent {
                 YourWaterTheme {
-                    EnterPincodeScreen(phone = phoneNumber, clientId, this@EnterPinCodeFragment.activity, viewModel)
+                    EnterPinCodeScreen(phone = phoneNumber, clientId, this.context, viewModel, this@EnterPinCodeFragment.requireActivity())
                 }
             }
         }
-//        binding.tvInfoCode.text = "Код отправлен на номер: $phoneNumber"
-//        binding.etPinCode.requestFocus()
-//
-//        binding.btnEnterPin.setOnClickListener {
-//            viewModel.checkPin(context, binding.etPinCode.text.toString(), clientId)
-//            viewModel.statusPinCode.observe(viewLifecycleOwner) { status ->
-//                when (status) {
-//                    StatusPinCode.DONE -> {
-//                        Toast.makeText(context, "Успешно", Toast.LENGTH_LONG).show()
-//                        this.activity?.finish()
-//                    }
-//                    StatusPinCode.ERROR -> {
-//                        Toast.makeText(context, "Ошибка", Toast.LENGTH_LONG).show()
-//                    }
-//                    StatusPinCode.LOAD -> {
-//
-//                    }
-//                    else -> Toast.makeText(context, "Ошибка", Toast.LENGTH_LONG).show()
-//                }
-//            }
-//        }
         return binding.root
     }
 

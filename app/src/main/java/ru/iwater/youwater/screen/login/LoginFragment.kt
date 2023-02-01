@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.AuthViewModel
+import ru.iwater.youwater.vm.AuthViewModel
 import ru.iwater.youwater.databinding.LoginFragmentBinding
 import ru.iwater.youwater.theme.YourWaterTheme
 import javax.inject.Inject

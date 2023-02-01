@@ -23,6 +23,7 @@
     <string name="btn_сlose">Удалить</string>
 
     <string name="confirmLogout">Вы уверены, что хотите выйти из своего аккаунта?</string>
+    <string name="distributionAnswer">Получать уведомления о новых предложениях и акциях</string>
 
 
     <string name="payment_on_card">Оплата по карте</string>
@@ -144,7 +145,7 @@
     <string name="fragment_faq_one_quest_answer_1_5">• Отсутствие накипи и осадка при кипячении, щадящее воздействие на бытовую технику.\n• Идеально подходит для использования в кулерах, чайниках и кофе-машинах.\n• Рекомендована для ежедневного употребления.\n• Имеет сертификаты качества.</string>
 
     <!-- fragment enter pin code -->
-    <string name="fragment_enter_pin_code_info_code">Код отправлен на номер</string>
+    <string name="fragment_enter_pin_code_info_code">Код отправлен на номер:\n</string>
     <string name="fragment_enter_pin_code_enter_code_on_sms">Введите код из СМС:</string>
     <string name="fragment_enter_pin_code_enter_text">Вход</string>
 

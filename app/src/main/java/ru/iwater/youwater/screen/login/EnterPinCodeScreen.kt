@@ -1,18 +1,24 @@
 package ru.iwater.youwater.screen.login
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -20,28 +26,57 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.AuthViewModel
+import ru.iwater.youwater.vm.AuthViewModel
+import ru.iwater.youwater.vm.StatusPinCode.*
+import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YourWaterTheme
+import timber.log.Timber
 
 @Composable
-fun EnterPincodeScreen(phone: String, clientId: Int, activityFragment: FragmentActivity?, viewModel: AuthViewModel) {
+fun EnterPinCodeScreen(phone: String, clientId: Int, context: Context?, viewModel: AuthViewModel, fragmentActivity: FragmentActivity) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val isEnabledEnter by viewModel.isFullPinCode.observeAsState()
-        val pinCode by viewModel.pinCode.observeAsState()
+        val infoPinCode = stringResource(id = R.string.fragment_enter_pin_code_info_code)
+        var isEnabledEnter by rememberSaveable { mutableStateOf(false) }
+        var pinCode by rememberSaveable{ mutableStateOf("") }
+        val statusPinCode by viewModel.statusPinCode.observeAsState()
+        when (statusPinCode) {
+            DONE -> {
+                Timber.d("DONE")
+                fragmentActivity.finish()
+                MainActivity.start(context)
+            }
+            ERROR -> {
+                Timber.d("Error")
+                Toast.makeText(context, "Неверный пин код", Toast.LENGTH_LONG).show()
+            }
+            NET_ERROR -> {
+                Timber.d("Net Error")
+                Toast.makeText(context, "Ошибка соединения", Toast.LENGTH_LONG).show()
+            }
+            else -> {}
+        }
+
         LoginTitle(title = stringResource(id = R.string.fragment_enter_pin_code_enter_text))
         EnterPinCodeText()
-        OtpTextFieldTheme(Blue500, 4, viewModel)
-        ButtonEnter({ checkPinCode(viewModel, getPicode(pinCode), clientId, activityFragment) }, isFullPinCode(isEnabledEnter))
-        ThisPhoneNumber(phone = phone)
+        OtpTextFieldTheme(
+            pinCode = pinCode,
+            setPinCode = {pinCode = it},
+            color = Blue500,
+            maxLength = 4,
+            isFullPinCode = {isEnabledEnter = it}
+        )
+        ButtonEnter(
+            text = stringResource(id = R.string.fragment_enter_pin_code_enter_text),
+            isEnabledButton = isEnabledEnter,
+        ) { viewModel.checkPin(pinCode, clientId) }
+        DescriptionText(text = "$infoPinCode $phone")
     }
 }
 
@@ -54,29 +89,24 @@ private fun EnterPinCodeText() {
         text = stringResource(id = R.string.fragment_enter_pin_code_enter_code_on_sms)
     )
 }
-@Composable
-private fun ThisPhoneNumber(phone: String) {
-    Text(modifier = Modifier
-        .padding(top = 16.dp, start = 52.dp, end = 52.dp),
-        textAlign = TextAlign.Center,
-        text = "Код отправлен на номер:\n $phone"
-    )
-}
 
 @Composable
-fun ButtonEnter(checkPinCode: () -> Unit, isEnabled: Boolean) {
+fun ButtonEnter(text: String, isEnabledButton: Boolean, onEvent: () -> Unit) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 52.dp, start = 52.dp, end = 52.dp),
-        enabled = isEnabled,
-        onClick = { checkPinCode }) {
-        Text(text = stringResource(id = R.string.fragment_enter_pin_code_enter_text))
+            .padding(top = 24.dp, start = 52.dp, end = 52.dp),
+        shape = RoundedCornerShape(8.dp),
+        enabled = isEnabledButton,
+        onClick = {
+            onEvent()
+        }) {
+        Text(text = text)
     }
 }
 
 @Composable
-fun OtpTextFieldTheme(color: Color, maxLength: Int, viewModel: AuthViewModel) {
+fun OtpTextFieldTheme(pinCode: String = "", setPinCode: (String) -> Unit, color: Color, maxLength: Int, isFullPinCode: (Boolean) -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,22 +114,21 @@ fun OtpTextFieldTheme(color: Color, maxLength: Int, viewModel: AuthViewModel) {
             .padding(20.dp),
         color = Color.White
     ) {
-        var otpValue by remember {
-            mutableStateOf("")
-        }
-
+        val focusRequester = remember { FocusRequester() }
         BasicTextField(
-            value = otpValue,
-            modifier = Modifier.focusTarget(),
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                                focusRequester.requestFocus()
+                },
+            value = pinCode,
             onValueChange = {
                 when {
                     it.length <= maxLength -> {
-                        otpValue = it
+                        setPinCode(it)
                     }
                 }
-                if (it.length == maxLength) {
-                    viewModel.setFullPinCode(true, it)
-                }
+                    isFullPinCode(it.length == maxLength)
                             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             decorationBox = {
@@ -112,7 +141,7 @@ fun OtpTextFieldTheme(color: Color, maxLength: Int, viewModel: AuthViewModel) {
                                 .border(1.dp, color, CircleShape)
                                 .clip(CircleShape)
                                 .background(
-                                    if (index < otpValue.length) color
+                                    if (index < pinCode.length) color
                                     else Color.Transparent
                                 )
                                 .padding(2.dp),
@@ -125,18 +154,17 @@ fun OtpTextFieldTheme(color: Color, maxLength: Int, viewModel: AuthViewModel) {
     }
 }
 
-private fun isFullPinCode(isFull: Boolean?) = isFull ?: false
-private fun getPicode(pinCode: String?) = pinCode ?: ""
-private fun checkPinCode(viewModel: AuthViewModel, pinCode: String, clientId: Int, fragmentActivity: FragmentActivity?) {
-    viewModel.viewModelScope.launch {
-        viewModel.checkPin(fragmentActivity, pinCode, clientId)
-    }
-}
-
-
 @Preview
 @Composable
 private fun EnterPinCodeScreenPreview() {
+    var pinCode by rememberSaveable {
+        mutableStateOf("")
+    }
+    var isEnabledButton by rememberSaveable {
+        mutableStateOf(false)
+    }
+    val text = stringResource(id = R.string.fragment_enter_pin_code_info_code)
+    val phone = "+7(123) 456-78-90"
     YourWaterTheme {
         Column(
             modifier = Modifier
@@ -146,9 +174,18 @@ private fun EnterPinCodeScreenPreview() {
         ) {
             LoginTitle(title = stringResource(id = R.string.fragment_enter_pin_code_enter_text))
             EnterPinCodeText()
-//            OtpTextFieldTheme(Blue500, 4)
-//            ButtonEnter()
-            ThisPhoneNumber(phone = "+7(123) 456-7890")
+            OtpTextFieldTheme(
+                pinCode = pinCode,
+                setPinCode = {pinCode = it},
+                color = Blue500,
+                maxLength = 4,
+                isFullPinCode = {isEnabledButton = it},
+            )
+            ButtonEnter(
+                stringResource(id = R.string.fragment_enter_pin_code_enter_text),
+                isEnabledButton,
+            ) {}
+            DescriptionText(text = "$text $phone")
         }
     }
 }

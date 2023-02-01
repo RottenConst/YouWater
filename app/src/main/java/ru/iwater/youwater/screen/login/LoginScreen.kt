@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.AuthViewModel
+import ru.iwater.youwater.vm.AuthViewModel
 import ru.iwater.youwater.theme.YouWaterTypography
 import timber.log.Timber
 import kotlin.math.absoluteValue
@@ -34,8 +35,25 @@ fun LoginScreen(authViewModel: AuthViewModel, navController: NavController) {
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally)
     {
+        var phone by rememberSaveable {
+            mutableStateOf("")
+        }
+        var isEnabledButton by rememberSaveable {
+            mutableStateOf(false)
+        }
         LoginTitle(stringResource(id = R.string.login_fragment_enter_text))
-        InputTelNumberField(stringResource(id = R.string.login_fragment_sent_code), authViewModel, navController)
+        InputTelNumberField(phone = phone, setPhone = {phone = it}, isFullPhoneNumber = {isEnabledButton = it})
+        ButtonEnter(text = stringResource(id = R.string.login_fragment_sent_code), isEnabledButton = isEnabledButton) {
+            authViewModel.authPhone(
+                phone = phone,
+                navController = navController
+            )
+        }
+        DescriptionText(
+            text = stringResource(
+                id = R.string.login_fragment_login_accept
+            )
+        )
     }
 }
 
@@ -64,59 +82,36 @@ fun LoginTitle(title: String) {
 }
 
 @Composable
-fun InputTelNumberField(textButton: String, authViewModel: AuthViewModel, navController: NavController) {
-    var phone by remember {
-        mutableStateOf("")
-    }
-    var buttonEnabled by remember { mutableStateOf(false) }
+fun InputTelNumberField(phone: String, setPhone: (String) -> Unit, isFullPhoneNumber: (Boolean) -> Unit) {
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(8.dp),
+        value = phone,
+        onValueChange = {number ->
+            if (number.length <= NumberDefaults.INPUT_LENGTH) {
+                setPhone(number)
+                Timber.d("TEXT = $phone")
 
-    Column {
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            value = phone,
-            onValueChange = {number ->
-                if (number.length <= NumberDefaults.INPUT_LENGTH) {
-                    phone = number
-                    Timber.d("TEXT = $phone")
-                }
-                buttonEnabled = phone.length == NumberDefaults.INPUT_LENGTH
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            label = { Text(text = stringResource(id = R.string.login_fragment_tel_number))},
-            visualTransformation =
-                MaskVisualTransformation(NumberDefaults.MASK),
-            maxLines = 1
-        )
-
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 52.dp,
-                    end = 52.dp,
-                    top = 52.dp
-                ),
-            shape = RoundedCornerShape(8.dp),
-            enabled = buttonEnabled,
-            onClick = {
-                authViewModel.authPhone(phone, navController)
             }
-        ) {
-            Text(
-                style = YouWaterTypography.h6,
-                text = textButton
-            )
-        }
-
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
-            textAlign = TextAlign.Center,
-            style = YouWaterTypography.body2,
-            text = stringResource(id = R.string.login_fragment_login_accept)
-        )
-    }
+            isFullPhoneNumber(number.length == NumberDefaults.INPUT_LENGTH)
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+        label = { Text(text = stringResource(id = R.string.login_fragment_tel_number))},
+        visualTransformation =
+        MaskVisualTransformation(NumberDefaults.MASK),
+        maxLines = 1
+    )
+}
+@Composable
+fun DescriptionText(text: String) {
+    Text(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
+        textAlign = TextAlign.Center,
+        style = YouWaterTypography.body2,
+        text = text
+    )
 }
 
 object NumberDefaults {
@@ -160,22 +155,38 @@ class MaskVisualTransformation(private val mask: String) : VisualTransformation 
 
 @Preview
 @Composable
-fun TextInputPreview() {
-    YourWaterTheme {
-    }
-}
-
-@Preview
-@Composable
-fun LoginTitlePreview() {
-    YourWaterTheme {
-        LoginTitle("Enter")
-    }
-}
-
-@Preview
-@Composable
 fun InputTelNumPreview() {
     YourWaterTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White),
+            horizontalAlignment = Alignment.CenterHorizontally)
+        {
+            var phone by rememberSaveable {
+                mutableStateOf("")
+            }
+            var isEnabledButton by rememberSaveable {
+                mutableStateOf(false)
+            }
+            LoginTitle(title = stringResource(id = R.string.login_fragment_enter_text))
+            InputTelNumberField(
+                phone = phone,
+                setPhone = {phone = it},
+                isFullPhoneNumber = {
+                    isEnabledButton = it
+                })
+            ButtonEnter(
+                stringResource(id = R.string.login_fragment_sent_code),
+                onEvent = {},
+                isEnabledButton = isEnabledButton
+            )
+            DescriptionText(
+                text = stringResource(
+                    id = R.string.login_fragment_login_accept
+                )
+            )
+        }
+
     }
 }

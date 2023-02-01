@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.AuthViewModel
-import ru.iwater.youwater.data.StatusSession
+import ru.iwater.youwater.vm.AuthViewModel
+import ru.iwater.youwater.vm.StatusSession
 import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
@@ -95,7 +96,8 @@ private fun StartLogoContent(visibleStartButton: Boolean, navigateToLoginScreen:
                 onClick = navigateToLoginScreen,
                 modifier = Modifier
                     .padding(start = 52.dp, top = 32.dp, end = 52.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
             ) {
                 Text(
                     text = stringResource(id = R.string.start_fragment_begin)
