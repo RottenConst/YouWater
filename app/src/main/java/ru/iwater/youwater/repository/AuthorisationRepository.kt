@@ -87,6 +87,22 @@ class AuthorisationRepository @Inject constructor(
         }
     }
 
+    suspend fun setMailing(clientId: Int, isMailing: Boolean) {
+        try {
+            val mailing = JsonObject()
+            if (isMailing) {
+                mailing.addProperty("mailing_consent", 1)
+                apiAuth.mailing(clientId, mailing)
+            } else {
+                mailing.addProperty("mailing_consent", 0)
+                apiAuth.mailing(clientId, mailing)
+            }
+        } catch (e: Exception) {
+            Timber.e("error set mailing: $e")
+        }
+
+    }
+
     suspend fun sendUserData(clientUserData: ClientUserData): String {
         try {
             val answer = apiAuth.sendUserData(clientUserData)

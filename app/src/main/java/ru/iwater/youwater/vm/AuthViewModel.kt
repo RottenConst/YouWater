@@ -1,4 +1,4 @@
-package ru.iwater.youwater.data
+package ru.iwater.youwater.vm
 
 import android.widget.Toast
 import androidx.lifecycle.LiveData
@@ -91,22 +91,44 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    suspend fun registerClient(phone: String, name: String, email: String, navController: NavController) {
+    suspend fun registerClient(
+        phone: String,
+        name: String,
+        email: String,
+        isMailing: Boolean,
+        navController: NavController
+    ) {
         val registerClient = authorisationRepository.registerClient(
             phone, name, email
         )
-        if (registerClient != null) {
-            isRegisteredClient(registerClient["status"].asBoolean, phone, registerClient["client_id"].asInt, navController)
+        if (registerClient != null && registerClient["status"].asBoolean) {
+            isRegisteredClient(
+                isMailing,
+                phone,
+                registerClient["client_id"].asInt,
+                navController
+            )
         } else {
-            Toast.makeText(navController.context, "ошибка соединения", Toast.LENGTH_SHORT).show()
+            Toast.makeText(navController.context, "Ошибка регистрации", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun isRegisteredClient(status: Boolean, phone: String, clientId: Int, navController: NavController) {
-        if (status) {
-            navController.navigate(RegisterFragmentDirections.actionRegisterFragmentToEnterPinCodeFragment(phone, clientId))
+    private suspend fun isRegisteredClient(
+        isMailing: Boolean,
+        phone: String,
+        clientId: Int,
+        navController: NavController
+    ) {
+        if (authorisationRepository.authPhone(phone)?.status == true) {
+            authorisationRepository.setMailing(clientId, isMailing)
+            navController.navigate(
+                RegisterFragmentDirections.actionRegisterFragmentToEnterPinCodeFragment(
+                    phone,
+                    clientId
+                )
+            )
         } else {
-            Toast.makeText(navController.context, "Ошибка регистрации", Toast.LENGTH_SHORT).show()
+            Toast.makeText(navController.context, "ошибка соединения", Toast.LENGTH_SHORT).show()
         }
     }
 

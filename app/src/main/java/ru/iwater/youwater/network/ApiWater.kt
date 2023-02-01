@@ -55,6 +55,12 @@ interface ApiWater {
         @Field("email") email: String
     ): Response<JsonObject>
 
+    @PUT("mailing-consent/{client_id}/")
+    suspend fun mailing(
+        @Path("client_id") clientId: Int,
+        @Body clientData: JsonObject
+    ): Response<JsonObject>?
+
     @POST("OrderCreate/")
     suspend fun createOrder(
         @Body order: Order
