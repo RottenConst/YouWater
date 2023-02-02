@@ -1,4 +1,4 @@
-package ru.iwater.youwater.data
+package ru.iwater.youwater.vm
 
 import android.content.Context
 import android.widget.Toast
@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import ru.iwater.youwater.data.AuthClient
 import ru.iwater.youwater.repository.AuthorisationRepository
 import ru.iwater.youwater.screen.MainActivity
 import javax.inject.Inject
@@ -91,30 +92,16 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun registerClient(phone: String, name: String, email: String) {
+    fun registerClient(phone: String, name: String, email: String, isMailing: Boolean) {
         viewModelScope.launch {
             val registerClient = authorisationRepository.registerClient(
                 phone, name, email
             )
             if (registerClient != null) {
                 val status = registerClient.get("status").asBoolean
+                val clientId = registerClient["client_id"].asInt
                 if (status) {
-//                    _clientId.value = registerClient.get("client_id").asInt
-                    authPhone(phone)
-                }
-            }
-        }
-    }
-
-    fun singUpClient(phone: String, name: String, email: String) {
-        viewModelScope.launch {
-            val registerClient = authorisationRepository.registerClient(
-                phone, name, email
-            )
-            if (registerClient != null) {
-                val status = registerClient.get("status").asBoolean
-                if (status) {
-//                    _clientId.value = registerClient.get("client_id").asInt
+                    authorisationRepository.setMailing(clientId, isMailing)
                     authPhone(phone)
                 }
             }

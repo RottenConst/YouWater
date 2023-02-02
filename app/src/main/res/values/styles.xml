@@ -4,4 +4,9 @@
         <item name="color">@color/blue</item>
         <item name="cornerRadius">16dp</item>
     </style>
+    
+    <style name="SwitchStyle" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorControlActivated">@color/blue</item>
+        <item name="android:colorForeground">@android:color/darker_gray</item>
+    </style>
 </resources>

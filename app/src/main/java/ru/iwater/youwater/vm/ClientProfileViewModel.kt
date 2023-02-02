@@ -64,6 +64,13 @@ class ClientProfileViewModel @Inject constructor(
         }
     }
 
+    fun setMailing(clientId: Int, isMailing: Boolean) {
+        viewModelScope.launch {
+            authRepository.setMailing(clientId, isMailing)
+            getClientInfo()
+        }
+    }
+
     private fun getClientInfo() {
         viewModelScope.launch {
             val client = authRepository.getClientInfo(authClient.clientId)

@@ -11,8 +11,8 @@ import androidx.navigation.fragment.NavHostFragment
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.AuthViewModel
-import ru.iwater.youwater.data.StatusSession
+import ru.iwater.youwater.vm.AuthViewModel
+import ru.iwater.youwater.vm.StatusSession
 import ru.iwater.youwater.databinding.StartFragmentBinding
 import ru.iwater.youwater.screen.MainActivity
 import javax.inject.Inject

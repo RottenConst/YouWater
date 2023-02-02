@@ -10,8 +10,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.base.App
-import ru.iwater.youwater.data.AuthViewModel
-import ru.iwater.youwater.data.StatusPhone
+import ru.iwater.youwater.vm.AuthViewModel
+import ru.iwater.youwater.vm.StatusPhone
 import ru.iwater.youwater.databinding.FragmentRegisterBinding
 import javax.inject.Inject
 
@@ -37,6 +37,7 @@ class RegisterFragment : Fragment() {
         binding.btnRegister.setOnClickListener {
             val name = binding.etNameRegister.text.toString()
             val email = binding.etEmailRegister.text.toString()
+            val isMailing = binding.checkBox.isChecked
             when {
                 name.isEmpty() -> {
                     Toast.makeText(context, "Введите ваше имя", Toast.LENGTH_LONG).show()
@@ -45,7 +46,7 @@ class RegisterFragment : Fragment() {
                     Toast.makeText(context, "Введите адрес электронной почты", Toast.LENGTH_LONG).show()
                 }
                 else -> {
-                    viewModel.registerClient(phoneNumber, name, email)
+                    viewModel.registerClient(phoneNumber, name, email, isMailing)
                 }
             }
             viewModel.statusPhone.observe(viewLifecycleOwner) { status ->

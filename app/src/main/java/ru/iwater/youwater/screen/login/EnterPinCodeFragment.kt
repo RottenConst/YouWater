@@ -9,8 +9,8 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import ru.iwater.youwater.base.App
-import ru.iwater.youwater.data.AuthViewModel
-import ru.iwater.youwater.data.StatusPinCode
+import ru.iwater.youwater.vm.AuthViewModel
+import ru.iwater.youwater.vm.StatusPinCode
 import ru.iwater.youwater.databinding.FragmentEnterPinCodeBinding
 import javax.inject.Inject
 

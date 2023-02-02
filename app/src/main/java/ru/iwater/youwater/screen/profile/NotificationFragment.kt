@@ -5,56 +5,55 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import ru.iwater.youwater.R
+import android.widget.Toast
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import ru.iwater.youwater.base.App
+import ru.iwater.youwater.data.ClientProfileViewModel
+import ru.iwater.youwater.databinding.FragmentNotificationBinding
+import javax.inject.Inject
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [NotificationFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class NotificationFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
+    @Inject
+    lateinit var factory: ViewModelProvider.Factory
+    private val screenComponent = App().buildScreenComponent()
+    private val viewModel: ClientProfileViewModel by viewModels { factory }
+
+    val binding: FragmentNotificationBinding by lazy {
+        FragmentNotificationBinding.inflate(
+            LayoutInflater.from(this.context)
+        )
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+        screenComponent.inject(this)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notification, container, false)
+    ): View {
+        viewModel.client.observe(this.viewLifecycleOwner) {client ->
+            when (client.mailing) {
+                0 -> binding.switchNotification.isChecked = false
+                1 -> binding.switchNotification.isChecked = true
+                else -> {
+                    Toast.makeText(this.context, "Не удается получить состояние", Toast.LENGTH_SHORT).show()
+                }
+            }
+            binding.switchNotification.setOnCheckedChangeListener { _, isChecked ->
+                when (isChecked) {
+                    true -> viewModel.setMailing(client.client_id, true)
+                    false -> viewModel.setMailing(client.client_id, false)
+                }
+            }
+        }
+        return binding.root
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment NotificationFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            NotificationFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        fun newInstance() =
+            NotificationFragment()
     }
 }

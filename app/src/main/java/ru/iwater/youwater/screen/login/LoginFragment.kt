@@ -10,8 +10,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.AuthViewModel
-import ru.iwater.youwater.data.StatusPhone
+import ru.iwater.youwater.vm.AuthViewModel
+import ru.iwater.youwater.vm.StatusPhone
 import ru.iwater.youwater.databinding.LoginFragmentBinding
 import ru.iwater.youwater.utils.PhoneTextFormatter
 import javax.inject.Inject
