@@ -46,6 +46,12 @@ class ProductListViewModel @Inject constructor(
         }
     }
 
+    fun updateBasket() {
+        viewModelScope.launch {
+            _productsList.value = productRepo.getProductsInBasket()
+        }
+    }
+
     fun deleteProductFromBasket(product: Product) {
         viewModelScope.launch {
             productRepo.deleteProductFromBasket(product)
@@ -56,20 +62,23 @@ class ProductListViewModel @Inject constructor(
         viewModelScope.launch {
             val dbProduct = productRepo.getProductFromDB(productId)
             val product = productRepo.getProduct(productId)
-            val productStart = productRepo.getProductListOfCategory()?.filter { it.category == 20 }
-            val start = productStart.isNullOrEmpty()
             try {
                 if (dbProduct != null && dbProduct.category != 20) {
                     dbProduct.count += 1
                     productRepo.updateProductInBasket(dbProduct)
                 } else {
-                    if (product?.category == 20 && start) {
-                        product.count = 1
-                        productRepo.addProductInBasket(product)
-                    } else if (product?.category != 20) {
-                        if (product != null) {
-                            product.count += 1
-                            productRepo.addProductInBasket(product)
+                    when {
+                        product?.category == 20 -> {
+                            if (productRepo.getProductsInBasket()?.filter { it.category == 20 }.isNullOrEmpty()) {
+                                product.count = 1
+                                productRepo.addProductInBasket(product)
+                            }
+                        }
+                        product?.category != 20 -> {
+                            if (product != null) {
+                                product.count += 1
+                                productRepo.addProductInBasket(product)
+                            }
                         }
                     }
                 }
@@ -92,7 +101,7 @@ class ProductListViewModel @Inject constructor(
                         productRepo.deleteProductFromBasket(productDB)
                     }
                 }
-                _productsList.value = productRepo.getProductListOfCategory()
+                _productsList.value = productRepo.getProductsInBasket()
             }
         }
     }

@@ -29,13 +29,13 @@ class ProductRepository @Inject constructor(
             if (clientFirst.isSuccessful) {
                 val isFirst = clientFirst.body()?.get("status")?.asBoolean
                 if (isFirst == true) {
-                    productDao.getAllProduct()
+                    syncProductsInBasket()
                 } else {
                     val startProductList = productDao.getAllProduct()?.filter { product -> product.category == 20 }
                     startProductList?.forEach {
                         productDao.delete(it)
                     }
-                    productDao.getAllProduct()
+                    syncProductsInBasket()
                 }
             } else {
                 Timber.d("error start pocket api")
@@ -43,6 +43,34 @@ class ProductRepository @Inject constructor(
             }
         } catch (e: Exception) {
             Timber.e("Get product error: $e")
+            null
+        }
+    }
+
+    suspend fun getProductsInBasket(): List<Product>? {
+        return try {
+            productDao.getAllProduct()
+        } catch (e: Exception) {
+            Timber.e("Error get product: $e")
+            null
+        }
+    }
+    private suspend fun syncProductsInBasket(): List<Product>?{
+        return try {
+            val basketProductList = productDao.getAllProduct()
+            basketProductList?.forEach { product ->
+                val truthProduct = apiWater.getProduct(productId = product.id)
+                if (truthProduct != null) {
+                    if (truthProduct.price != product.price) {
+                        product.price = truthProduct.price
+                        truthProduct.count = product.count
+                        updateProductInBasket(truthProduct)
+                    }
+                }
+            }
+            basketProductList
+        } catch (e: Exception) {
+            Timber.e("Error syncProduct: $e")
             null
         }
     }

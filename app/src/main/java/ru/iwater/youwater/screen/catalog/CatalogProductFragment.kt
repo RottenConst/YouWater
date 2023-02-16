@@ -71,7 +71,7 @@ class CatalogProductFragment : Fragment(), AdapterProductList.OnProductItemClick
                     findNavController().navigate(CatalogProductFragmentDirections.actionCatalogProductFragmentToBasketFragment())
                 }.show()
         } else {
-            Toast.makeText(this.context, "Стартовый пакет возможно заказать только 1", Toast.LENGTH_LONG).show()
+            Toast.makeText(this.context, "Стартовый пакет добавлен", Toast.LENGTH_LONG).show()
         }
     }
 

@@ -19,7 +19,7 @@ data class Product(
     @PrimaryKey
     val id: Int,
     val name: String,
-    val price: String,
+    var price: String,
     val shname: String?,
     val site: Int,
     var count: Int = 0,

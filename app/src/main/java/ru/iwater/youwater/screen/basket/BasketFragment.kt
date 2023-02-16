@@ -93,17 +93,17 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
 
     override fun deleteProductClick(product: Product) {
         viewModel.deleteProductFromBasket(product)
-        viewModel.getBasket()
+        viewModel.updateBasket()
     }
 
     override fun addProduct(product: Product) {
         viewModel.addProductInBasket(product.id)
-        viewModel.getBasket()
+        viewModel.updateBasket()
     }
 
     override fun minusProduct(product: Product) {
         viewModel.minusCountProduct(product)
-        viewModel.getBasket()
+        viewModel.updateBasket()
     }
 
     companion object {

@@ -21,8 +21,8 @@ android {
         applicationId "ru.iwater.youwater"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 15
-        versionName "1.0.4"
+        versionCode 17
+        versionName "1.0.6"
         manifestPlaceholders = [GOOGLE_MAPS_API_KEY:getApiKey()]
 
         multiDexEnabled true
