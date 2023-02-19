@@ -322,6 +322,14 @@ class OrderViewModel @Inject constructor(
                             products.add(product)
                         }
                     }
+                    if (products.isEmpty()) {
+                        val product = orderRepo.getProduct(81)
+                        if (product != null){
+                            product.count = 1
+                            orderRepo.saveProduct(product)
+                            products.add(product)
+                        }
+                    }
                     _products.value = products
                 }
             }
@@ -343,8 +351,7 @@ class OrderViewModel @Inject constructor(
             Timber.d("STATUS ${paymentStatus.first} ${paymentStatus.second}")
             if (paymentStatus.second == 2) {
                 val parameters = JsonObject()
-                parameters.addProperty("updated_payment_state", 1)
-                parameters.addProperty("updated_acq", orderId)
+                parameters.addProperty("acq_order_id", orderId)
                 if (orderRepo.setStatusPayment(paymentStatus.first, parameters)) {
                     _paymentStatus.value = PaymentStatus.SUCCESSFULLY
                 } else _paymentStatus.value = PaymentStatus.ERROR

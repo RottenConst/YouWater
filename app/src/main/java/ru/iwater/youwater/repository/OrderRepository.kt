@@ -10,6 +10,7 @@ import ru.iwater.youwater.network.RetrofitSberApi
 import ru.iwater.youwater.network.SberPaymentApi
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.Exception
 
 class OrderRepository @Inject constructor(
     youWaterDB: YouWaterDB,
@@ -174,7 +175,7 @@ class OrderRepository @Inject constructor(
     }
 
     suspend fun payCard(paymentCard: PaymentCard): List<String> {
-        try {
+        return try {
             val answer = sberApi.registerOrder(
                 userName = paymentCard.userName,
                 password = paymentCard.password,
@@ -192,8 +193,8 @@ class OrderRepository @Inject constructor(
             }
         } catch (e: Exception) {
             Timber.e("error pay: $e")
+            emptyList()
         }
-        return emptyList()
     }
 
     suspend fun getPaymentStatus(orderId: String): Pair<Int, Int> {
@@ -214,7 +215,7 @@ class OrderRepository @Inject constructor(
         try {
             val answer = apiAuth.setStatusPayment(orderId, parameters)
             if (answer.isSuccessful) {
-                Timber.d(answer.body()?.get("ready").toString())
+                Timber.d(" ANSWER set status ${answer.body()?.get("ready").toString()}")
                 return true
             }
         }catch (e: Exception) {

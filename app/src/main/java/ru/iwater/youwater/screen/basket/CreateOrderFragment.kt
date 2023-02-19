@@ -313,10 +313,27 @@ class CreateOrderFragment : BaseFragment(),
                             viewModel.numberOrder.observe(this.viewLifecycleOwner) { numberOrder ->
                                 viewModel.payToCard(numberOrder, amount = order.orderCost * 100, order.contact)//*100
                                 viewModel.dataPayment.observe(this.viewLifecycleOwner) { dataPayment ->
-//                                    Timber.d("SBER LINK: ${dataPayment[0]}; ${dataPayment[1]}")
-                                    val orderId = dataPayment[0].removePrefix("\"").removeSuffix("\"")
-                                    val url = dataPayment[1].removePrefix("\"").removeSuffix("\"")
-                                    this.findNavController().navigate(CreateOrderFragmentDirections.actionCreateOrderFragmentToCardPaymentFragment(url, orderId))
+                                    if (dataPayment.isNotEmpty()) {
+//                                        Timber.d("SBER LINK: ${dataPayment[0]}; ${dataPayment[1]}")
+                                        val orderId =
+                                            dataPayment[0].removePrefix("\"").removeSuffix("\"")
+                                        val url =
+                                            dataPayment[1].removePrefix("\"").removeSuffix("\"")
+                                        this.findNavController().navigate(
+                                            CreateOrderFragmentDirections.actionCreateOrderFragmentToCardPaymentFragment(
+                                                url,
+                                                orderId
+                                            )
+                                        )
+                                    }
+                                    else {
+                                        Toast.makeText(
+                                            this.context,
+                                            "Ошибка подключения к сервису оплаты",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        binding.btnCreateOrder.isEnabled = true
+                                    }
                                 }
                             }
                         }

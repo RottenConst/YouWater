@@ -7,6 +7,7 @@ import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.repository.ProductRepository
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.Exception
 
 @OnScreen
 class CatalogListViewModel @Inject constructor(
