@@ -48,6 +48,8 @@ class CreateOrderFragment : BaseFragment(),
     private val adapterOrder = OrderProductAdapter(this)
 
     private val productClear = mutableListOf<Product>()
+    private val deliveryTime = mutableListOf<Common>()
+    private val exceptionTime = mutableListOf<Exception>()
     private var order =
         Order(
             clientId = 0,
@@ -85,6 +87,7 @@ class CreateOrderFragment : BaseFragment(),
         // true - да, false - нет
         val isShowMessage = CreateOrderFragmentArgs.fromBundle(this.requireArguments()).isShowMessage
         val lastOrder = CreateOrderFragmentArgs.fromBundle(this.requireArguments()).lastOrderId
+        val calendar = Calendar.getInstance()
         warningPay(isShowMessage)
 
         binding.lifecycleOwner = this
@@ -102,7 +105,7 @@ class CreateOrderFragment : BaseFragment(),
             }
         }
 
-        viewModel.getInfoLastOrder(lastOrder)
+        viewModel.getInfoLastOrder(lastOrder, findNavController())
 
         // выбор адреса доставки
         viewModel.rawAddress.observe(viewLifecycleOwner) { listRawAddress ->
@@ -111,14 +114,11 @@ class CreateOrderFragment : BaseFragment(),
                 val listAddress = mutableListOf<Address>()
                 val addresses = mutableListOf<String>()
                 listRawAddress.forEach { rawAddress ->
-                    val region = rawAddress.fullAddress.split(",")[0]
+                    val region = rawAddress.region ?: rawAddress.fullAddress.split(",")[0]
                     addresses.add(rawAddress.factAddress)
                     listAddress.add(viewModel.getAddressFromString(rawAddress.factAddress.split(","), region, rawAddress.id, rawAddress.notice))
                 }
                 binding.btnSetAddress.setOnClickListener {
-                    listAddress.forEach {
-                        Timber.d("List Address ${it.note}")
-                    }
                     AddAddressDialog.getAddressDialog(childFragmentManager, listAddress, addresses)
                 }
             } else {
@@ -132,27 +132,30 @@ class CreateOrderFragment : BaseFragment(),
                 }
 
             }
+        }
 
+        viewModel.deliverySchedule.observe(viewLifecycleOwner) {delivery ->
+            if (delivery != null) {
+                deliveryTime.addAll(
+                    delivery.common.filter { it.available }
+                )
+                exceptionTime.addAll(
+                    delivery.exceptions.filter { it.available }
+                )
+                binding.btnSetTime.setOnClickListener {
+                    getCalendar(calendar, delivery.common.filter { !it.available }, delivery.exceptions)
+                }
+                binding.btnSetTime.visibility = View.VISIBLE
+            } else {
+                binding.btnSetTime.visibility = View.GONE
+                Toast.makeText(this.context, "Не удается получить график доставки к этому адресу", Toast.LENGTH_SHORT).show()
+            }
         }
 
         //выбор даты заказа
         binding.btnSetTime.text = "Укажите дату"
-        binding.btnSetTime.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            if (order.date.isNotEmpty()) {
-                val year = order.date.split('-')[0].toInt()
-                val month = order.date.split('-')[1].toInt() - 1
-                val day = order.date.split('-')[2].toInt()
-                Timber.d("DATE = $year, $month, $day")
-                calendar.set(year, month, day)
-                getCalendar(calendar)
-            } else {
-                getCalendar(calendar)
-            }
-        }
-        // детали заказа
 
-//        val product = mutableListOf<Product>()
+        // детали заказа
         binding.rvOrderProduct.adapter = adapterOrder
         viewModel.products.observe(viewLifecycleOwner) { products ->
             adapterOrder.submitList(products)
@@ -274,7 +277,6 @@ class CreateOrderFragment : BaseFragment(),
         }
 
         binding.btnCreateOrder.setOnClickListener {
-            Timber.d("PERIOD ${order.period}")
             if (binding.btnSetAddress.text != "Выбрать адрес доставки" &&
                 binding.btnSetAddress.text != "Адрес устарел, выберете другой" &&
                 binding.btnSetTime.text != "Укажите дату" &&
@@ -370,8 +372,15 @@ class CreateOrderFragment : BaseFragment(),
         notice: String?
     ) {
         binding.btnSetAddress.text = addressString
+//        binding.btnSetTime.visibility = View.VISIBLE
         if (id != null) {
             order.addressId = id
+            binding.btnSetTime.text = "Укажите дату"
+            binding.tvTimeSetLogo.visibility = View.GONE
+            binding.cvTimeSet.visibility = View.GONE
+            deliveryTime.clear()
+            exceptionTime.clear()
+            viewModel.getDeliveryOnAddress(id)
         }
         if (!notice.isNullOrEmpty()) {
             binding.cvNoticeAddress.visibility = View.VISIBLE
@@ -386,6 +395,8 @@ class CreateOrderFragment : BaseFragment(),
     override fun cancelClick(dialogFragment: DialogFragment) {
         binding.btnSetAddress.text = "Выбрать адрес доставки"
         order.addressId = 0
+        binding.btnSetTime.visibility = View.GONE
+        binding.cvNoticeAddress.visibility = View.GONE
         dialogFragment.dismissNow()
     }
 
@@ -416,7 +427,8 @@ class CreateOrderFragment : BaseFragment(),
         viewModel.viewModelScope.launch {
             if (product.category != 20) {
                 viewModel.addProductCount(product)
-                adapterOrder.notifyDataSetChanged()
+                Timber.d("ITEM COUNT + ${adapterOrder.currentList.indexOf(product)}")
+                adapterOrder.notifyItemChanged(adapterOrder.currentList.indexOf(product))
             } else {
                 Toast.makeText(context, "Стартовый пакет можно заказать один", Toast.LENGTH_SHORT).show()
             }
@@ -426,7 +438,7 @@ class CreateOrderFragment : BaseFragment(),
     override fun minusProduct(product: Product) {
         viewModel.viewModelScope.launch {
             viewModel.minusProductCount(product)
-            adapterOrder.notifyDataSetChanged()
+            adapterOrder.notifyItemChanged(adapterOrder.currentList.indexOf(product))
         }
     }
 
@@ -451,7 +463,6 @@ class CreateOrderFragment : BaseFragment(),
                 ) {
                     order.period = parent?.getItemAtPosition(position).toString()
                     beforeTimeArray.remove("**:**-**:**")
-
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -468,31 +479,16 @@ class CreateOrderFragment : BaseFragment(),
 
     //Калбэк для устовки даты
     override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int) {
-        val todayTimes = mutableListOf(
-            "17:00-22:00",
-            "19:00-22:00",
-            "**:**-**:**"
-        )
-        val saturdayTimes = mutableListOf(
-            "09:00-16:00",
-            "**:**-**:**"
-        )
-        val otherTimes = mutableListOf(
-            "09:00-16:00",
-            "17:00-22:00",
-            "19:00-22:00",
-            "**:**-**:**"
-        )
         if (monthOfYear + 1 >= 10) "$dayOfMonth.${monthOfYear + 1}.$year".also {
             setTimeOrderText(it)
-            choiceDateAndTime(year, monthOfYear, dayOfMonth, todayTimes, saturdayTimes, otherTimes)
+            choiceDateAndTime(year, monthOfYear, dayOfMonth)
         } else "$dayOfMonth.0${monthOfYear + 1}.$year".also {
             setTimeOrderText(it)
-            choiceDateAndTime(year, monthOfYear, dayOfMonth, todayTimes, saturdayTimes, otherTimes)
+            choiceDateAndTime(year, monthOfYear, dayOfMonth)
         }
     }
 
-    private fun getCalendar(calendar: Calendar) {
+    private fun getCalendar(calendar: Calendar, disabledDays: List<Common>, exceptions: List<Exception>) {
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
@@ -514,70 +510,111 @@ class CreateOrderFragment : BaseFragment(),
         // установить мин дату на сегодня
         // Установить max дату year + 2
         val maxDate = Calendar.getInstance()
-        maxDate.set(Calendar.YEAR, year + 2)
+        maxDate.set(Calendar.DAY_OF_MONTH, day + 320)
         datePickerDialog.maxDate = maxDate
 
-        disableSunday(minDate, maxDate, datePickerDialog)
+        disableOnDelivery(minDate, maxDate, disabledDays, exceptions, datePickerDialog)
 
         datePickerDialog.firstDayOfWeek = Calendar.MONDAY
         datePickerDialog.show(parentFragmentManager, "SetDateDialog")
     }
 
     // выбор даты и времени доставки
-    private fun choiceDateAndTime(year: Int, monthOfYear: Int, dayOfMonth: Int, todayTimes: MutableList<String>, saturdayTimes: MutableList<String>, otherTimes: MutableList<String>) {
+    private fun choiceDateAndTime(year: Int, monthOfYear: Int, dayOfMonth: Int) {
         val calendar = Calendar.getInstance()
         //дата заказа
         calendar.set(year, monthOfYear, dayOfMonth)
-        order.date = SimpleDateFormat("yyyy-MM-dd").format(Date(calendar.timeInMillis))
-        // дата заказа, день.месяц
-        val dayOrder = SimpleDateFormat("dd.MM").format(Date(calendar.timeInMillis))
-        // день недели
-        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-        val calendarNow = Calendar.getInstance().timeInMillis / 1000
-        // сегодняшняя дата, день.месяц
-        val dayNow = SimpleDateFormat("dd.MM").format(Date(calendarNow * 1000))
-        Timber.d("DATE ===== $dayNow, $dayOrder")
-        // заказ на сегодня
-        if (dayNow == dayOrder) {
-            val spinnerBeforeTimeAdapter = ArrayAdapter(this.requireContext(),
-                R.layout.spinner_item_layout_resource,
-                R.id.TextView,
-                todayTimes
-            )
-            setPeriodTime(spinnerBeforeTimeAdapter, todayTimes, todayTimes.size - 1)
+        val orderDate = calendar.get(Calendar.DAY_OF_WEEK) - 1
+        order.date = SimpleDateFormat("yyyy-MM-dd", Locale("ru")).format(Date(calendar.timeInMillis))
+
+        val exception = exceptionTime.filter { it.date == order.date }
+        val commons = deliveryTime.filter { it.day_num == orderDate }
+        val times =
+        if (exception.isNotEmpty()) {
+            addTime(exception[0].part_types)
+        } else {
+            Timber.d("Common ${commons.get(0).part_types.size}")
+            commons[0].part_types.forEach {
+                Timber.d("part_types = $it")
+            }
+            addTime(commons[0].part_types)
         }
-        //заказ на субботу
-        else if (dayOfWeek == Calendar.SATURDAY){
-            val spinnerBeforeTimeAdapter = ArrayAdapter(this.requireContext(),
-                R.layout.spinner_item_layout_resource,
-                R.id.TextView,
-                saturdayTimes
-            )
-            setPeriodTime(spinnerBeforeTimeAdapter, saturdayTimes, saturdayTimes.size - 1)
-        }
-        //заказ на другой день
-        else {
-            val spinnerBeforeTimeAdapter = ArrayAdapter(this.requireContext(),
-                R.layout.spinner_item_layout_resource,
-                R.id.TextView,
-                otherTimes
-            )
-            setPeriodTime(spinnerBeforeTimeAdapter, otherTimes, otherTimes.size - 1)
+        val spinnerBeforeTimeAdapter = ArrayAdapter(this.requireContext(),
+            R.layout.spinner_item_layout_resource,
+            R.id.TextView,
+            times
+        )
+        setPeriodTime(spinnerBeforeTimeAdapter, times, times.size - 1)
+    }
+
+    private fun addTime(part_types: List<Int>): MutableList<String> {
+        return when {
+            part_types.size == 2 -> {
+                arrayListOf("09:00-16:00", "17:00-22:00", "19:00-22:00", "**:**-**:**")
+            }
+            part_types[0] == 0 -> {
+                arrayListOf("09:00-16:00", "**:**-**:**")
+            }
+            else -> {arrayListOf("17:00-22:00", "19:00-22:00", "**:**-**:**")}
         }
     }
 
-    //Отключить все ВОСКРЕСЕНЬЯ между минимальной и максимальной датами
-    private fun disableSunday(minDate: Calendar, maxDate: Calendar, datePickerDialog: DatePickerDialog) {
+    private fun disableDay(day: Int, dayOfWeek: Int, loopDate: Calendar, datePickerDialog: DatePickerDialog) {
+        when(day) {
+            1 -> if (dayOfWeek == Calendar.MONDAY) {
+                    val disables = arrayOfNulls<Calendar>(1)
+                    disables[0] = loopDate
+                    datePickerDialog.disabledDays = disables
+            }
+            2 -> if (dayOfWeek == Calendar.TUESDAY) {
+                    val disables = arrayOfNulls<Calendar>(1)
+                    disables[0] = loopDate
+                    datePickerDialog.disabledDays = disables
+                }
+            3 -> if (dayOfWeek == Calendar.WEDNESDAY) {
+                    val disables = arrayOfNulls<Calendar>(1)
+                    disables[0] = loopDate
+                    datePickerDialog.disabledDays = disables
+            }
+            4 -> if (dayOfWeek == Calendar.THURSDAY) {
+                    val disables = arrayOfNulls<Calendar>(1)
+                    disables[0] = loopDate
+                    datePickerDialog.disabledDays = disables
+            }
+            5 -> if (dayOfWeek == Calendar.FRIDAY) {
+                    val disables = arrayOfNulls<Calendar>(1)
+                    disables[0] = loopDate
+                    datePickerDialog.disabledDays = disables
+            }
+            6 -> if (dayOfWeek == Calendar.SATURDAY) {
+                    val disables = arrayOfNulls<Calendar>(1)
+                    disables[0] = loopDate
+                    datePickerDialog.disabledDays = disables
+            }
+            7 -> if (dayOfWeek == Calendar.SUNDAY) {
+                    val disables = arrayOfNulls<Calendar>(1)
+                    disables[0] = loopDate
+                    datePickerDialog.disabledDays = disables
+            }
+        }
+    }
+    private fun disableOnDelivery(minDate: Calendar, maxDate: Calendar, disabledDays: List<Common>, exceptions: List<Exception>, datePickerDialog: DatePickerDialog) {
         var loopDate = minDate
         while (minDate.before(maxDate)) {
             val dayOfWeek = loopDate[Calendar.DAY_OF_WEEK]
-            if (dayOfWeek == Calendar.SUNDAY) {
-                val disabledDays = arrayOfNulls<Calendar>(1)
-                disabledDays[0] = loopDate
-                datePickerDialog.disabledDays = disabledDays
+            disabledDays.forEach { common ->
+                disableDay(common.day_num, dayOfWeek, loopDate, datePickerDialog)
             }
             minDate.add(Calendar.DATE, 1)
             loopDate = minDate
+        }
+        datePickerDialog.disabledDays.forEach { calendar ->
+            val date = SimpleDateFormat("yyyy-MM-dd", Locale("ru")).format(calendar.time)
+            exceptions.forEach {
+                if (it.date == date && it.available) {
+                    calendar.clear()
+                }
+            }
         }
     }
 

@@ -8,7 +8,7 @@ import ru.iwater.youwater.data.*
 import ru.iwater.youwater.utils.ProductConverter
 
 @Database(
-    version = 4,
+    version = 5,
     entities = [
         Product::class,
         Address::class,
@@ -73,6 +73,14 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             "DROP TABLE FavoriteProduct"
+        )
+    }
+}
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "ALTER TABLE RawAddress ADD COLUMN region TEXT"
         )
     }
 }

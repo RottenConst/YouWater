@@ -123,6 +123,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="@string/fragment_create_order_set_time_order"
                                 android:textAlignment="textStart"
+                                android:visibility="gone"
                                 app:icon="@drawable/ic_time_24"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"

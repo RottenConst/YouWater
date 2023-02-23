@@ -19,8 +19,8 @@ class ProductListViewModel @Inject constructor(
     private val _productsList: MutableLiveData<List<Product>> = MutableLiveData()
     val productsList: LiveData<List<Product>> get() = _productsList
 
-    private val _navigateToSelectProduct: MutableLiveData<Int> = MutableLiveData()
-    val navigateToSelectProduct: LiveData<Int>
+    private val _navigateToSelectProduct: MutableLiveData<Int?> = MutableLiveData()
+    val navigateToSelectProduct: LiveData<Int?>
         get() = _navigateToSelectProduct
 
     fun setCatalogItem(catalogId: Int) {
@@ -64,12 +64,11 @@ class ProductListViewModel @Inject constructor(
             val product = productRepo.getProduct(productId)
             try {
                 if (dbProduct != null && dbProduct.category != 20) {
-                    dbProduct.count += 1
-                    productRepo.updateProductInBasket(dbProduct)
+                    productRepo.updateProductInBasket(dbProduct.copy(count = dbProduct.count + 1))
                 } else {
                     when {
                         product?.category == 20 -> {
-                            if (productRepo.getProductsInBasket()?.filter { it.category == 20 }.isNullOrEmpty()) {
+                            if (productRepo.getProductsInBasket().none { it.category == 20 }) {
                                 product.count = 1
                                 productRepo.addProductInBasket(product)
                             }

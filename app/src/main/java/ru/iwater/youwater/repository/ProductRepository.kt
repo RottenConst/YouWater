@@ -47,12 +47,12 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    suspend fun getProductsInBasket(): List<Product>? {
+    suspend fun getProductsInBasket(): List<Product> {
         return try {
-            productDao.getAllProduct()
+            productDao.getAllProduct() ?: emptyList()
         } catch (e: Exception) {
             Timber.e("Error get product: $e")
-            null
+            emptyList()
         }
     }
     private suspend fun syncProductsInBasket(): List<Product>?{

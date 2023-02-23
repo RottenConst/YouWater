@@ -1,10 +1,13 @@
 package ru.iwater.youwater.vm
 
+import android.widget.Toast
 import androidx.lifecycle.*
+import androidx.navigation.NavController
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.repository.OrderRepository
+import ru.iwater.youwater.screen.basket.CreateOrderFragmentDirections
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,6 +33,9 @@ class OrderViewModel @Inject constructor(
 
     private val _address: MutableLiveData<String> = MutableLiveData()
     val address: LiveData<String> get() = _address
+
+    private val _deliverySchedule: MutableLiveData<DeliverySchedule?> = MutableLiveData()
+    val deliverySchedule: LiveData<DeliverySchedule?> get() = _deliverySchedule
 
     //список продуктов заявки
     private val _products: MutableLiveData<List<Product>> = MutableLiveData()
@@ -99,7 +105,7 @@ class OrderViewModel @Inject constructor(
         var floor: Int? = null
         val flat: Int? = null
         rawAddress.forEachIndexed { index, s ->
-            if (index == 0) street = s.removePrefix("\"").removeSuffix(",")
+            if (index == 1) street = s.removePrefix("\"").removeSuffix(",")
             if (index > 0) {
                 house = parseHouse(s, house)
                 building = parseBuilding(s, building)
@@ -107,7 +113,7 @@ class OrderViewModel @Inject constructor(
                 floor = parseFloor(s, floor)
             }
         }
-        Timber.d("$region $street $house $building $entrance $floor $flat, $notice")
+//        Timber.d("get strig from address:  region = $region, street = $street, house = $house, building = $building, entrance = $entrance, floor = $floor, flat = $flat, $notice")
         return Address(region, street, house, building, entrance, floor, flat, notice , id)
     }
 
@@ -232,7 +238,7 @@ class OrderViewModel @Inject constructor(
     private suspend fun getStringAddress(order: OrderFromCRM): String {
         return if (order.address_id != 0) {
             val rawAddress = orderRepo.getFactAddress(order.address_id)
-            Timber.d("ADDRESS + ${rawAddress?.factAddress}")
+//            Timber.d("RAW ADDRESS + ${rawAddress?.factAddress}")
             rawAddress?.factAddress ?: "error"
         } else {
             order.address
@@ -296,7 +302,22 @@ class OrderViewModel @Inject constructor(
         }
     }
 
-    fun getInfoLastOrder(orderId: Int) {
+    fun getDeliveryOnAddress(addressId: Int) {
+        viewModelScope.launch {
+            val address = orderRepo.getFactAddress(addressId)
+            if (address != null) {
+                val delivery = orderRepo.getDelivery(address)
+                if (delivery != null) {
+                    _deliverySchedule.value = delivery
+                }
+                Timber.d("DELIVERY $delivery")
+            } else {
+                Timber.d("Error address")
+            }
+        }
+    }
+
+    fun getInfoLastOrder(orderId: Int, navController: NavController) {
         viewModelScope.launch {
             if (orderId != 0) {
                 val lastOrder = orderRepo.getLastOrderInfo(orderId)
@@ -304,6 +325,7 @@ class OrderViewModel @Inject constructor(
                     if (lastOrder.address_id != 0) {
                         val address = orderRepo.getFactAddress(lastOrder.address_id)
                         _address.value = if (address != null && address.active != false) {
+                            _deliverySchedule.value = orderRepo.getDelivery(address)
                             address.factAddress
                         } else {
                             "Адрес устарел, выберете другой"
@@ -323,12 +345,16 @@ class OrderViewModel @Inject constructor(
                         }
                     }
                     if (products.isEmpty()) {
-                        val product = orderRepo.getProduct(81)
-                        if (product != null){
-                            product.count = 1
-                            orderRepo.saveProduct(product)
-                            products.add(product)
-                        }
+                        Toast.makeText(
+                            navController.context,
+                            "Добавте товары в корзину и оформите заказ",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        navController
+                            .navigate(
+                                CreateOrderFragmentDirections
+                                    .actionCreateOrderFragmentToHomeFragment()
+                            )
                     }
                     _products.value = products
                 }

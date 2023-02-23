@@ -39,6 +39,29 @@ class OrderRepository @Inject constructor(
         return addressDao.getAddress(id)
     }
 
+    suspend fun getDelivery(address: RawAddress): DeliverySchedule? {
+        return try {
+            val region = address.region ?: address.fullAddress.split(",")[0]
+            val city = address.factAddress.split(',')[0]
+            val street = address.factAddress.split(',')[1]
+            val house = address.factAddress.split(',')[2]
+            val jsonAddress = JsonObject().apply {
+                addProperty("region", region)
+                addProperty("city", city)
+                addProperty("floor", house)
+                addProperty("entrance", "")
+                addProperty("street", street)
+                addProperty("house", house)
+                addProperty("building", "")
+                addProperty("flat", "")
+            }
+            return apiAuth.getDeliverySchedule(jsonAddress)
+        } catch (e: Exception) {
+            Timber.d("Error getDelivery: $e")
+            null
+        }
+    }
+
     suspend fun getAllFactAddress(): List<RawAddress> {
         return try {
             val rawAddress = apiAuth.getAllAddresses(authClient.get().clientId)

@@ -135,4 +135,10 @@ interface ApiWater {
     suspend fun getLastOrderInfo(
         @Path("lastOrderId") lastOrderId: Int
     ): OrderFromCRM?
+
+    //Получить график доставки
+    @POST("delivery-days/")
+    suspend fun getDeliverySchedule(
+        @Body addressJson: JsonObject
+    ): DeliverySchedule?
 }

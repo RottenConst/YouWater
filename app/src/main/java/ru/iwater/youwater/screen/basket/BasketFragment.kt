@@ -25,6 +25,7 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
     lateinit var factory: ViewModelProvider.Factory
     private val screenComponent = App().buildScreenComponent()
     val viewModel: ProductListViewModel by viewModels {factory}
+    private val adapterBasketList = AdapterBasketList(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +38,7 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
     ): View {
         val binding = FragmentBasketBinding.inflate(inflater)
         binding.lifecycleOwner = this
-        val adapterBasketList = AdapterBasketList(this)
+
         binding.rvBasketList.adapter = adapterBasketList
         viewModel.getBasket()
 //        binding.btnCheckoutOrder.isEnabled = false
@@ -94,6 +95,7 @@ class BasketFragment : BaseFragment(), AdapterBasketList.OnProductItemListener {
     override fun deleteProductClick(product: Product) {
         viewModel.deleteProductFromBasket(product)
         viewModel.updateBasket()
+//        adapterBasketList.notifyItemRemoved(adapterBasketList.currentList.indexOf(product))
     }
 
     override fun addProduct(product: Product) {
