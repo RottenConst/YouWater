@@ -35,25 +35,25 @@ class AboutProductViewModel @Inject constructor(
     }
 
     //сохранить(добавить в корзину)
-    fun addProductToBasket(productId: Int) {
+    fun addProductToBasket(productId: Int, count: Int) {
         viewModelScope.launch {
             val dbProduct = productRepo.getProductFromDB(productId)
             val product = productRepo.getProduct(productId)
             try {
                 if (dbProduct != null && dbProduct.category != 20) {
-                    dbProduct.count += 1
+                    dbProduct.count = count
                     productRepo.updateProductInBasket(dbProduct)
                 } else {
                     when {
                         product?.category == 20 -> {
-                            if (productRepo.getProductsInBasket()?.filter { it.category == 20 }.isNullOrEmpty()) {
+                            if (productRepo.getProductsInBasket().none { it.category == 20 }) {
                                 product.count = 1
                                 productRepo.addProductInBasket(product)
                             }
                         }
                         product?.category != 20 -> {
                             if (product != null) {
-                                product.count += 1
+                                product.count = count
                                 productRepo.addProductInBasket(product)
                             }
                         }
