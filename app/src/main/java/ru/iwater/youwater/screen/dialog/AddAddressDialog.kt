@@ -38,7 +38,7 @@ class AddAddressDialog : DialogFragment() {
             val builder = AlertDialog.Builder(it)
             var id: Int? = null
             var addressString = ""
-            var notice: String? = "1"
+            var notice: String? = ""
             builder.setTitle("Выберете адрес")
                 .setIcon(R.drawable.ic_address)
                 .setSingleChoiceItems(addressesString.toTypedArray(), -1) {

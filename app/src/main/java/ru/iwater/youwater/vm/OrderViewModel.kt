@@ -309,8 +309,9 @@ class OrderViewModel @Inject constructor(
                 val delivery = orderRepo.getDelivery(address)
                 if (delivery != null) {
                     _deliverySchedule.value = delivery
+                } else {
+                    _deliverySchedule.value = null
                 }
-                Timber.d("DELIVERY $delivery")
             } else {
                 Timber.d("Error address")
             }

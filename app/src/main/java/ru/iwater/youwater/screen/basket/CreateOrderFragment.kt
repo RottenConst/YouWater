@@ -114,17 +114,20 @@ class CreateOrderFragment : BaseFragment(),
                 val listAddress = mutableListOf<Address>()
                 val addresses = mutableListOf<String>()
                 listRawAddress.forEach { rawAddress ->
-                    val region = rawAddress.region ?: rawAddress.fullAddress.split(",")[0]
+                    val region = rawAddress.region
+                        ?: rawAddress.fullAddress.split(',')[0].ifEmpty {
+                            "Санкт-Петербург"
+                        }
                     addresses.add(rawAddress.factAddress)
                     listAddress.add(viewModel.getAddressFromString(rawAddress.factAddress.split(","), region, rawAddress.id, rawAddress.notice))
                 }
                 binding.btnSetAddress.setOnClickListener {
+                    binding.btnSetTime.visibility = View.GONE
                     AddAddressDialog.getAddressDialog(childFragmentManager, listAddress, addresses)
                 }
             } else {
                 // если адресов нету переводим на страницу создания адреса
                 binding.btnSetAddress.text = "Добавить адрес"
-//                binding.tvAddressOrder.setBackgroundColor(Color.WHITE)
                 binding.btnSetAddress.setOnClickListener {
                     this.findNavController().navigate(
                         CreateOrderFragmentDirections.actionCreateOrderFragmentToAddAddressFragment(true)
@@ -136,9 +139,11 @@ class CreateOrderFragment : BaseFragment(),
 
         viewModel.deliverySchedule.observe(viewLifecycleOwner) {delivery ->
             if (delivery != null) {
+                deliveryTime.clear()
                 deliveryTime.addAll(
                     delivery.common.filter { it.available }
                 )
+                exceptionTime.clear()
                 exceptionTime.addAll(
                     delivery.exceptions.filter { it.available }
                 )
@@ -372,7 +377,6 @@ class CreateOrderFragment : BaseFragment(),
         notice: String?
     ) {
         binding.btnSetAddress.text = addressString
-//        binding.btnSetTime.visibility = View.VISIBLE
         if (id != null) {
             order.addressId = id
             binding.btnSetTime.text = "Укажите дату"
@@ -529,22 +533,24 @@ class CreateOrderFragment : BaseFragment(),
 
         val exception = exceptionTime.filter { it.date == order.date }
         val commons = deliveryTime.filter { it.day_num == orderDate }
-        val times =
-        if (exception.isNotEmpty()) {
-            addTime(exception[0].part_types)
+        if (commons.isNotEmpty() || exception.isNotEmpty()) {
+            val times =
+                if (exception.isNotEmpty()) {
+                    addTime(exception[0].part_types)
+                } else {
+                    addTime(commons[0].part_types)
+                }
+            val spinnerBeforeTimeAdapter = ArrayAdapter(
+                this.requireContext(),
+                R.layout.spinner_item_layout_resource,
+                R.id.TextView,
+                times
+            )
+            setPeriodTime(spinnerBeforeTimeAdapter, times, times.size - 1)
         } else {
-            Timber.d("Common ${commons.get(0).part_types.size}")
-            commons[0].part_types.forEach {
-                Timber.d("part_types = $it")
-            }
-            addTime(commons[0].part_types)
+            binding.btnSetTime.visibility = View.GONE
+            Toast.makeText(this.context, "Не удается получить график доставки к этому адресу", Toast.LENGTH_SHORT).show()
         }
-        val spinnerBeforeTimeAdapter = ArrayAdapter(this.requireContext(),
-            R.layout.spinner_item_layout_resource,
-            R.id.TextView,
-            times
-        )
-        setPeriodTime(spinnerBeforeTimeAdapter, times, times.size - 1)
     }
 
     private fun addTime(part_types: List<Int>): MutableList<String> {
