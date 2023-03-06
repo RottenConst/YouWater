@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +24,7 @@ import ru.iwater.youwater.databinding.FragmentHomeBinding
 import ru.iwater.youwater.screen.adapters.AdapterProductList
 import ru.iwater.youwater.screen.adapters.CatalogWaterAdapter
 import ru.iwater.youwater.screen.adapters.PromoBannerAdapter
+import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.utils.ExtendedFloatingActionButtonScrollListener
 import javax.inject.Inject
 
@@ -49,100 +51,112 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding.rvTypeProductList.adapter = adapterWatter
-        binding.rvPromo.adapter = adapterPromo
 
-        binding.rvTypeProductList.addOnScrollListener(ExtendedFloatingActionButtonScrollListener(binding.fabRepeatOrder))
-
-        viewModel.lastOrder.observe(viewLifecycleOwner) { lastOrder ->
-            if (lastOrder != null) {
-                binding.fabRepeatOrder.setOnClickListener {
-                    findNavController().navigate(
-                        HomeFragmentDirections.actionHomeFragmentToCreateOrderFragment(false, lastOrder)
-                    )
+        binding.composeViewHomeScreen.apply {
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            )
+            setContent {
+                YourWaterTheme {
+                    HomeScreen(catalogListViewModel = viewModel)
                 }
-            } else {
-                binding.fabRepeatOrder.visibility = View.GONE
             }
         }
 
-        viewModel.screenLoading.observe(viewLifecycleOwner) { status ->
-            when (status) {
-                StatusLoading.LOADING -> {
-                    binding.rvPromo.visibility = View.GONE
-                    binding.tvLabelPromo.visibility = View.GONE
-                    binding.rvTypeProductList.visibility = View.GONE
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.progressBar.progress
-                }
-                StatusLoading.DONE -> {
-                    binding.rvPromo.visibility = View.VISIBLE
-                    binding.tvLabelPromo.visibility = View.VISIBLE
-                    binding.rvTypeProductList.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                }
-                else -> {Toast.makeText(this.context, "Error", Toast.LENGTH_LONG)}
-            }
-        }
-
-        viewModel.promoBanners.observe(viewLifecycleOwner) { banners ->
-            if (banners.isNotEmpty()) {
-                adapterPromo.submitList(banners)
-                lifecycleScope.launch(Dispatchers.Main) {
-                    var itemBanner = 0
-                    while (itemBanner <= banners.size) {
-                        delay(5000)
-                        if (itemBanner != banners.size) {
-                            itemBanner++
-                            binding.rvPromo.scrollToPosition(itemBanner)
-                        } else {
-                            itemBanner = 0
-                            binding.rvPromo.scrollToPosition(itemBanner)
-                        }
-                    }
-                }
-            } else {
-                binding.tvLabelPromo.visibility = View.GONE
-                binding.rvPromo.visibility = View.GONE
-            }
-        }
-
-        viewModel.catalogList.observe(viewLifecycleOwner) { catalogs ->
-            if (catalogs.isEmpty()) {
-                Toast.makeText(this.context, "Ошибка не удалось загрузить котегории товаров", Toast.LENGTH_LONG).show()
-            }
-        }
-
+//        binding.rvTypeProductList.adapter = adapterWatter
+//        binding.rvPromo.adapter = adapterPromo
+//
+//        binding.rvTypeProductList.addOnScrollListener(ExtendedFloatingActionButtonScrollListener(binding.fabRepeatOrder))
+//
+//        viewModel.lastOrder.observe(viewLifecycleOwner) { lastOrder ->
+//            if (lastOrder != null) {
+//                binding.fabRepeatOrder.setOnClickListener {
+//                    findNavController().navigate(
+//                        HomeFragmentDirections.actionHomeFragmentToCreateOrderFragment(false, lastOrder)
+//                    )
+//                }
+//            } else {
+//                binding.fabRepeatOrder.visibility = View.GONE
+//            }
+//        }
+//
+//        viewModel.screenLoading.observe(viewLifecycleOwner) { status ->
+//            when (status) {
+//                StatusLoading.LOADING -> {
+//                    binding.rvPromo.visibility = View.GONE
+//                    binding.tvLabelPromo.visibility = View.GONE
+//                    binding.rvTypeProductList.visibility = View.GONE
+//                    binding.progressBar.visibility = View.VISIBLE
+//                    binding.progressBar.progress
+//                }
+//                StatusLoading.DONE -> {
+//                    binding.rvPromo.visibility = View.VISIBLE
+//                    binding.tvLabelPromo.visibility = View.VISIBLE
+//                    binding.rvTypeProductList.visibility = View.VISIBLE
+//                    binding.progressBar.visibility = View.GONE
+//                }
+//                else -> {Toast.makeText(this.context, "Error", Toast.LENGTH_LONG)}
+//            }
+//        }
+//
+//        viewModel.promoBanners.observe(viewLifecycleOwner) { banners ->
+//            if (banners.isNotEmpty()) {
+//                adapterPromo.submitList(banners)
+//                lifecycleScope.launch(Dispatchers.Main) {
+//                    var itemBanner = 0
+//                    while (itemBanner <= banners.size) {
+//                        delay(5000)
+//                        if (itemBanner != banners.size) {
+//                            itemBanner++
+//                            binding.rvPromo.scrollToPosition(itemBanner)
+//                        } else {
+//                            itemBanner = 0
+//                            binding.rvPromo.scrollToPosition(itemBanner)
+//                        }
+//                    }
+//                }
+//            } else {
+//                binding.tvLabelPromo.visibility = View.GONE
+//                binding.rvPromo.visibility = View.GONE
+//            }
+//        }
+//
+//        viewModel.catalogList.observe(viewLifecycleOwner) { catalogs ->
+//            if (catalogs.isEmpty()) {
+//                Toast.makeText(this.context, "Ошибка не удалось загрузить котегории товаров", Toast.LENGTH_LONG).show()
+//            }
+//        }
+//
         val productCatalog = Observer<Map<TypeProduct, List<Product>>> {
             adapterWatter.submitList(it.toList())
         }
-
+//
         viewModel.catalogProductMap.observeForever(productCatalog)
-
-        viewModel.navigateToSelectProduct.observe(this.viewLifecycleOwner) {
-            if (null != it) {
-                this.findNavController().navigate(
-                    HomeFragmentDirections.actionShowAboutProductFragment(it)
-                )
-                viewModel.displayProductComplete()
-            }
-        }
-
-        viewModel.navigateToSelectBanner.observe(this.viewLifecycleOwner) { banner ->
-            if (banner != null) {
-                this.findNavController().navigate(
-                    HomeFragmentDirections
-                        .actionHomeFragmentToBannerInfoBottomSheetFragment(banner.name, banner.description)
-                )
-                viewModel.displayPromoInfoComplete()
-            }
-        }
+//
+//        viewModel.navigateToSelectProduct.observe(this.viewLifecycleOwner) {
+//            if (null != it) {
+//                this.findNavController().navigate(
+//                    HomeFragmentDirections.actionShowAboutProductFragment(it)
+//                )
+//                viewModel.displayProductComplete()
+//            }
+//        }
+//
+//        viewModel.navigateToSelectBanner.observe(this.viewLifecycleOwner) { banner ->
+//            if (banner != null) {
+//                this.findNavController().navigate(
+//                    HomeFragmentDirections
+//                        .actionHomeFragmentToBannerInfoBottomSheetFragment(banner.name, banner.description)
+//                )
+//                viewModel.displayPromoInfoComplete()
+//            }
+//        }
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.getFavoriteProduct()
+//        viewModel.getFavoriteProduct()
     }
 
     override fun onProductItemClicked(product: Product) {
