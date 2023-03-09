@@ -35,17 +35,19 @@ class NotificationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         viewModel.client.observe(this.viewLifecycleOwner) {client ->
-            when (client.mailing) {
+            when (client?.mailing) {
                 0 -> binding.switchNotification.isChecked = false
                 1 -> binding.switchNotification.isChecked = true
                 else -> {
                     Toast.makeText(this.context, "Не удается получить состояние", Toast.LENGTH_SHORT).show()
                 }
             }
-            binding.switchNotification.setOnCheckedChangeListener { _, isChecked ->
-                when (isChecked) {
-                    true -> viewModel.setMailing(client.client_id, true)
-                    false -> viewModel.setMailing(client.client_id, false)
+            if (client != null) {
+                binding.switchNotification.setOnCheckedChangeListener { _, isChecked ->
+                    when (isChecked) {
+                        true -> viewModel.setMailing(client.client_id, true)
+                        false -> viewModel.setMailing(client.client_id, false)
+                    }
                 }
             }
         }

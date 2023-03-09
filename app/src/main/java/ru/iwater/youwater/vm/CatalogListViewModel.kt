@@ -33,9 +33,8 @@ class CatalogListViewModel @Inject constructor(
     val favorite: LiveData<List<Int>>
         get() = _favorite
 
-    val catalogProductMap: LiveData<MutableMap<TypeProduct, List<Product>>> = Transformations.switchMap(favorite) {
-        liveData { emit(getAllProducts(it)) }
-    }
+    private val _catalogProductMap: MutableLiveData<MutableMap<TypeProduct, List<Product>>> = MutableLiveData()
+    val catalogProductMap: LiveData<MutableMap<TypeProduct, List<Product>>> get() = _catalogProductMap
 
     val catalogList: LiveData<List<TypeProduct>> = liveData {
         emit(productRepo.getCategoryList())
@@ -72,26 +71,27 @@ class CatalogListViewModel @Inject constructor(
         getFavoriteProductId()
     }
 
-    private suspend fun getAllProducts(favoriteProducts: List<Int>): MutableMap<TypeProduct, List<Product>> {
-        val catalogMap = mutableMapOf<TypeProduct, List<Product>>()
-        val catalogs = productRepo.getCategoryList()
-        return if (catalogs.isNotEmpty()) {
-            val productsList = productRepo.getProductList()
-            catalogs.forEach { category ->
-                val products = productsList.filter { it.category == category.id }
-                products.forEach { product ->
-                    for (favoriteProduct in favoriteProducts) {
-                        if (favoriteProduct == product.id) {
-                            product.onFavoriteClick = true
+    fun getAllProducts(favoriteProducts: List<Int>) {
+        viewModelScope.launch {
+            val catalogMap = mutableMapOf<TypeProduct, List<Product>>()
+            val catalogs = productRepo.getCategoryList()
+            if (catalogs.isNotEmpty()) {
+                val productsList = productRepo.getProductList()
+                catalogs.forEach { category ->
+                    val products = productsList.filter { it.category == category.id }
+                    products.forEach { product ->
+                        for (favoriteProduct in favoriteProducts) {
+                            if (favoriteProduct == product.id) {
+                                product.onFavoriteClick = true
+                            }
                         }
                     }
+                    catalogMap[category] = products
                 }
-                catalogMap[category] = products
+                _screenLoading.value = StatusLoading.DONE
+                _catalogProductMap.value = catalogMap
             }
-            _screenLoading.value = StatusLoading.DONE
-            return catalogMap
         }
-        else mutableMapOf()
     }
 
     private suspend fun getFavoriteProducts(favoriteProductsId: List<Int>): List<FavoriteProduct> {
@@ -128,7 +128,7 @@ class CatalogListViewModel @Inject constructor(
                 } else {
                     when {
                         product?.category == 20 -> {
-                            if (productRepo.getProductsInBasket().isNullOrEmpty()) {
+                            if (productRepo.getProductsInBasket().isEmpty()) {
                                 product.count = 1
                                 productRepo.addProductInBasket(product)
                             }

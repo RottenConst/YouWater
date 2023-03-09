@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.annotation.Keep
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -35,6 +36,7 @@ import javax.inject.Inject
 /**
  * Фрагмент оформления заказа
  */
+@Keep
 class CreateOrderFragment : BaseFragment(),
     DatePickerDialog.OnDateSetListener,
     AddNoticeDialog.AddNoticeDialogListener,
@@ -431,7 +433,6 @@ class CreateOrderFragment : BaseFragment(),
         viewModel.viewModelScope.launch {
             if (product.category != 20) {
                 viewModel.addProductCount(product)
-                Timber.d("ITEM COUNT + ${adapterOrder.currentList.indexOf(product)}")
                 adapterOrder.notifyItemChanged(adapterOrder.currentList.indexOf(product))
             } else {
                 Toast.makeText(context, "Стартовый пакет можно заказать один", Toast.LENGTH_SHORT).show()

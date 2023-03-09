@@ -49,26 +49,31 @@ class EditUserDataFragment : BaseFragment() {
         }
         viewModel.client.observe(this.viewLifecycleOwner) { client ->
             //clientId
-            clientId = client.client_id
-            //name
-            binding.tvEditName.text.clear()
-            binding.tvEditName.text = Editable.Factory.getInstance().newEditable(client.name)
-            //phone
-            binding.tvEditPhone.text.clear()
-            binding.tvEditPhone.text = Editable.Factory.getInstance().newEditable(client.contact)
-            //email
-            binding.tvEditEmail.text.clear()
-            binding.tvEditEmail.text = Editable.Factory.getInstance().newEditable(client.email)
+            if (client != null) {
+                clientId = client.client_id
+                //name
+                binding.tvEditName.text.clear()
+                binding.tvEditName.text = Editable.Factory.getInstance().newEditable(client.name)
+                //phone
+                binding.tvEditPhone.text.clear()
+                binding.tvEditPhone.text =
+                    Editable.Factory.getInstance().newEditable(client.contact)
+                //email
+                binding.tvEditEmail.text.clear()
+                binding.tvEditEmail.text = Editable.Factory.getInstance().newEditable(client.email)
+            }
         }
         return binding.root
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.findItem(R.id.login_out_menu).isVisible = false
         menu.findItem(R.id.send_edit).isVisible = true
         super.onPrepareOptionsMenu(menu)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.send_edit -> {

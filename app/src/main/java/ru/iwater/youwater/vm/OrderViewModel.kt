@@ -1,6 +1,7 @@
 package ru.iwater.youwater.vm
 
 import android.widget.Toast
+import androidx.annotation.Keep
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import com.google.gson.JsonObject
@@ -15,6 +16,7 @@ enum class Status { SEND, ERROR }
 enum class PaymentStatus { SUCCESSFULLY, ERROR }
 enum class StatusLoading { LOADING, DONE, EMPTY, ERROR }
 
+@Keep
 class OrderViewModel @Inject constructor(
     private val orderRepo: OrderRepository
 ) : ViewModel() {

@@ -43,12 +43,14 @@ class UserDataFragment : BaseFragment() {
         return binding.root
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.findItem(R.id.login_out_menu).isVisible = false
         menu.findItem(R.id.edit_profile).isVisible = true
         super.onPrepareOptionsMenu(menu)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.edit_profile -> {

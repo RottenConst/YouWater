@@ -145,6 +145,9 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
         val productCatalog = Observer<Map<TypeProduct, List<Product>>> {
             adapterWatter.submitList(it.toList())
         }
+        viewModel.favorite.observe(this.viewLifecycleOwner) {
+            viewModel.getAllProducts(it)
+        }
 
         viewModel.catalogProductMap.observeForever(productCatalog)
 

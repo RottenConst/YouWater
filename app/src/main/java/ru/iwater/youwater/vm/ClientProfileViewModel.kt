@@ -19,12 +19,12 @@ class ClientProfileViewModel @Inject constructor(
     private val authRepository: AuthorisationRepository
 ): ViewModel() {
 
-    private val _client: MutableLiveData<Client> = MutableLiveData()
-    val client: LiveData<Client>
+    private val _client: MutableLiveData<Client?> = MutableLiveData()
+    val client: LiveData<Client?>
         get() = _client
 
-    private val _navigateToDataUser: MutableLiveData<Int> = MutableLiveData()
-    val navigateToDataUser: LiveData<Int>
+    private val _navigateToDataUser: MutableLiveData<Int?> = MutableLiveData()
+    val navigateToDataUser: LiveData<Int?>
         get() = _navigateToDataUser
 
     private val _statusSend: MutableLiveData<StatusSendData> = MutableLiveData()
