@@ -82,7 +82,9 @@ class OrderViewModel @Inject constructor(
     private fun getClient() {
         viewModelScope.launch {
             val client = orderRepo.getClientInfo(authClient.clientId)
-            if (client != null) _client.value = client
+            if (client != null) {
+                _client.value = client!!
+            }
         }
     }
 
@@ -412,6 +414,8 @@ class OrderViewModel @Inject constructor(
     }
 
     fun setLinkHttp(link: String?) {
-        _linkPayment.value = link
+        if (link != null) {
+            _linkPayment.value = link!!
+        }
     }
 }

@@ -9,7 +9,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,32 +28,31 @@ import com.bumptech.glide.request.RequestOptions
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.Product
-import ru.iwater.youwater.data.ProductXX
-import ru.iwater.youwater.data.PromoBanner
+import ru.iwater.youwater.data.*
 import ru.iwater.youwater.network.ImageUrl
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.CatalogListViewModel
+import timber.log.Timber
 
 @Composable
 fun HomeScreen(catalogListViewModel: CatalogListViewModel) {
-    val promoBanner = catalogListViewModel.promoBanners.observeAsState()
-    val catalogList = catalogListViewModel.catalogList.observeAsState()
-    val catalogProductMap = catalogListViewModel.catalogProductMap.observeAsState()
-    val listState = rememberLazyListState()
+    val promoBanner by catalogListViewModel.promoBanners.observeAsState()
+    val promoListState = rememberLazyListState()
+    catalogListViewModel.getFavoriteProduct()
+    val catalogList by catalogListViewModel.catalogList.observeAsState()
+    val productsList by catalogListViewModel.products.observeAsState()
+    val favorite by catalogListViewModel.favorite.observeAsState()
+    favorite?.forEach {favoriteId ->
+        val product = productsList?.filter { it.id == favoriteId.toInt() }
+        product?.first()?.onFavoriteClick = true
+    }
     Column {
-        PromoAction(promo = promoBanner.value, listState)
-        LazyColumn {
-                items(catalogList.value?.size ?: 0) { catalog ->
-                    val products = catalogProductMap.value?.get(catalogList.value?.get(catalog) ?: 0)
-                    CategoryProduct(
-                        categoryName = catalogList.value?.get(catalog)?.category,
-                        productsList = products
-                    )
-                }
-            }
+        PromoAction(promo = promoBanner, promoListState)
+        if (catalogList != null && productsList != null) {
+            ProductContent(catalogList = catalogList!!, productsList = productsList!!, addToFavoriteProduct = { catalogListViewModel.addToFavorite(it) }, deleteFavorite = {catalogListViewModel.deleteFavorite(it)})
+        }
     }
 }
 
@@ -64,13 +67,26 @@ fun CatalogName(name: String) {
 }
 
 @Composable
+fun ProductContent(catalogList: List<TypeProduct>, productsList: List<Product>, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
+    LazyColumn {
+        items(catalogList.size) { catalog ->
+            val products =  productsList.filter { it.category ==  catalogList[catalog].id }
+            CategoryProduct(
+                categoryName = catalogList[catalog].category,
+                productsList = products,
+                addToFavoriteProduct,
+                deleteFavorite
+            )
+        }
+    }
+}
+
+@Composable
 fun PromoImage(banners: List<PromoBanner>?, listState: LazyListState) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth(),
-//            .padding(4.dp),
         horizontalArrangement = Arrangement.Center,
-//        contentPadding = PaddingValues(8.dp),
         state = listState
     ) {
         items(banners?.size ?: 0) {
@@ -91,11 +107,8 @@ fun PromoImage(banners: List<PromoBanner>?, listState: LazyListState) {
                             .error(R.drawable.ic_your_water_logo)
                     },
                     modifier = Modifier
-//                        .fillMaxSize()
-//                        .fillMaxHeight()
                         .padding(8.dp)
                         .clip(RoundedCornerShape(8.dp))
-//                        .aspectRatio(16f / 4f)
                 )
             }
         }
@@ -125,7 +138,7 @@ fun PromoAction(promo: List<PromoBanner>?, listState: LazyListState) {
 }
 
 @Composable
-fun ProductCard(product: Product) {
+fun ProductCard(product: Product, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
     Surface(
         modifier = Modifier
             .width(152.dp)
@@ -135,7 +148,7 @@ fun ProductCard(product: Product) {
         elevation = 8.dp
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            FavoriteIconButton()
+
             Column(modifier = Modifier.padding(8.dp)) {
                 ProductInfo(product)
                 Row(
@@ -147,12 +160,13 @@ fun ProductCard(product: Product) {
                     ProductPlusButton()
                 }
             }
+            FavoriteIconButton(product, addToFavoriteProduct, deleteFavorite)
         }
     }
 }
 
 @Composable
-fun CategoryProduct(categoryName: String?, productsList: List<Product>?) {
+fun CategoryProduct(categoryName: String?, productsList: List<Product>?, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
     Column(
         modifier = Modifier.padding(8.dp)
     ) {
@@ -162,7 +176,11 @@ fun CategoryProduct(categoryName: String?, productsList: List<Product>?) {
         LazyRow {
             if (productsList != null) {
                 items(productsList.size) { product ->
-                    ProductCard(product = productsList[product])
+                    ProductCard(
+                        product = productsList[product],
+                        addToFavoriteProduct,
+                        deleteFavorite
+                    )
                 }
             }
         }
@@ -170,18 +188,38 @@ fun CategoryProduct(categoryName: String?, productsList: List<Product>?) {
 }
 
 @Composable
-private fun FavoriteIconButton() {
+private fun IconLike(idIconLike: Int) {
+    Icon(
+        modifier = Modifier.padding(1.dp),
+        painter = painterResource(id = idIconLike),
+        contentDescription = stringResource(id = R.string.description_add_product),
+        tint = Blue500
+    )
+}
+
+@Composable
+private fun FavoriteIconButton(product: Product, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit ) {
+    var isFavorite by rememberSaveable { mutableStateOf(product.onFavoriteClick) }
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
         contentAlignment = Alignment.TopEnd
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_like),
-            contentDescription = stringResource(id = R.string.description_add_product),
-            tint = Blue500
-        )
+        IconButton(
+            onClick = {
+                isFavorite = !isFavorite
+                if (isFavorite)
+                    addToFavoriteProduct(product.id)
+                else
+                    deleteFavorite(product.id)
+            }
+        ) {
+           if (isFavorite) {
+               IconLike(idIconLike = R.drawable.ic_like_true)
+           } else
+               IconLike(idIconLike = R.drawable.ic_like)
+        }
     }
 }
 
@@ -295,7 +333,9 @@ fun HomeScreenPreview() {
                 items(catalogNames.size) { catalog ->
                     CategoryProduct(
                         categoryName = "Catalog #$catalog",
-                        productsList = productsList1
+                        productsList = productsList1,
+                        {},
+                        {}
                     )
                 }
             }

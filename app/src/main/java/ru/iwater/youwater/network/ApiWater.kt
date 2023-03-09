@@ -15,6 +15,25 @@ interface ApiWater {
         @Path("product_id") productId: Int
     ): Product?
 
+    @GET("favorites-list/{client_id}/")
+    suspend fun getFavoriteProduct(
+        @Path("client_id") client_id: Int
+    ): Favorite?
+
+    @FormUrlEncoded
+    @PUT("favorites-list/{client_id}/")
+    suspend fun addToFavoriteProduct(
+        @Path("client_id") clientId: Int,
+        @Field("product_id") productId: Int
+    ): ResponseStatus?
+
+    @FormUrlEncoded
+    @HTTP(method = "DELETE", path = "favorites-list/{client_id}/", hasBody = true)
+    suspend fun deleteFavoriteProduct(
+        @Path("client_id") client_id: Int,
+        @Field("product_id") productId: Int
+    ): ResponseStatus?
+
     @GET("categoryProducts_list/")
     suspend fun getCategoryList():List<TypeProduct>?
 
@@ -134,7 +153,7 @@ interface ApiWater {
     @GET("starter-eligible/{client_id}")
     suspend fun isStartPocket(
         @Path("client_id") client_id: Int
-    ): Response<JsonObject>
+    ): StartPocket?
 
     @GET("promo/")
     suspend fun getPromo(): List<PromoBanner>?

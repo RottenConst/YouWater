@@ -74,11 +74,8 @@ class OrderRepository @Inject constructor(
 
     suspend fun isFirstOrder(): Boolean? {
         return try {
-            val isStartPocket = apiAuth.isStartPocket(getAuthClient().clientId)
-            if (isStartPocket.isSuccessful) {
-                val isFirstOrder = isStartPocket.body()?.get("status")?.asBoolean
-                isFirstOrder
-            } else null
+            val isStartPocket = apiAuth.isStartPocket(getAuthClient().clientId)?.status
+            isStartPocket
         } catch (e: Exception) {
             Timber.e("Error get status first order")
             null

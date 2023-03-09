@@ -24,17 +24,15 @@ class CatalogListViewModel @Inject constructor(
         emit(getLastOrder())
     }
 
+    val favorite: LiveData<List<String>> = liveData { emit(getFavorite()) }
+
     private val _favoriteProducts: MutableLiveData<List<FavoriteProduct>> = MutableLiveData()
     val favoriteProducts: LiveData<List<FavoriteProduct>>
         get() = _favoriteProducts
 
-    val catalogProductMap: LiveData<MutableMap<TypeProduct, List<Product>>> = Transformations.switchMap(favoriteProducts) {
-        liveData { emit(getAllProducts(it)) }
-    }
+    val products: LiveData<List<Product>> = liveData { emit(getProducts()) }
 
-    val catalogList: LiveData<List<TypeProduct>> = liveData {
-        emit(productRepo.getCategoryList())
-    }
+    val catalogList: LiveData<List<TypeProduct>> = liveData { emit(productRepo.getCategoryList()) }
 
     private val _navigateToSelectCategory: MutableLiveData<TypeProduct?> = MutableLiveData()
     val navigateToSelectCategory: LiveData<TypeProduct?>
@@ -58,26 +56,18 @@ class CatalogListViewModel @Inject constructor(
         getFavoriteProduct()
     }
 
-    private suspend fun getAllProducts(favoriteProducts: List<FavoriteProduct>): MutableMap<TypeProduct, List<Product>> {
-        val catalogMap = mutableMapOf<TypeProduct, List<Product>>()
-        val catalogs = productRepo.getCategoryList()
-        return if (catalogs.isNotEmpty()) {
-            val productsList = productRepo.getProductList()
-            catalogs.forEach { category ->
-                val products = productsList.filter { it.category == category.id }
-                products.forEach { product ->
-                    for (favoriteProduct in favoriteProducts) {
-                        if (favoriteProduct.id == product.id) {
-                            product.onFavoriteClick = true
-                        }
-                    }
-                }
-                catalogMap[category] = products
-            }
-            _screenLoading.value = StatusLoading.DONE
-            return catalogMap
-        }
-        else mutableMapOf()
+    private suspend fun getFavorite(): List<String> {
+        val favorite = productRepo.getFavorite()
+        return favorite?.favorites_list ?: emptyList()
+
+    }
+
+    suspend fun getCatalogList(): List<TypeProduct> {
+        return productRepo.getCategoryList()
+    }
+
+    private suspend fun getProducts(): List<Product> {
+        return productRepo.getProductList()
     }
 
     fun addProductInBasket(productId: Int) {
@@ -127,6 +117,19 @@ class CatalogListViewModel @Inject constructor(
     fun addFavoriteProduct(favoriteProduct: FavoriteProduct) {
         viewModelScope.launch {
             productRepo.addToFavoriteProduct(favoriteProduct)
+        }
+    }
+
+    fun addToFavorite(productId: Int) {
+        viewModelScope.launch {
+            productRepo.addToFavoriteProduct(productId)
+
+        }
+    }
+
+    fun deleteFavorite(productId: Int) {
+        viewModelScope.launch {
+            productRepo.deleteFavorite(productId)
         }
     }
 

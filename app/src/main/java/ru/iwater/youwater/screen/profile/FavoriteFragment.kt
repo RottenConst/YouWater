@@ -68,9 +68,10 @@ class FavoriteFragment : BaseFragment(), FavoriteProductAdapter.OnFavoriteProduc
     override fun addItemInBasked(favoriteProduct: FavoriteProduct) {
         viewModel.addProductInBasket(favoriteProduct.id)
         Snackbar.make(binding.root, "Товар добавлен в корзину", Snackbar.LENGTH_SHORT)
-            .setAction("Перейти в корзину", View.OnClickListener {
-                this.findNavController().navigate(FavoriteFragmentDirections.actionFavoriteFragmentToBasketFragment())
-            }).show()
+            .setAction("Перейти в корзину") {
+                this.findNavController()
+                    .navigate(FavoriteFragmentDirections.actionFavoriteFragmentToBasketFragment())
+            }.show()
     }
 
     override fun aboutFavoriteClick(favoriteProduct: FavoriteProduct) {

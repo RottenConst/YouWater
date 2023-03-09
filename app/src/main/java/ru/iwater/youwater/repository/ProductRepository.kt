@@ -81,6 +81,33 @@ class ProductRepository @Inject constructor(
         } else favoriteProducts
     }
 
+    suspend fun getFavorite(): Favorite? {
+        return try {
+            apiWater.getFavoriteProduct(authClient.get().clientId)
+        } catch (e: Exception) {
+            Timber.e("get favorite error: $e")
+            null
+        }
+    }
+
+    suspend fun addToFavoriteProduct(productId: Int): Boolean {
+        return try {
+            apiWater.addToFavoriteProduct(authClient.get().clientId, productId)?.status ?: false
+        } catch (e: Exception) {
+            Timber.e("add to favorite error: $e")
+            false
+        }
+    }
+
+    suspend fun deleteFavorite(productId: Int): Boolean {
+        return try {
+            apiWater.deleteFavoriteProduct(authClient.get().clientId, productId)?.status ?: false
+        } catch (e: Exception) {
+            Timber.e("delete favorite product error: $e")
+            false
+        }
+    }
+
     /**
      * получить список банеров по акциям
      */
@@ -142,14 +169,10 @@ class ProductRepository @Inject constructor(
      */
     suspend fun getCategoryList(): List<TypeProduct> {
         return try {
-            val startPocket = apiWater.isStartPocket(getAuthClient().clientId) //стартовый пакет
-            var startClient: Boolean? = false // клиент новый?
-            if (startPocket.isSuccessful) {
-                startClient = startPocket.body()?.get("status")?.asBoolean
-            }
+            val startPocket = apiWater.isStartPocket(getAuthClient().clientId)?.status ?: false //стартовый пакет
             val category = apiWater.getCategoryList()
             if (!category.isNullOrEmpty()) {
-                if (startClient == false || startClient == null) {
+                if (!startPocket) {
                     return category.filter { it.id != 20 && it.visible_app == 1 && it.company_id == "0007" }.sortedBy { it.priority }
                 }
                 return category.filter { it.visible_app == 1 && it.company_id == "0007"}.sortedBy { it.priority }

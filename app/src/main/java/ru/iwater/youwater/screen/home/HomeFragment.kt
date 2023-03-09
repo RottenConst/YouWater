@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
@@ -131,7 +132,7 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
             adapterWatter.submitList(it.toList())
         }
 //
-        viewModel.catalogProductMap.observeForever(productCatalog)
+//        viewModel.catalogProductMap.observeForever(productCatalog)
 //
 //        viewModel.navigateToSelectProduct.observe(this.viewLifecycleOwner) {
 //            if (null != it) {
