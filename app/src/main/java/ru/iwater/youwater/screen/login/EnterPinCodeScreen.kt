@@ -43,7 +43,7 @@ fun EnterPinCodeScreen(phone: String, clientId: Int, context: Context?, viewMode
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val infoPinCode = stringResource(id = R.string.fragment_enter_pin_code_info_code)
-        var isEnabledEnter by rememberSaveable { mutableStateOf(false) }
+        var isCheckPinCode by rememberSaveable { mutableStateOf(false) }
         var pinCode by rememberSaveable{ mutableStateOf("") }
         val statusPinCode by viewModel.statusPinCode.observeAsState()
         when (statusPinCode) {
@@ -70,12 +70,11 @@ fun EnterPinCodeScreen(phone: String, clientId: Int, context: Context?, viewMode
             setPinCode = {pinCode = it},
             color = Blue500,
             maxLength = 4,
-            isFullPinCode = {isEnabledEnter = it}
+            isFullPinCode = {isCheckPinCode = it}
         )
-        ButtonEnter(
-            text = stringResource(id = R.string.fragment_enter_pin_code_enter_text),
-            isEnabledButton = isEnabledEnter,
-        ) { viewModel.checkPin(pinCode, clientId) }
+        if (isCheckPinCode) {
+            viewModel.checkPin(pinCode, clientId)
+        }
         DescriptionText(text = "$infoPinCode $phone")
     }
 }
