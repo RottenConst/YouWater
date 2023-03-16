@@ -183,6 +183,15 @@ class ProductRepository @Inject constructor(
         }
     }
 
+    suspend fun isStartPocket(): Boolean {
+        return try {
+            apiWater.isStartPocket(getAuthClient().clientId)?.status ?: false
+        } catch (e: Exception) {
+            Timber.e("Error get catalog list: $e")
+            false
+        }
+    }
+
     /**
      * получить id последней заявки
      */

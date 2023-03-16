@@ -26,8 +26,8 @@ class ProductListViewModel @Inject constructor(
     private val _productsList: MutableLiveData<List<Product>> = MutableLiveData()
     val productsList: LiveData<List<Product>> get() = _productsList
 
-    private val _navigateToSelectProduct: MutableLiveData<Int> = MutableLiveData()
-    val navigateToSelectProduct: LiveData<Int>
+    private val _navigateToSelectProduct: MutableLiveData<Int?> = MutableLiveData()
+    val navigateToSelectProduct: LiveData<Int?>
         get() = _navigateToSelectProduct
 
     fun setCatalogItem(catalogId: Int) {

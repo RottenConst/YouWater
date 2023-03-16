@@ -23,8 +23,8 @@ class ClientProfileViewModel @Inject constructor(
     val client: LiveData<Client>
         get() = _client
 
-    private val _navigateToDataUser: MutableLiveData<Int> = MutableLiveData()
-    val navigateToDataUser: LiveData<Int>
+    private val _navigateToDataUser: MutableLiveData<Int?> = MutableLiveData()
+    val navigateToDataUser: LiveData<Int?>
         get() = _navigateToDataUser
 
     private val _statusSend: MutableLiveData<StatusSendData> = MutableLiveData()
@@ -68,7 +68,7 @@ class ClientProfileViewModel @Inject constructor(
         viewModelScope.launch {
             val client = authRepository.getClientInfo(authClient.clientId)
             if (client != null) {
-                _client.value = client
+                _client.value = client!!
             }
         }
     }

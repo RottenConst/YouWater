@@ -97,6 +97,26 @@ class CatalogListViewModel @Inject constructor(
 
         }
     }
+    fun addProductToBasket(product: Product) {
+        viewModelScope.launch {
+            val dbProduct = productRepo.getProductFromDB(product.id)
+            try {
+                if (dbProduct != null && dbProduct.category != 20) {
+                    dbProduct.count += 1
+                    productRepo.updateProductInBasket(dbProduct)
+                } else {
+                    if (product.category == 20 && productRepo.isStartPocket()) {
+                        productRepo.addProductInBasket(product.copy(count = 1))
+                    } else {
+                        product.count += 1
+                        productRepo.addProductInBasket(product)
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e("Error add in basket: $e")
+            }
+        }
+    }
 
     fun addProductInFavorite(product: Product) {
         viewModelScope.launch {

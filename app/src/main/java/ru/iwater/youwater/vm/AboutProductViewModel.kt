@@ -62,6 +62,23 @@ class AboutProductViewModel @Inject constructor(
         }
     }
 
+    fun addProductToBasket1(product: Product) {
+        viewModelScope.launch {
+            val dbProduct = productRepo.getProductFromDB(product.id)
+//            val start = productRepo.isStartPocket()
+            try {
+                if (dbProduct == null) {
+                    productRepo.addProductInBasket(product = product)
+                } else {
+                    productRepo.updateProductInBasket(product = product)
+                }
+            } catch (e: Exception) {
+                Timber.d("Error add in basket: $e")
+            }
+        }
+
+    }
+
     //инициалезация товара
     fun initProduct(productId: Int) {
         viewModelScope.launch {
@@ -71,6 +88,14 @@ class AboutProductViewModel @Inject constructor(
                     _product.value = product
             }
         }
+    }
+
+    suspend fun getProduct(productId: Int): Product? {
+        val product = productRepo.getProduct(productId)
+        return if (product!= null) {
+            product.count = 1
+            product
+        } else null
     }
 
     // показать подробную цену товара

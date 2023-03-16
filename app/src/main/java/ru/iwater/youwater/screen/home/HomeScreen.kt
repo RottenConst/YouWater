@@ -1,5 +1,6 @@
 package ru.iwater.youwater.screen.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,14 +18,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.request.RequestOptions
+import androidx.navigation.NavController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import ru.iwater.youwater.R
@@ -34,10 +37,9 @@ import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.CatalogListViewModel
-import timber.log.Timber
 
 @Composable
-fun HomeScreen(catalogListViewModel: CatalogListViewModel) {
+fun HomeScreen(catalogListViewModel: CatalogListViewModel, navController: NavController) {
     val promoBanner by catalogListViewModel.promoBanners.observeAsState()
     val promoListState = rememberLazyListState()
     catalogListViewModel.getFavoriteProduct()
@@ -49,9 +51,16 @@ fun HomeScreen(catalogListViewModel: CatalogListViewModel) {
         product?.first()?.onFavoriteClick = true
     }
     Column {
-        PromoAction(promo = promoBanner, promoListState)
+        PromoAction(promo = promoBanner, promoListState) {navController.navigate(HomeFragmentDirections.actionHomeFragmentToBannerInfoBottomSheetFragment(it!!.name, it.description))}
         if (catalogList != null && productsList != null) {
-            ProductContent(catalogList = catalogList!!, productsList = productsList!!, addToFavoriteProduct = { catalogListViewModel.addToFavorite(it) }, deleteFavorite = {catalogListViewModel.deleteFavorite(it)})
+            ProductContent(
+                catalogList = catalogList!!,
+                productsList = productsList!!,
+                getAboutProduct = {navController.navigate( HomeFragmentDirections.actionShowAboutProductFragment(it))},
+                addProductInBasket = {catalogListViewModel.addProductToBasket(it)},
+                addToFavoriteProduct = { catalogListViewModel.addToFavorite(it) },
+                deleteFavorite = {catalogListViewModel.deleteFavorite(it)}
+            )
         }
     }
 }
@@ -67,13 +76,15 @@ fun CatalogName(name: String) {
 }
 
 @Composable
-fun ProductContent(catalogList: List<TypeProduct>, productsList: List<Product>, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
-    LazyColumn {
+fun ProductContent(catalogList: List<TypeProduct>, productsList: List<Product>, addProductInBasket: (Product) -> Unit, getAboutProduct: (Int) -> Unit, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
+    LazyColumn(modifier = Modifier.padding(bottom = 60.dp)) {
         items(catalogList.size) { catalog ->
             val products =  productsList.filter { it.category ==  catalogList[catalog].id }
             CategoryProduct(
                 categoryName = catalogList[catalog].category,
                 productsList = products,
+                getAboutProduct,
+                addProductInBasket,
                 addToFavoriteProduct,
                 deleteFavorite
             )
@@ -82,7 +93,7 @@ fun ProductContent(catalogList: List<TypeProduct>, productsList: List<Product>, 
 }
 
 @Composable
-fun PromoImage(banners: List<PromoBanner>?, listState: LazyListState) {
+fun PromoImage(banners: List<PromoBanner>?, listState: LazyListState, getInfoBanner: (PromoBanner?) -> Unit) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth(),
@@ -101,14 +112,19 @@ fun PromoImage(banners: List<PromoBanner>?, listState: LazyListState) {
                         contentDescription = stringResource(id = R.string.description_image_logo),
                         contentScale = ContentScale.FillWidth,
                     ),
-                    requestOptions = {
-                        RequestOptions()
-                            .placeholder(R.drawable.ic_your_water_logo)
-                            .error(R.drawable.ic_your_water_logo)
+                    loading = {
+                        CircularProgressIndicator(
+                            modifier = Modifier.matchParentSize()
+                        )
                     },
+                    failure = {
+                        Text(text = "Не удалось загрузить картинку")
+                    },
+                    previewPlaceholder = R.drawable.ic_your_water_logo,
                     modifier = Modifier
                         .padding(8.dp)
                         .clip(RoundedCornerShape(8.dp))
+                        .clickable { getInfoBanner(banners?.get(it)) }
                 )
             }
         }
@@ -117,7 +133,7 @@ fun PromoImage(banners: List<PromoBanner>?, listState: LazyListState) {
 }
 
 @Composable
-fun PromoAction(promo: List<PromoBanner>?, listState: LazyListState) {
+fun PromoAction(promo: List<PromoBanner>?, listState: LazyListState, getInfoBanner: (PromoBanner?) -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,13 +148,13 @@ fun PromoAction(promo: List<PromoBanner>?, listState: LazyListState) {
                 .padding(8.dp)
         ) {
             CatalogName(name = "Акции")
-            PromoImage(banners = promo, listState)
+            PromoImage(banners = promo, listState, getInfoBanner)
         }
     }
 }
 
 @Composable
-fun ProductCard(product: Product, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
+fun ProductCard(product: Product, getAboutProduct: (Int) -> Unit, addProductInBasket: (Product) -> Unit, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
     Surface(
         modifier = Modifier
             .width(152.dp)
@@ -147,7 +163,11 @@ fun ProductCard(product: Product, addToFavoriteProduct: (Int) -> Unit, deleteFav
         shape = RoundedCornerShape(8.dp),
         elevation = 8.dp
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable { getAboutProduct(product.id) }
+        ) {
 
             Column(modifier = Modifier.padding(8.dp)) {
                 ProductInfo(product)
@@ -156,8 +176,8 @@ fun ProductCard(product: Product, addToFavoriteProduct: (Int) -> Unit, deleteFav
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    ProductCost()
-                    ProductPlusButton()
+                    ProductCost(product.id, product.getMinPriceProduct())
+                    ProductPlusButton(product, addProductInBasket)
                 }
             }
             FavoriteIconButton(product, addToFavoriteProduct, deleteFavorite)
@@ -166,7 +186,7 @@ fun ProductCard(product: Product, addToFavoriteProduct: (Int) -> Unit, deleteFav
 }
 
 @Composable
-fun CategoryProduct(categoryName: String?, productsList: List<Product>?, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
+fun CategoryProduct(categoryName: String?, productsList: List<Product>?, getAboutProduct: (Int) -> Unit, addProductInBasket: (Product) -> Unit, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
     Column(
         modifier = Modifier.padding(8.dp)
     ) {
@@ -178,6 +198,8 @@ fun CategoryProduct(categoryName: String?, productsList: List<Product>?, addToFa
                 items(productsList.size) { product ->
                     ProductCard(
                         product = productsList[product],
+                        getAboutProduct,
+                        addProductInBasket,
                         addToFavoriteProduct,
                         deleteFavorite
                     )
@@ -227,11 +249,22 @@ private fun FavoriteIconButton(product: Product, addToFavoriteProduct: (Int) -> 
 fun ProductInfo(product: Product) {
     GlideImage(
         imageModel = {"$ImageUrl/${product.gallery}"},
-        requestOptions = {
-            RequestOptions()
-                .placeholder(R.drawable.ic_your_water_logo)
-                .error(R.drawable.ic_your_water_logo)
+        loading = {
+            Box(modifier = Modifier.matchParentSize()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
         },
+        failure = {
+            Image(
+                modifier = Modifier.matchParentSize(),
+                painter = painterResource(id = R.drawable.ic_your_water_logo),
+                contentDescription = stringResource(id = R.string.description_image_product),
+                alignment = Alignment.TopCenter
+            )
+        },
+        previewPlaceholder = R.drawable.ic_your_water_logo,
         imageOptions = ImageOptions(
             alignment = Alignment.TopCenter,
             contentDescription = stringResource(id = R.string.description_image_product),
@@ -249,26 +282,38 @@ fun ProductInfo(product: Product) {
         style = YouWaterTypography.caption,
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.Bold,
-        maxLines = 3
+        maxLines = if (product.id == 81 || product.id == 84) 2 else 3
     )
 }
 
 @Composable
-fun ProductCost() {
+fun ProductCost(id: Int, minPrice: Int) {
     Box(
         contentAlignment = Alignment.BottomStart
     ) {
-        Text(
-            text = "от 100Р",
-            color = Blue500,
-            style = YouWaterTypography.caption,
-            fontWeight = FontWeight.Bold
-        )
+        Column {
+            if (id == 81 || id == 84) {
+                Text(
+                    text = "${minPrice}₽",
+                    color = Color.Gray,
+                    fontWeight = FontWeight.Light,
+                    textDecoration = TextDecoration.LineThrough,
+                    style = YouWaterTypography.overline
+                )
+            }
+            Text(
+                text = if (id == 81 || id == 82) "от ${minPrice - 15}₽" else "от ${minPrice}₽",
+                color = Blue500,
+                style = YouWaterTypography.caption,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
     }
 }
 
 @Composable
-fun ProductPlusButton() {
+fun ProductPlusButton(product: Product, addProductInBasket: (Product) -> Unit) {
     Box(
         contentAlignment = Alignment.BottomEnd
     ) {
@@ -276,18 +321,10 @@ fun ProductPlusButton() {
             painter = painterResource(id = R.drawable.ic_btn_plus),
             contentDescription = stringResource(id = R.string.description_add_product),
             tint = Blue500,
-            modifier = Modifier.clickable { }
+            modifier = Modifier.clickable { addProductInBasket(product) }
         )
     }
 }
-
-//@Preview
-//@Composable
-//fun PromoActionPreview() {
-//    YourWaterTheme {
-//        PromoAction()
-//    }
-//}
 
 @Preview
 @Composable
@@ -302,7 +339,7 @@ fun HomeScreenPreview() {
             discount = 0,
             category = 1,
             about = "",
-            gallery = "008.png",
+            gallery = "cat-1.png",
             date_created = 1676121935,
             date = "11/02/2023",
             site = 1,
@@ -328,12 +365,14 @@ fun HomeScreenPreview() {
             display_in_app = true)
         }
         Column {
-            PromoAction(promoTest, rememberLazyListState())
+            PromoAction(promoTest, rememberLazyListState()) {}
             LazyColumn {
                 items(catalogNames.size) { catalog ->
                     CategoryProduct(
                         categoryName = "Catalog #$catalog",
                         productsList = productsList1,
+                        {},
+                        {},
                         {},
                         {}
                     )
