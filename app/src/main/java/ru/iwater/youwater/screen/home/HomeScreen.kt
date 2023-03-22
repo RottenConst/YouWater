@@ -225,7 +225,7 @@ private fun FavoriteIconButton(product: Product, addToFavoriteProduct: (Int) -> 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(start = 8.dp, bottom = 8.dp),
         contentAlignment = Alignment.TopEnd
     ) {
         IconButton(
@@ -276,8 +276,7 @@ fun ProductInfo(product: Product) {
     )
     Text(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 4.dp, bottom = 4.dp),
+            .fillMaxWidth(),
         text = product.app_name ?: product.name,
         style = YouWaterTypography.caption,
         textAlign = TextAlign.Center,
