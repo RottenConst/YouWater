@@ -17,33 +17,25 @@ class CatalogListViewModel @Inject constructor(
         emit(productRepo.getPromoBanners())
     }
 
-    private val _screenLoading: MutableLiveData<StatusLoading> = MutableLiveData()
-    val screenLoading: LiveData<StatusLoading> get() = _screenLoading
-
     val lastOrder: LiveData<Int?> = liveData {
         emit(getLastOrder())
     }
 
-    val favorite: LiveData<List<String>> = liveData { emit(getFavorite()) }
+    var favorite: LiveData<List<String>> = liveData { emit(getFavorite()) }
 
     private val _favoriteProducts: MutableLiveData<List<FavoriteProduct>> = MutableLiveData()
     val favoriteProducts: LiveData<List<FavoriteProduct>>
         get() = _favoriteProducts
 
-    val products: LiveData<List<Product>> = liveData { emit(getProducts()) }
+    var products: LiveData<List<Product>> = liveData { emit(getProducts()) }
 
     val catalogList: LiveData<List<TypeProduct>> = liveData { emit(productRepo.getCategoryList()) }
-
-    private val _navigateToSelectCategory: MutableLiveData<TypeProduct?> = MutableLiveData()
-    val navigateToSelectCategory: LiveData<TypeProduct?>
-        get() = _navigateToSelectCategory
 
     private val _navigateToSelectProduct: MutableLiveData<Int?> = MutableLiveData()
     val navigateToSelectProduct: LiveData<Int?>
         get() = _navigateToSelectProduct
 
     private val _navigateToSelectBanner: MutableLiveData<PromoBanner?> = MutableLiveData()
-    val navigateToSelectBanner: LiveData<PromoBanner?> get() = _navigateToSelectBanner
 
     fun getFavoriteProduct() {
         viewModelScope.launch {
@@ -52,7 +44,6 @@ class CatalogListViewModel @Inject constructor(
     }
 
     init {
-        _screenLoading.value = StatusLoading.LOADING
         getFavoriteProduct()
     }
 
@@ -62,12 +53,15 @@ class CatalogListViewModel @Inject constructor(
 
     }
 
-    suspend fun getCatalogList(): List<TypeProduct> {
-        return productRepo.getCategoryList()
-    }
-
     private suspend fun getProducts(): List<Product> {
-        return productRepo.getProductList()
+        val favorite = getFavorite()
+        val products = productRepo.getProductList()
+        products.forEach {product: Product ->
+            favorite.forEach { favoriteId ->
+                product.onFavoriteClick = favoriteId.toInt() == product.id
+            }
+        }
+        return products
     }
 
     fun addProductInBasket(productId: Int) {
@@ -118,22 +112,6 @@ class CatalogListViewModel @Inject constructor(
         }
     }
 
-    fun addProductInFavorite(product: Product) {
-        viewModelScope.launch {
-            productRepo.addToFavoriteProduct(
-                FavoriteProduct(product.about,
-                                product.app,
-                                product.app_name,
-                                product.category,
-                                product.company_id,
-                                product.gallery,
-                                product.id,
-                                product.name,
-                                product.price)
-            )
-        }
-    }
-
     fun addFavoriteProduct(favoriteProduct: FavoriteProduct) {
         viewModelScope.launch {
             productRepo.addToFavoriteProduct(favoriteProduct)
@@ -143,31 +121,13 @@ class CatalogListViewModel @Inject constructor(
     fun addToFavorite(productId: Int) {
         viewModelScope.launch {
             productRepo.addToFavoriteProduct(productId)
-
         }
     }
 
     fun deleteFavorite(productId: Int) {
         viewModelScope.launch {
             productRepo.deleteFavorite(productId)
-        }
-    }
-
-    fun deleteFavoriteProduct(product: Product) {
-        viewModelScope.launch {
-            productRepo.deleteFavoriteProduct(
-                FavoriteProduct(
-                    product.about,
-                    product.app,
-                    product.app_name,
-                    product.category,
-                    product.company_id,
-                    product.gallery,
-                    product.id,
-                    product.name,
-                    product.price
-                )
-            )
+            getFavorite()
         }
     }
 
@@ -185,23 +145,11 @@ class CatalogListViewModel @Inject constructor(
         _navigateToSelectBanner.value = promoBanner
     }
 
-    fun displayPromoInfoComplete() {
-        _navigateToSelectBanner.value = null
-    }
-
     fun displayProduct(productId: Int) {
         _navigateToSelectProduct.value = productId
     }
 
     fun displayProductComplete() {
         _navigateToSelectProduct.value = null
-    }
-
-    fun displayCatalogList(catalog: TypeProduct) {
-        _navigateToSelectCategory.value = catalog
-    }
-
-    fun displayCatalogListComplete() {
-        _navigateToSelectCategory.value = null
     }
 }

@@ -4,14 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.databinding.FragmentCatalogBinding
 import ru.iwater.youwater.vm.CatalogListViewModel
-import ru.iwater.youwater.screen.adapters.AdapterCatalogList
+import ru.iwater.youwater.theme.YourWaterTheme
 import javax.inject.Inject
 
 /**
@@ -34,21 +35,18 @@ class CatalogFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentCatalogBinding.inflate(inflater)
-        binding.lifecycleOwner = this
-        binding.viewModel = viewModel
-        binding.rvCatalogList.adapter = AdapterCatalogList(AdapterCatalogList.OnClickListener {
-            viewModel.displayCatalogList(it)
-        })
+        val navController = NavHostFragment.findNavController(this)
 
-        viewModel.navigateToSelectCategory.observe(this.viewLifecycleOwner) {
-            if (null != it) {
-                this.findNavController().navigate(
-                    CatalogFragmentDirections.actionShowTypeCatalog(it.id, it.category)
-                )
-                viewModel.displayCatalogListComplete()
+        binding.composeViewCatalog.apply {
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.Default
+            )
+            setContent {
+                YourWaterTheme {
+                    CatalogScreen(viewModel = viewModel, navController)
+                }
             }
         }
-
         return binding.root
     }
 

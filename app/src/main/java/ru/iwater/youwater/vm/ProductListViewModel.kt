@@ -139,7 +139,7 @@ class ProductListViewModel @Inject constructor(
 
     private fun getFavoriteProduct() {
         viewModelScope.launch {
-            productRepo.getAllFavoriteProducts()?.let { favoriteProducts.addAll(it) }
+            productRepo.getAllFavoriteProducts().let { favoriteProducts.addAll(it) }
         }
     }
 

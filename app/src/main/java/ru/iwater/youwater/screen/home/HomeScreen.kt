@@ -9,12 +9,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,14 +39,9 @@ import ru.iwater.youwater.vm.CatalogListViewModel
 fun HomeScreen(catalogListViewModel: CatalogListViewModel, navController: NavController) {
     val promoBanner by catalogListViewModel.promoBanners.observeAsState()
     val promoListState = rememberLazyListState()
-    catalogListViewModel.getFavoriteProduct()
     val catalogList by catalogListViewModel.catalogList.observeAsState()
     val productsList by catalogListViewModel.products.observeAsState()
-    val favorite by catalogListViewModel.favorite.observeAsState()
-    favorite?.forEach {favoriteId ->
-        val product = productsList?.filter { it.id == favoriteId.toInt() }
-        product?.first()?.onFavoriteClick = true
-    }
+    val favorite = catalogListViewModel.favorite.observeAsState()
     Column {
         PromoAction(promo = promoBanner, promoListState) {navController.navigate(HomeFragmentDirections.actionHomeFragmentToBannerInfoBottomSheetFragment(it!!.name, it.description))}
         if (catalogList != null && productsList != null) {
@@ -58,17 +50,18 @@ fun HomeScreen(catalogListViewModel: CatalogListViewModel, navController: NavCon
                 productsList = productsList!!,
                 getAboutProduct = {navController.navigate( HomeFragmentDirections.actionShowAboutProductFragment(it))},
                 addProductInBasket = {catalogListViewModel.addProductToBasket(it)},
-                addToFavoriteProduct = { catalogListViewModel.addToFavorite(it) },
-                deleteFavorite = {catalogListViewModel.deleteFavorite(it)}
+                onCheckedFavorite = {product -> if (product.onFavoriteClick) {
+                    catalogListViewModel.deleteFavorite(product.id)
+                } else catalogListViewModel.addToFavorite(product.id) }
             )
         }
     }
 }
 
 @Composable
-fun CatalogName(name: String) {
+fun CatalogName(name: String, modifier: Modifier) {
     Text(
-        modifier = Modifier.padding(8.dp),
+        modifier = modifier,
         text = name,
         style = YouWaterTypography.h6,
         fontWeight = FontWeight.Bold
@@ -76,17 +69,15 @@ fun CatalogName(name: String) {
 }
 
 @Composable
-fun ProductContent(catalogList: List<TypeProduct>, productsList: List<Product>, addProductInBasket: (Product) -> Unit, getAboutProduct: (Int) -> Unit, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
+fun ProductContent(catalogList: List<TypeProduct>, productsList: List<Product>, addProductInBasket: (Product) -> Unit, getAboutProduct: (Int) -> Unit, onCheckedFavorite: (Product) -> Unit) {
     LazyColumn(modifier = Modifier.padding(bottom = 60.dp)) {
-        items(catalogList.size) { catalog ->
-            val products =  productsList.filter { it.category ==  catalogList[catalog].id }
-            CategoryProduct(
-                categoryName = catalogList[catalog].category,
-                productsList = products,
-                getAboutProduct,
-                addProductInBasket,
-                addToFavoriteProduct,
-                deleteFavorite
+        items(catalogList.size) { catalogIndex ->
+            ProductsByCategoryRow(
+                categoryName = catalogList[catalogIndex].category,
+                productsList = productsList.filter { it.category == catalogList[catalogIndex].id },
+                getAboutProduct = getAboutProduct,
+                addProductInBasket = addProductInBasket,
+                onCheckedFavorite = onCheckedFavorite
             )
         }
     }
@@ -147,14 +138,14 @@ fun PromoAction(promo: List<PromoBanner>?, listState: LazyListState, getInfoBann
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            CatalogName(name = "Акции")
+            CatalogName(name = "Акции", Modifier.padding(8.dp))
             PromoImage(banners = promo, listState, getInfoBanner)
         }
     }
 }
 
 @Composable
-fun ProductCard(product: Product, getAboutProduct: (Int) -> Unit, addProductInBasket: (Product) -> Unit, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
+fun ProductCard(product: Product, getAboutProduct: (Int) -> Unit, addProductInBasket: (Product) -> Unit, onCheckedFavorite: (Product) -> Unit) {
     Surface(
         modifier = Modifier
             .width(152.dp)
@@ -168,7 +159,6 @@ fun ProductCard(product: Product, getAboutProduct: (Int) -> Unit, addProductInBa
                 .fillMaxSize()
                 .clickable { getAboutProduct(product.id) }
         ) {
-
             Column(modifier = Modifier.padding(8.dp)) {
                 ProductInfo(product)
                 Row(
@@ -177,31 +167,30 @@ fun ProductCard(product: Product, getAboutProduct: (Int) -> Unit, addProductInBa
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     ProductCost(product.id, product.getMinPriceProduct())
-                    ProductPlusButton(product, addProductInBasket)
+                    ProductPlusButton { addProductInBasket(product) }
                 }
             }
-            FavoriteIconButton(product, addToFavoriteProduct, deleteFavorite)
+            FavoriteIconButton(isFavorite = product.onFavoriteClick, onCheckedFavorite = { onCheckedFavorite(product)} )
         }
     }
 }
 
 @Composable
-fun CategoryProduct(categoryName: String?, productsList: List<Product>?, getAboutProduct: (Int) -> Unit, addProductInBasket: (Product) -> Unit, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
+fun ProductsByCategoryRow(categoryName: String?, productsList: List<Product>?, getAboutProduct: (Int) -> Unit, addProductInBasket: (Product) -> Unit, onCheckedFavorite: (Product) -> Unit) {
     Column(
         modifier = Modifier.padding(8.dp)
     ) {
         if (categoryName != null) {
-            CatalogName(name = categoryName)
+            CatalogName(name = categoryName, Modifier.padding(8.dp))
         }
         LazyRow {
             if (productsList != null) {
-                items(productsList.size) { product ->
+                items(count =  productsList.size, key = {product -> productsList[product].id}) { productIndex ->
                     ProductCard(
-                        product = productsList[product],
-                        getAboutProduct,
-                        addProductInBasket,
-                        addToFavoriteProduct,
-                        deleteFavorite
+                        product = productsList[productIndex],
+                        getAboutProduct = getAboutProduct,
+                        addProductInBasket = addProductInBasket,
+                        onCheckedFavorite = {isFavorite -> onCheckedFavorite(productsList[productIndex])}
                     )
                 }
             }
@@ -220,8 +209,10 @@ private fun IconLike(idIconLike: Int) {
 }
 
 @Composable
-private fun FavoriteIconButton(product: Product, addToFavoriteProduct: (Int) -> Unit, deleteFavorite: (Int) -> Unit ) {
-    var isFavorite by rememberSaveable { mutableStateOf(product.onFavoriteClick) }
+private fun FavoriteIconButton(isFavorite: Boolean, onCheckedFavorite: (Boolean) -> Unit) {
+    var favoriteProduct by rememberSaveable {
+        mutableStateOf(isFavorite)
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -230,14 +221,11 @@ private fun FavoriteIconButton(product: Product, addToFavoriteProduct: (Int) -> 
     ) {
         IconButton(
             onClick = {
-                isFavorite = !isFavorite
-                if (isFavorite)
-                    addToFavoriteProduct(product.id)
-                else
-                    deleteFavorite(product.id)
+                favoriteProduct = !favoriteProduct
+                onCheckedFavorite(favoriteProduct)
             }
         ) {
-           if (isFavorite) {
+           if (favoriteProduct) {
                IconLike(idIconLike = R.drawable.ic_like_true)
            } else
                IconLike(idIconLike = R.drawable.ic_like)
@@ -312,7 +300,7 @@ fun ProductCost(id: Int, minPrice: Int) {
 }
 
 @Composable
-fun ProductPlusButton(product: Product, addProductInBasket: (Product) -> Unit) {
+fun ProductPlusButton(addProductInBasket: () -> Unit) {
     Box(
         contentAlignment = Alignment.BottomEnd
     ) {
@@ -320,7 +308,7 @@ fun ProductPlusButton(product: Product, addProductInBasket: (Product) -> Unit) {
             painter = painterResource(id = R.drawable.ic_btn_plus),
             contentDescription = stringResource(id = R.string.description_add_product),
             tint = Blue500,
-            modifier = Modifier.clickable { addProductInBasket(product) }
+            modifier = Modifier.clickable { addProductInBasket() }
         )
     }
 }
@@ -367,13 +355,12 @@ fun HomeScreenPreview() {
             PromoAction(promoTest, rememberLazyListState()) {}
             LazyColumn {
                 items(catalogNames.size) { catalog ->
-                    CategoryProduct(
+                    ProductsByCategoryRow(
                         categoryName = "Catalog #$catalog",
                         productsList = productsList1,
                         {},
                         {},
-                        {},
-                        {}
+                        {product -> {}}
                     )
                 }
             }
