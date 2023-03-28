@@ -107,6 +107,7 @@
         <action
             android:id="@+id/action_aboutProductFragment_to_basketFragment"
             app:destination="@id/basketFragment"
+            app:popUpTo="@id/route_main"
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_aboutProductFragment_to_priceBottomSheetFragment"
