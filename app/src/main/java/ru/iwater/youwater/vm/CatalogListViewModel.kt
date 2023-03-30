@@ -1,5 +1,6 @@
 package ru.iwater.youwater.vm
 
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.*
@@ -21,21 +22,21 @@ class CatalogListViewModel @Inject constructor(
         emit(getLastOrder())
     }
 
-    var favorite: LiveData<List<String>> = liveData { emit(getFavorite()) }
+    private val _productsList = listOf<Product>().toMutableStateList()
+    val productList: List<Product>
+        get() = _productsList
 
     private val _favoriteProducts: MutableLiveData<List<FavoriteProduct>> = MutableLiveData()
     val favoriteProducts: LiveData<List<FavoriteProduct>>
         get() = _favoriteProducts
 
-    var products: LiveData<List<Product>> = liveData { emit(getProducts()) }
-
-    val catalogList: LiveData<List<TypeProduct>> = liveData { emit(productRepo.getCategoryList()) }
+    private val _catalogList = listOf<TypeProduct>().toMutableStateList()
+    val catalogList: List<TypeProduct>
+        get() = _catalogList
 
     private val _navigateToSelectProduct: MutableLiveData<Int?> = MutableLiveData()
     val navigateToSelectProduct: LiveData<Int?>
         get() = _navigateToSelectProduct
-
-    private val _navigateToSelectBanner: MutableLiveData<PromoBanner?> = MutableLiveData()
 
     fun getFavoriteProduct() {
         viewModelScope.launch {
@@ -45,23 +46,25 @@ class CatalogListViewModel @Inject constructor(
 
     init {
         getFavoriteProduct()
+        getCatalogList()
     }
 
-    private suspend fun getFavorite(): List<String> {
-        val favorite = productRepo.getFavorite()
-        return favorite?.favorites_list ?: emptyList()
-
+    private fun getCatalogList() {
+        viewModelScope.launch {
+            _catalogList.addAll(productRepo.getCategoryList())
+        }
     }
 
-    private suspend fun getProducts(): List<Product> {
-        val favorite = getFavorite()
-        val products = productRepo.getProductList()
-        products.forEach {product: Product ->
-            favorite.forEach { favoriteId ->
-                product.onFavoriteClick = favoriteId.toInt() == product.id
+    fun getProductsList() {
+        viewModelScope.launch {
+            _productsList.clear()
+            val favoriteList = productRepo.getFavorite()?.favorites_list?.map { it.toInt() }
+            _productsList.addAll(productRepo.getProductList())
+            _productsList.forEach{ product ->
+                product.onFavoriteClick = favoriteList?.contains(product.id) == true
             }
         }
-        return products
+
     }
 
     fun addProductInBasket(productId: Int) {
@@ -118,17 +121,13 @@ class CatalogListViewModel @Inject constructor(
         }
     }
 
-    fun addToFavorite(productId: Int) {
+    fun onChangeFavorite(productId: Int, onFavorite: Boolean) {
         viewModelScope.launch {
-            productRepo.addToFavoriteProduct(productId)
+            if (onFavorite) productRepo.deleteFavorite(productId)
+                else productRepo.addToFavoriteProduct(productId)
+            _productsList.find { product -> product.id == productId }?.onFavoriteClick = !onFavorite
         }
-    }
 
-    fun deleteFavorite(productId: Int) {
-        viewModelScope.launch {
-            productRepo.deleteFavorite(productId)
-            getFavorite()
-        }
     }
 
     private suspend fun getLastOrder(): Int? {
@@ -139,10 +138,6 @@ class CatalogListViewModel @Inject constructor(
         viewModelScope.launch {
             productRepo.deleteFavoriteProduct(favoriteProduct)
         }
-    }
-
-    fun displayPromoInfo(promoBanner: PromoBanner) {
-        _navigateToSelectBanner.value = promoBanner
     }
 
     fun displayProduct(productId: Int) {

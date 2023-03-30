@@ -10,8 +10,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -33,16 +31,14 @@ import ru.iwater.youwater.vm.CatalogListViewModel
 
 @Composable
 fun CatalogScreen(viewModel: CatalogListViewModel, navController: NavController) {
-    val catalogList by viewModel.catalogList.observeAsState()
-    if (catalogList != null) {
-        CatalogList(
-            catalogList = catalogList!!.sortedBy { it.priority },
-            countColumn = 2
-        ) {
-            navController.navigate(
-                CatalogFragmentDirections.actionShowTypeCatalog(it.id, it.category)
-            )
-        }
+
+    CatalogList(
+        catalogList = viewModel.catalogList.sortedBy { it.priority },
+        countColumn = 2
+    ) {
+        navController.navigate(
+            CatalogFragmentDirections.actionShowTypeCatalog(it.id, it.category)
+        )
     }
 }
 
@@ -66,7 +62,7 @@ fun CategoryCard(catalog: TypeProduct, getProductThisCategory: (TypeProduct) -> 
         ) {
             GlideImage(
                 modifier = Modifier.height(96.dp),
-                imageModel = {"$ImageUrl/${catalog.image}"},
+                imageModel = { "$ImageUrl/${catalog.image}" },
                 loading = {
                     Box(modifier = Modifier.matchParentSize()) {
                         CircularProgressIndicator(
@@ -101,7 +97,11 @@ fun CategoryCard(catalog: TypeProduct, getProductThisCategory: (TypeProduct) -> 
 }
 
 @Composable
-fun CatalogList(catalogList: List<TypeProduct>, countColumn: Int, getProductThisCategory: (TypeProduct) -> Unit) {
+fun CatalogList(
+    catalogList: List<TypeProduct>,
+    countColumn: Int,
+    getProductThisCategory: (TypeProduct) -> Unit
+) {
     LazyVerticalGrid(
         modifier = Modifier.padding(bottom = 60.dp),
         columns = GridCells.Fixed(countColumn),
@@ -127,6 +127,6 @@ fun CatalogScreenPreview() {
                 visible_app = 1
             )
         }
-        CatalogList(catalogList = catalogList, countColumn = 2){}
+        CatalogList(catalogList = catalogList, countColumn = 2) {}
     }
 }

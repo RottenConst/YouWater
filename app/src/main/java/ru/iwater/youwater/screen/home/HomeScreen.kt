@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -36,25 +36,40 @@ import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.CatalogListViewModel
 
 @Composable
-fun HomeScreen(catalogListViewModel: CatalogListViewModel, navController: NavController) {
+fun HomeScreen(
+    catalogListViewModel: CatalogListViewModel = viewModel(),
+    navController: NavController
+) {
     val promoBanner by catalogListViewModel.promoBanners.observeAsState()
     val promoListState = rememberLazyListState()
-    val catalogList by catalogListViewModel.catalogList.observeAsState()
-    val productsList by catalogListViewModel.products.observeAsState()
-    val favorite = catalogListViewModel.favorite.observeAsState()
     Column {
-        PromoAction(promo = promoBanner, promoListState) {navController.navigate(HomeFragmentDirections.actionHomeFragmentToBannerInfoBottomSheetFragment(it!!.name, it.description))}
-        if (catalogList != null && productsList != null) {
-            ProductContent(
-                catalogList = catalogList!!,
-                productsList = productsList!!,
-                getAboutProduct = {navController.navigate( HomeFragmentDirections.actionShowAboutProductFragment(it))},
-                addProductInBasket = {catalogListViewModel.addProductToBasket(it)},
-                onCheckedFavorite = {product -> if (product.onFavoriteClick) {
-                    catalogListViewModel.deleteFavorite(product.id)
-                } else catalogListViewModel.addToFavorite(product.id) }
+        PromoAction(promo = promoBanner, promoListState) {
+            navController.navigate(
+                HomeFragmentDirections.actionHomeFragmentToBannerInfoBottomSheetFragment(
+                    it!!.name,
+                    it.description
+                )
             )
         }
+
+        ProductContent(
+            catalogList = catalogListViewModel.catalogList,
+            productsList = catalogListViewModel.productList,
+            getAboutProduct = {
+                navController.navigate(
+                    HomeFragmentDirections.actionShowAboutProductFragment(
+                        it
+                    )
+                )
+            },
+            addProductInBasket = { catalogListViewModel.addProductToBasket(it) },
+            onCheckedFavorite = { product, onFavorite ->
+                catalogListViewModel.onChangeFavorite(
+                    productId = product.id,
+                    onFavorite = onFavorite
+                )
+            }
+        )
     }
 }
 
@@ -69,7 +84,13 @@ fun CatalogName(name: String, modifier: Modifier) {
 }
 
 @Composable
-fun ProductContent(catalogList: List<TypeProduct>, productsList: List<Product>, addProductInBasket: (Product) -> Unit, getAboutProduct: (Int) -> Unit, onCheckedFavorite: (Product) -> Unit) {
+fun ProductContent(
+    catalogList: List<TypeProduct>,
+    productsList: List<Product>,
+    addProductInBasket: (Product) -> Unit,
+    getAboutProduct: (Int) -> Unit,
+    onCheckedFavorite: (Product, Boolean) -> Unit
+) {
     LazyColumn(modifier = Modifier.padding(bottom = 60.dp)) {
         items(catalogList.size) { catalogIndex ->
             ProductsByCategoryRow(
@@ -84,7 +105,47 @@ fun ProductContent(catalogList: List<TypeProduct>, productsList: List<Product>, 
 }
 
 @Composable
-fun PromoImage(banners: List<PromoBanner>?, listState: LazyListState, getInfoBanner: (PromoBanner?) -> Unit) {
+fun ProductsByCategoryRow(
+    categoryName: String?,
+    productsList: List<Product>?,
+    getAboutProduct: (Int) -> Unit,
+    addProductInBasket: (Product) -> Unit,
+    onCheckedFavorite: (Product, Boolean) -> Unit
+) {
+    Column(
+        modifier = Modifier.padding(8.dp)
+    ) {
+        if (categoryName != null) {
+            CatalogName(name = categoryName, Modifier.padding(8.dp))
+        }
+        LazyRow {
+            if (productsList != null) {
+                items(
+                    count = productsList.size,
+                    key = { product -> productsList[product].id }) { productIndex ->
+                    ProductCard(
+                        product = productsList[productIndex],
+                        getAboutProduct = getAboutProduct,
+                        addProductInBasket = addProductInBasket,
+                        onCheckedFavorite = { isFavorite ->
+                            onCheckedFavorite(
+                                productsList[productIndex],
+                                isFavorite
+                            )
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PromoImage(
+    banners: List<PromoBanner>?,
+    listState: LazyListState,
+    getInfoBanner: (PromoBanner?) -> Unit
+) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth(),
@@ -98,7 +159,7 @@ fun PromoImage(banners: List<PromoBanner>?, listState: LazyListState, getInfoBan
             ) {
                 GlideImage(
                     imageModel = { "$ImageUrl/${banners?.get(it)?.picture}" },
-                    imageOptions = ImageOptions (
+                    imageOptions = ImageOptions(
                         alignment = Alignment.Center,
                         contentDescription = stringResource(id = R.string.description_image_logo),
                         contentScale = ContentScale.FillWidth,
@@ -124,7 +185,11 @@ fun PromoImage(banners: List<PromoBanner>?, listState: LazyListState, getInfoBan
 }
 
 @Composable
-fun PromoAction(promo: List<PromoBanner>?, listState: LazyListState, getInfoBanner: (PromoBanner?) -> Unit) {
+fun PromoAction(
+    promo: List<PromoBanner>?,
+    listState: LazyListState,
+    getInfoBanner: (PromoBanner?) -> Unit
+) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -145,7 +210,12 @@ fun PromoAction(promo: List<PromoBanner>?, listState: LazyListState, getInfoBann
 }
 
 @Composable
-fun ProductCard(product: Product, getAboutProduct: (Int) -> Unit, addProductInBasket: (Product) -> Unit, onCheckedFavorite: (Product) -> Unit) {
+fun ProductCard(
+    product: Product,
+    getAboutProduct: (Int) -> Unit,
+    addProductInBasket: (Product) -> Unit,
+    onCheckedFavorite: (Boolean) -> Unit
+) {
     Surface(
         modifier = Modifier
             .width(152.dp)
@@ -170,30 +240,9 @@ fun ProductCard(product: Product, getAboutProduct: (Int) -> Unit, addProductInBa
                     ProductPlusButton { addProductInBasket(product) }
                 }
             }
-            FavoriteIconButton(isFavorite = product.onFavoriteClick, onCheckedFavorite = { onCheckedFavorite(product)} )
-        }
-    }
-}
-
-@Composable
-fun ProductsByCategoryRow(categoryName: String?, productsList: List<Product>?, getAboutProduct: (Int) -> Unit, addProductInBasket: (Product) -> Unit, onCheckedFavorite: (Product) -> Unit) {
-    Column(
-        modifier = Modifier.padding(8.dp)
-    ) {
-        if (categoryName != null) {
-            CatalogName(name = categoryName, Modifier.padding(8.dp))
-        }
-        LazyRow {
-            if (productsList != null) {
-                items(count =  productsList.size, key = {product -> productsList[product].id}) { productIndex ->
-                    ProductCard(
-                        product = productsList[productIndex],
-                        getAboutProduct = getAboutProduct,
-                        addProductInBasket = addProductInBasket,
-                        onCheckedFavorite = {isFavorite -> onCheckedFavorite(productsList[productIndex])}
-                    )
-                }
-            }
+            StatefulFavoriteButton(
+                isFavorite = product.onFavoriteClick,
+                onCheckedFavorite = { onFavorite -> onCheckedFavorite(onFavorite) })
         }
     }
 }
@@ -209,10 +258,21 @@ private fun IconLike(idIconLike: Int) {
 }
 
 @Composable
-private fun FavoriteIconButton(isFavorite: Boolean, onCheckedFavorite: (Boolean) -> Unit) {
-    var favoriteProduct by rememberSaveable {
+private fun StatefulFavoriteButton(isFavorite: Boolean, onCheckedFavorite: (Boolean) -> Unit) {
+    var onFavorite by remember {
         mutableStateOf(isFavorite)
     }
+    StatelessFavoriteButton(
+        onFavorite = onFavorite,
+        onCheckedFavorite = { favorite ->
+            onFavorite = !favorite
+            onCheckedFavorite(favorite)
+        }
+    )
+}
+
+@Composable
+private fun StatelessFavoriteButton(onFavorite: Boolean, onCheckedFavorite: (Boolean) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -221,14 +281,13 @@ private fun FavoriteIconButton(isFavorite: Boolean, onCheckedFavorite: (Boolean)
     ) {
         IconButton(
             onClick = {
-                favoriteProduct = !favoriteProduct
-                onCheckedFavorite(favoriteProduct)
+                onCheckedFavorite(onFavorite)
             }
         ) {
-           if (favoriteProduct) {
-               IconLike(idIconLike = R.drawable.ic_like_true)
-           } else
-               IconLike(idIconLike = R.drawable.ic_like)
+            if (onFavorite) {
+                IconLike(idIconLike = R.drawable.ic_like_true)
+            } else
+                IconLike(idIconLike = R.drawable.ic_like)
         }
     }
 }
@@ -236,7 +295,7 @@ private fun FavoriteIconButton(isFavorite: Boolean, onCheckedFavorite: (Boolean)
 @Composable
 fun ProductInfo(product: Product) {
     GlideImage(
-        imageModel = {"$ImageUrl/${product.gallery}"},
+        imageModel = { "$ImageUrl/${product.gallery}" },
         loading = {
             Box(modifier = Modifier.matchParentSize()) {
                 CircularProgressIndicator(
@@ -317,39 +376,42 @@ fun ProductPlusButton(addProductInBasket: () -> Unit) {
 @Composable
 fun HomeScreenPreview() {
     YourWaterTheme {
-        val productsList1: List<Product> = List(100) { Product(
-            id = it,
-            name = "Plesca Натуральная 19л в оборотной таре",
-            shname = "PLN",
-            app_name = "Plesca Натуральная в оборотной таре",
-            price = "1:355;2:325;4:300;8:280;10:250;20:240;",
-            discount = 0,
-            category = 1,
-            about = "",
-            gallery = "cat-1.png",
-            date_created = 1676121935,
-            date = "11/02/2023",
-            site = 1,
-            app = 1,
-            company_id = "0007"
-        ) }
+        val productsList1: List<Product> = List(100) {
+            Product(
+                id = it,
+                name = "Plesca Натуральная 19л в оборотной таре",
+                shname = "PLN",
+                app_name = "Plesca Натуральная в оборотной таре",
+                price = "1:355;2:325;4:300;8:280;10:250;20:240;",
+                discount = 0,
+                category = 1,
+                about = "",
+                gallery = "cat-1.png",
+                date_created = 1676121935,
+                date = "11/02/2023",
+                site = 1,
+                app = 1,
+                company_id = "0007"
+            )
+        }
         val catalogNames: List<String> = List(100) { "$it" }
         val promoTest: List<PromoBanner> = List(10) {
             PromoBanner(
-            id = it,
-            name = "name $it",
-            promocode = "",
-            picture = "iwater_logistic.PNG",
-            discount = 10.0,
-            discount_type = false,
-            description = "ПРОЦЕНТ",
-            is_active = true,
-            end_date = "",
-            start_date = "",
-            products = List(1) {product ->
-                ProductXX(product, name = "name $product")
-            },
-            display_in_app = true)
+                id = it,
+                name = "name $it",
+                promocode = "",
+                picture = "iwater_logistic.PNG",
+                discount = 10.0,
+                discount_type = false,
+                description = "ПРОЦЕНТ",
+                is_active = true,
+                end_date = "",
+                start_date = "",
+                products = List(1) { product ->
+                    ProductXX(product, name = "name $product")
+                },
+                display_in_app = true
+            )
         }
         Column {
             PromoAction(promoTest, rememberLazyListState()) {}
@@ -360,7 +422,7 @@ fun HomeScreenPreview() {
                         productsList = productsList1,
                         {},
                         {},
-                        {product -> {}}
+                        { _, _ -> run {} }
                     )
                 }
             }

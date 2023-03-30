@@ -9,47 +9,72 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.screen.home.CatalogName
 import ru.iwater.youwater.screen.home.ProductCard
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.CatalogListViewModel
 
 @Composable
-fun ProductByCategory(productsList: List<Product>, categoryName: String, getAboutProduct: (Int) -> Unit, addProductInBasket: (Product) -> Unit, addToFavorite: (Int) -> Unit, deleteFavorite: (Int) -> Unit) {
-    val products = productsList.toMutableStateList()
-    if (productsList.isNotEmpty()) {
-        Column {
-            CatalogName(
-                name = categoryName,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp)
-            )
-            ProductGrid(
-                productList = products,
-                countGrid = 2,
-                getAboutProduct = {getAboutProduct(it)},
-                addProductInBasket = {addProductInBasket(it)},
-                onCheckedFavorite = {product -> if (product.onFavoriteClick) deleteFavorite(product.id) else addToFavorite(product.id) }
-            )
-        }
+fun ProductByCategory(
+    catalogListViewModel: CatalogListViewModel = viewModel(),
+    catalogId: Int,
+    navController: NavController
+) {
+    Column {
+        CatalogName(
+            name = catalogListViewModel.catalogList.find { typeProduct -> typeProduct.id == catalogId }?.category ?: "",
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+        )
+        ProductGrid(
+            productsList = catalogListViewModel.productList.filter { product -> product.category == catalogId },
+            countGrid = 2,
+            getAboutProduct = {
+                navController.navigate(
+                    CatalogProductFragmentDirections.actionCatalogProductFragmentToAboutProductFragment(
+                        it
+                    )
+                )
+            },
+            addProductInBasket = { catalogListViewModel.addProductToBasket(it) },
+            onCheckedFavorite = { product, isFavorite ->
+                catalogListViewModel.onChangeFavorite(
+                    productId = product.id,
+                    isFavorite
+                )
+            }
+        )
     }
-
 }
 
 @Composable
-fun ProductGrid(productList: List<Product>, countGrid: Int, getAboutProduct:(Int) -> Unit, addProductInBasket: (Product) -> Unit, onCheckedFavorite:(Product) -> Unit) {
+fun ProductGrid(
+    productsList: List<Product>,
+    countGrid: Int,
+    getAboutProduct: (Int) -> Unit,
+    addProductInBasket: (Product) -> Unit,
+    onCheckedFavorite: (Product, Boolean) -> Unit
+) {
     LazyVerticalGrid(
         modifier = Modifier.padding(bottom = 60.dp),
         columns = GridCells.Fixed(countGrid),
         contentPadding = PaddingValues(8.dp)
     ) {
         items(
-            productList.size
-        ) {productIndex->
+            productsList.size
+        ) { productIndex ->
             ProductCard(
-                product = productList[productIndex],
-                getAboutProduct = {getAboutProduct(productList[productIndex].id)},
-                addProductInBasket = {addProductInBasket(productList[productIndex])},
-                onCheckedFavorite = {isFavorite -> onCheckedFavorite(productList[productIndex])}
+                product = productsList[productIndex],
+                getAboutProduct = { getAboutProduct(productsList[productIndex].id) },
+                addProductInBasket = { addProductInBasket(productsList[productIndex]) },
+                onCheckedFavorite = { isFavorite ->
+                    onCheckedFavorite(
+                        productsList[productIndex],
+                        isFavorite
+                    )
+                }
             )
         }
     }
@@ -80,13 +105,13 @@ fun ProductByCategoryPreview() {
         Column {
             CatalogName(name = "Name Catalog", Modifier.padding(start = 16.dp, top = 16.dp))
             ProductGrid(
-                productList = productsList1,
+                productsList = productsList1,
                 countGrid = 2,
-                {},
-                {},
-                {product -> {} }
+                getAboutProduct = {},
+                addProductInBasket = {},
+                onCheckedFavorite = { _, _ -> run {} }
             )
         }
-        
+
     }
 }

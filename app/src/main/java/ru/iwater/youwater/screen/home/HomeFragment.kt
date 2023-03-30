@@ -11,18 +11,14 @@ import androidx.navigation.fragment.NavHostFragment
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.vm.CatalogListViewModel
-import ru.iwater.youwater.data.Product
-import ru.iwater.youwater.data.PromoBanner
 import ru.iwater.youwater.databinding.FragmentHomeBinding
-import ru.iwater.youwater.screen.adapters.AdapterProductList
-import ru.iwater.youwater.screen.adapters.PromoBannerAdapter
 import ru.iwater.youwater.theme.YourWaterTheme
 import javax.inject.Inject
 
 /**
  * Фрагмент для домашнего экрана
  */
-class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListener, PromoBannerAdapter.OnBannerItemClickListener {
+class HomeFragment : BaseFragment() {
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
@@ -54,16 +50,9 @@ class HomeFragment : BaseFragment(), AdapterProductList.OnProductItemClickListen
         return binding.root
     }
 
-    override fun onProductItemClicked(product: Product) {
-        viewModel.addProductInBasket(product.id)
-    }
-
-    override fun aboutProductClick(product: Product) {
-        viewModel.displayProduct(product.id)
-    }
-
-    override fun onBannerItemClicked(banner: PromoBanner) {
-        viewModel.displayPromoInfo(banner)
+    override fun onResume() {
+        super.onResume()
+        viewModel.getProductsList()
     }
 
     companion object {
