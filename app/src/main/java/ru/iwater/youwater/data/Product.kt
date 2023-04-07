@@ -30,6 +30,18 @@ data class Product(
         return this.price.split(';')[0].split(':')[1].toInt()
     }
 
+
+    fun getPriceNoDiscount(count: Int): Int {
+        val priceList = this.price.removeSuffix(";").split(';')
+        var price = 0
+        priceList.forEach {
+            val priceCount = it.split(':')
+            if(priceCount[0].toInt() <= count) {
+                price = (priceCount[1].toInt()) * count
+            }
+        }
+        return price
+    }
     fun getPriceOnCount(count: Int): Int {
         val priceList = this.price.removeSuffix(";").split(';')
         var price = 0

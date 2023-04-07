@@ -1,0 +1,407 @@
+package ru.iwater.youwater.screen.basket
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
+import ru.iwater.youwater.R
+import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.network.ImageUrl
+import ru.iwater.youwater.theme.Blue500
+import ru.iwater.youwater.theme.YouWaterTypography
+import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.ProductListViewModel
+
+@Composable
+fun BasketScreen(productViewModel: ProductListViewModel = viewModel(), navController: NavController) {
+    val productsListInOrder = productViewModel.productsList
+    val priceNoDiscount by productViewModel.priceNoDiscount.observeAsState()
+    val generalCost by productViewModel.generalCost.observeAsState()
+    Column {
+        if (productsListInOrder.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(
+                    horizontal = 16.dp,
+                    vertical = 16.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(productsListInOrder.size) { productIndex ->
+                    val product = productsListInOrder[productIndex]
+                    var count by remember {
+                        mutableStateOf(product.count)
+                    }
+                    CardProductInBasket(
+                        id = product.id,
+                        name = product.name,
+                        urlImage = product.gallery,
+                        priceNoDiscount = {product.getPriceNoDiscount(count)},
+                        costProducts = { product.getPriceOnCount(count) },
+                        count = count,
+                        deleteProduct = {
+                            productViewModel.deleteProductFromBasket(product.id)
+                        },
+                        plusCount = {
+                            if (product.category != 20) {
+                                count = it + 1
+                                productViewModel.plusCountProduct(product.id)
+                            }
+                        },
+                        minusCount = {
+                            if (it > 1) {
+                                count = it - 1
+                                productViewModel.minusCountProduct(product.id)
+                            } else
+                                count = 1
+                        }
+                    )
+
+                }
+            }
+        } else {
+            Box(
+                modifier = Modifier.fillMaxSize().weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Ни одного товара не добавлено в корзину",
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+        GeneralInfo (
+            priceNoDiscount = priceNoDiscount ?: 0,
+            generalCost = generalCost ?: 0,
+            countProducts = productsListInOrder.size
+        ){
+            navController.navigate(
+                BasketFragmentDirections.actionBasketFragmentToCreateOrderFragment(false, 0)
+            )
+        }
+    }
+
+}
+
+@Composable
+fun CardProductInBasket(
+    id: Int,
+    name: String,
+    urlImage: String,
+    priceNoDiscount: (Int) -> Int,
+    costProducts: (Int) -> Int,
+    count: Int,
+    deleteProduct: () -> Unit,
+    plusCount: (Int) -> Unit,
+    minusCount: (Int) -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(102.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = 8.dp
+    ) {
+        Box(
+            modifier = Modifier.padding(4.dp)
+        ) {
+            Row {
+                ImageProduct(image = urlImage)
+                Column(modifier = Modifier.wrapContentWidth()) {
+                    TitleProduct(name) { deleteProduct() }
+                    CostProducts(
+                        id = id,
+                        priceNoDiscount = {priceNoDiscount(count)},
+                        costProducts = { costProducts(count) },
+                        count = count,
+                        plusCount = {plusCount(count)},
+                        minusCount = {minusCount(count)}
+                    )
+                    }
+                }
+            }
+        }
+}
+
+@Composable
+fun TitleProduct(productName: String, deleteProduct: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(4.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = productName,
+            style = YouWaterTypography.subtitle2,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Start,
+            maxLines = 2,
+            modifier = Modifier.width(200.dp)
+        )
+        Icon(
+            modifier = Modifier.clickable { deleteProduct() },
+            painter = painterResource(id = R.drawable.ic_cancel),
+            contentDescription = stringResource(id = R.string.description_ic_delete),
+            tint = Color.LightGray
+        )
+    }
+}
+
+@Composable
+fun CostProducts(id: Int, priceNoDiscount: (Int) -> Int, costProducts: (Int) -> Int, count: Int, plusCount: (Int) -> Unit, minusCount: (Int) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Bottom
+    ) {
+        if (id == 81 || id == 84) {
+            Column {
+                Text(
+                    text = "${priceNoDiscount(count)}",
+                    style = YouWaterTypography.subtitle2,
+                    textDecoration = TextDecoration.LineThrough,
+                    color = Color.Gray
+                )
+                Text(
+                    text = "${costProducts(count)}",
+                    style = YouWaterTypography.subtitle1,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Start,
+                    color = Blue500
+                )
+            }
+        } else {
+            Text(
+                text = "${costProducts(count)}",
+                style = YouWaterTypography.subtitle1,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Start,
+                color = Blue500
+            )
+        }
+        Box(
+            contentAlignment = Alignment.BottomEnd) {
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                MinusProductButton {
+                    minusCount(count)
+                }
+                Text(
+                    text = "$count",
+                    textAlign = TextAlign.Center,
+                    color = Color.Gray,
+                    style = YouWaterTypography.body1,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                PlusProductButton {
+                    plusCount(count)
+                }
+            }
+        }
+
+    }
+}
+
+@Composable
+fun PlusProductButton(plusClick: () -> Unit) {
+    Box(contentAlignment = Alignment.BottomEnd) {
+        Icon(
+            modifier = Modifier.clickable { plusClick() },
+            painter = painterResource(id = R.drawable.ic_btn_plus),
+            contentDescription = stringResource(id = R.string.description_ic_delete),
+            tint = Blue500
+        )
+    }
+}
+
+@Composable
+fun MinusProductButton(minusClick: () -> Unit) {
+    Box(contentAlignment = Alignment.BottomStart) {
+        Icon(
+            modifier = Modifier.clickable { minusClick() },
+            painter = painterResource(id = R.drawable.ic_btn_minus),
+            contentDescription = stringResource(id = R.string.description_ic_delete),
+            tint = Color.LightGray
+        )
+    }
+}
+
+@Composable
+fun ImageProduct(image: String) {
+    GlideImage(
+        imageModel = { "$ImageUrl/$image" },
+        loading = {
+            Box(
+                modifier = Modifier.wrapContentWidth()
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        },
+        failure = {
+            Image(
+                painter = painterResource(id = R.drawable.ic_your_water_logo),
+                contentDescription = stringResource(id = R.string.description_image_product),
+                alignment = Alignment.Center
+            )
+        },
+        previewPlaceholder = R.drawable.ic_your_water_logo,
+        imageOptions = ImageOptions(
+            alignment = Alignment.Center,
+            contentDescription = stringResource(id = R.string.description_image_product),
+            contentScale = ContentScale.Inside
+        ),
+        modifier = Modifier
+            .padding(8.dp)
+    )
+}
+
+@Composable
+fun PriceOrderNoDiscount(priceOrderNoDiscount: Int){
+    Box(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = stringResource(id = R.string.fragment_basket_total_sum_order))
+            Text(text = "$priceOrderNoDiscount", fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun GeneralInfoOrder(generalPrice: Int, countProducts: Int, toCreateOrder: () -> Unit) {
+    Box(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box {
+                Row(modifier = Modifier
+                    .fillMaxHeight(),
+                    verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        text = stringResource(id = R.string.fragment_basket_total_sum),
+                        style = YouWaterTypography.h6,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "$generalPrice",
+                        style = YouWaterTypography.h6,
+                        fontWeight = FontWeight.Bold,
+                        color = Blue500,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                }
+            }
+            Button(
+                onClick = { toCreateOrder() },
+                enabled = countProducts > 0,
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(text = stringResource(id = R.string.fragment_basket_checkout_order))
+            }
+        }
+    }
+}
+
+@Composable
+fun GeneralInfo(priceNoDiscount: Int, generalCost: Int, countProducts: Int, toCreateOrder: () -> Unit) {
+        Surface(
+            modifier = Modifier
+                .padding(bottom = 60.dp)
+                .fillMaxWidth()
+                .height(120.dp),
+            elevation = 8.dp
+        ) {
+            Column(verticalArrangement = Arrangement.Bottom) {
+                PriceOrderNoDiscount(priceNoDiscount)
+                GeneralInfoOrder(generalCost, countProducts) {toCreateOrder()}
+            }
+        }
+
+}
+
+@Preview
+@Composable
+fun GeneralInfoPreview() {
+    val productsList1: List<Product> = List(100) {
+        Product(
+            id = it,
+            name = "Plesca Натуральная 19л в оборотной таре",
+            shname = "PLN",
+            app_name = "Plesca Натуральная в оборотной таре",
+            price = "1:355;2:325;4:300;8:280;10:250;20:240;",
+            discount = 0,
+            category = 1,
+            about = "",
+            gallery = "cat-1.png",
+            date_created = 1676121935,
+            date = "11/02/2023",
+            site = 1,
+            app = 1,
+            company_id = "0007"
+        )
+    }
+    YourWaterTheme {
+
+        Column(modifier = Modifier.wrapContentHeight()) {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(
+                    horizontal = 16.dp,
+                    vertical = 16.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(productsList1.size) { productIndex ->
+                    CardProductInBasket(
+                        productsList1[productIndex].id,
+                        productsList1[productIndex].name,
+                        productsList1[productIndex].gallery,
+                        {productsList1[productIndex].getPriceNoDiscount(1)},
+                        {productsList1[productIndex].getPriceOnCount(1)},
+                        productsList1[productIndex].count,
+                        {}, {}, {})
+                }
+            }
+            GeneralInfo(123, 1, productsList1.size,) {}
+        }
+    }
+}

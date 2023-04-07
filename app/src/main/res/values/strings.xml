@@ -30,7 +30,7 @@
 
     <string name="home">Главная</string>
     <string name="catalog">Каталог</string>
-    <string name="basket">Карзина</string>
+    <string name="basket">Корзина</string>
     <string name="profile">Личный кабинет</string>
     <string name="info_product">Информация о товаре</string>
     <string name="complete_order_label">Оформление заказа</string>

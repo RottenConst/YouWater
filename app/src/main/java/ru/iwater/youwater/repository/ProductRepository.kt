@@ -25,8 +25,8 @@ class ProductRepository @Inject constructor(
     /**
      * получить список продуктов добавленых в корзину
      */
-    suspend fun getProductListOfCategory(): List<Product>? {
-        return productDao.getAllProduct()
+    suspend fun getProductListOfCategory(): List<Product> {
+        return productDao.getAllProduct() ?: emptyList()
     }
 
     /**
@@ -133,21 +133,6 @@ class ProductRepository @Inject constructor(
             } else emptyList()
         } catch (e: Exception) {
             Timber.e("Error get product list: $e")
-            emptyList()
-        }
-    }
-
-    /**
-     * получить список товаров определённой категории
-     */
-    suspend fun getProductListOfCategory(category: Int): List<Product> {
-        return try {
-            val productList = apiWater.getProductList()
-            if (productList.isNotEmpty()) {
-                productList.filter { it.app == 1 && it.category == category }
-            } else emptyList()
-        }catch (e: Exception) {
-            Timber.e("Error getProductListOfCategory: $e")
             emptyList()
         }
     }
