@@ -42,6 +42,7 @@ fun HomeScreen(
 ) {
     val promoBanner by catalogListViewModel.promoBanners.observeAsState()
     val promoListState = rememberLazyListState()
+    val productsList = catalogListViewModel.productList
     Column {
         PromoAction(promo = promoBanner, promoListState) {
             navController.navigate(
@@ -51,25 +52,32 @@ fun HomeScreen(
                 )
             )
         }
-
-        ProductContent(
-            catalogList = catalogListViewModel.catalogList,
-            productsList = catalogListViewModel.productList,
-            getAboutProduct = {
-                navController.navigate(
-                    HomeFragmentDirections.actionShowAboutProductFragment(
-                        it
-                    )
-                )
-            },
-            addProductInBasket = { catalogListViewModel.addProductToBasket(it) },
-            onCheckedFavorite = { product, onFavorite ->
-                catalogListViewModel.onChangeFavorite(
-                    productId = product.id,
-                    onFavorite = onFavorite
-                )
+        if (productsList.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
-        )
+        } else {
+            ProductContent(
+                catalogList = catalogListViewModel.catalogList,
+                productsList = productsList,
+                getAboutProduct = {
+                    navController.navigate(
+                        HomeFragmentDirections.actionShowAboutProductFragment(
+                            it
+                        )
+                    )
+                },
+                addProductInBasket = { catalogListViewModel.addProductToBasket(it) },
+                onCheckedFavorite = { product, onFavorite ->
+                    catalogListViewModel.onChangeFavorite(
+                        productId = product.id,
+                        onFavorite = onFavorite
+                    )
+                }
+            )
+        }
     }
 }
 
