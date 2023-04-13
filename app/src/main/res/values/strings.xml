@@ -217,7 +217,7 @@
     <string name="fragment_create_order_complete_order">Оформить заявку</string>
     <string name="fragment_create_order_info_order">Детали заказа:</string>
     <string name="fragment_create_order_total_cost_order">Итого с учётом скидок:</string>
-    <string name="fragment_create_order_time_order">Укажите время доставки:</string>
+    <string name="fragment_create_order_time_order">Время доставки:</string>
 
     <string name="faq_label">Часто задаваемые вопросы </string>
     <string name="one_quest_answer_2">Plesca Натуральная – это вода из артезианской скважины из Псковской области Печерского района. Этот вид воды отлично подходит для питья в сыром виде. В воде Plesca Натуральная много природных минералов полезных для здоровья, она обладает хорошими вкусовые качествами и безопасна для употребления взрослыми и детьми.</string>

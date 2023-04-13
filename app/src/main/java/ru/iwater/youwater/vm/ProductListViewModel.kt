@@ -1,20 +1,28 @@
 package ru.iwater.youwater.vm
 
 import androidx.compose.runtime.toMutableStateList
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import kotlinx.coroutines.launch
+import ru.iwater.youwater.data.Client
+import ru.iwater.youwater.data.Common
+import ru.iwater.youwater.data.Exception
 import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.data.RawAddress
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.repository.ProductRepository
+import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 @OnScreen
 class ProductListViewModel @Inject constructor(
     private val productRepo: ProductRepository,
 ) : ViewModel() {
+
+    private val _client: MutableLiveData<Client?> = MutableLiveData()
+    val client: LiveData<Client?> = _client
 
     private val _productsList = listOf<Product>().toMutableStateList()
     val productsList: List<Product> get() = _productsList
@@ -25,6 +33,24 @@ class ProductListViewModel @Inject constructor(
     private val _generalCost: MutableLiveData<Int> = MutableLiveData()
     val generalCost: LiveData<Int>
         get() = _generalCost
+
+    private val _addressList: MutableLiveData<List<RawAddress>> = MutableLiveData()
+    val addressList: LiveData<List<RawAddress>> get() = _addressList
+
+    private val _timesListOrder = listOf<String>().toMutableStateList()
+    val timesListOrder: MutableList<String> get() = _timesListOrder
+
+    private val disabledDays = mutableListOf<Common>()
+    private val exceptions = mutableListOf<Exception>()
+
+    private val deliveryTime = mutableListOf<Common>()
+    private val exceptionTime = mutableListOf<Exception>()
+
+    fun getClient() {
+        viewModelScope.launch {
+            _client.value = productRepo.getClientInfo()
+        }
+    }
 
     fun getBasket() {
         viewModelScope.launch {
@@ -73,7 +99,6 @@ class ProductListViewModel @Inject constructor(
             getPriceNoDiscount()
             getCostProduct()
         }
-
     }
 
     fun minusCountProduct(productId: Int) {
@@ -89,6 +114,165 @@ class ProductListViewModel @Inject constructor(
             }
             getPriceNoDiscount()
             getCostProduct()
+        }
+    }
+
+    fun getAddressList() {
+        viewModelScope.launch {
+//            _addressList.clear()
+//            _addressList.addAll(productRepo.getAddress())
+            _addressList.value = productRepo.getAddress()
+        }
+    }
+
+    fun getDeliveryOnAddress(address: RawAddress) {
+        viewModelScope.launch {
+            disabledDays.clear()
+            exceptions.clear()
+            val delivery = productRepo.getDelivery(address)
+            if (delivery != null) {
+                disabledDays.addAll(delivery.common.filter { !it.available })
+                exceptions.addAll(delivery.exceptions)
+                deliveryTime.addAll(
+                    delivery.common.filter { it.available }
+                )
+                exceptionTime.addAll(
+                    delivery.exceptions.filter { it.available }
+                )
+            }
+        }
+    }
+
+    fun getCalendar(calendar: Calendar, setDateOrder: (String) -> Unit): DatePickerDialog {
+        val thisYear = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        _timesListOrder.clear()
+
+        val datePickerDialog = DatePickerDialog.newInstance({ _, year, monthOfYear, dayOfMonth ->
+            if (monthOfYear + 1 >= 10) "$dayOfMonth.${monthOfYear + 1}.$year".also {
+                setDateOrder(it)
+                _timesListOrder.addAll(getTimeList(year, monthOfYear, dayOfMonth))
+            } else "$dayOfMonth.0${monthOfYear + 1}.$year".also {
+                setDateOrder(it)
+                _timesListOrder.addAll(getTimeList(year, monthOfYear, dayOfMonth))
+            }
+         }, thisYear,month,day)
+
+        datePickerDialog.setTitle("Укажите время заказа")
+        datePickerDialog.firstDayOfWeek = Calendar.MONDAY
+        val minDate = Calendar.getInstance()
+        datePickerDialog.minDate = minDate
+
+        if (hour >= 14) {
+            val yearMin = minDate.get(Calendar.YEAR)
+            val monthMin = minDate.get(Calendar.MONTH)
+            val dayMin = minDate.get(Calendar.DAY_OF_MONTH)
+            minDate.set(yearMin, monthMin, dayMin + 1)
+            datePickerDialog.minDate = minDate
+        }
+
+        val maxDate = Calendar.getInstance()
+        maxDate.set(Calendar.DAY_OF_MONTH, day + 320)
+        datePickerDialog.maxDate = maxDate
+
+        disableOnDelivery(minDate, maxDate, disabledDays, exceptions, datePickerDialog)
+        return datePickerDialog
+    }
+
+    private fun disableOnDelivery(minDate: Calendar, maxDate: Calendar, disabledDays: List<Common>, exceptions: List<Exception>, datePickerDialog: DatePickerDialog) {
+        var loopDate = minDate
+        while (minDate.before(maxDate)) {
+            val dayOfWeek = loopDate[Calendar.DAY_OF_WEEK]
+            disabledDays.forEach { common ->
+                disableDay(common.day_num, dayOfWeek, loopDate, datePickerDialog)
+            }
+            minDate.add(Calendar.DATE, 1)
+            loopDate = minDate
+        }
+        datePickerDialog.disabledDays.forEach { calendar ->
+            val date = SimpleDateFormat("yyyy-MM-dd", Locale("ru")).format(calendar.time)
+            exceptions.forEach {
+                if (it.date == date && it.available) {
+                    calendar.clear()
+                }
+            }
+        }
+    }
+
+    private fun disableDay(day: Int, dayOfWeek: Int, loopDate: Calendar, datePickerDialog: DatePickerDialog) {
+        when(day) {
+            1 -> if (dayOfWeek == Calendar.MONDAY) {
+                val disables = arrayOfNulls<Calendar>(1)
+                disables[0] = loopDate
+                datePickerDialog.disabledDays = disables
+            }
+            2 -> if (dayOfWeek == Calendar.TUESDAY) {
+                val disables = arrayOfNulls<Calendar>(1)
+                disables[0] = loopDate
+                datePickerDialog.disabledDays = disables
+            }
+            3 -> if (dayOfWeek == Calendar.WEDNESDAY) {
+                val disables = arrayOfNulls<Calendar>(1)
+                disables[0] = loopDate
+                datePickerDialog.disabledDays = disables
+            }
+            4 -> if (dayOfWeek == Calendar.THURSDAY) {
+                val disables = arrayOfNulls<Calendar>(1)
+                disables[0] = loopDate
+                datePickerDialog.disabledDays = disables
+            }
+            5 -> if (dayOfWeek == Calendar.FRIDAY) {
+                val disables = arrayOfNulls<Calendar>(1)
+                disables[0] = loopDate
+                datePickerDialog.disabledDays = disables
+            }
+            6 -> if (dayOfWeek == Calendar.SATURDAY) {
+                val disables = arrayOfNulls<Calendar>(1)
+                disables[0] = loopDate
+                datePickerDialog.disabledDays = disables
+            }
+            7 -> if (dayOfWeek == Calendar.SUNDAY) {
+                val disables = arrayOfNulls<Calendar>(1)
+                disables[0] = loopDate
+                datePickerDialog.disabledDays = disables
+            }
+        }
+    }
+
+    fun getTimeList(year: Int, monthOfYear: Int, dayOfMonth: Int): List<String> {
+        val calendar = Calendar.getInstance()
+        //дата заказа
+        calendar.set(year, monthOfYear, dayOfMonth)
+        val orderDate = calendar.get(Calendar.DAY_OF_WEEK) - 1
+        val date = SimpleDateFormat("yyyy-MM-dd", Locale("ru")).format(Date(calendar.timeInMillis))
+
+        val exception = exceptionTime.filter { it.date == date }
+        val commons = deliveryTime.filter { it.day_num == orderDate }
+        val times = if (commons.isNotEmpty() || exception.isNotEmpty()) {
+                if (exception.isNotEmpty()) {
+                    addTime(exception[0].part_types)
+                } else {
+                    Timber.d("Common ${commons.get(0).part_types.size}")
+                    commons[0].part_types.forEach {
+                        Timber.d("part_types = $it")
+                    }
+                    addTime(commons[0].part_types)
+                }
+        } else emptyList<String>()
+        return times
+    }
+
+    private fun addTime(part_types: List<Int>): MutableList<String> {
+        return when {
+            part_types.size == 2 -> {
+                arrayListOf("09:00-16:00", "17:00-22:00", "19:00-22:00", "**:**-**:**")
+            }
+            part_types[0] == 0 -> {
+                arrayListOf("09:00-16:00", "**:**-**:**")
+            }
+            else -> {arrayListOf("17:00-22:00", "19:00-22:00", "**:**-**:**")}
         }
     }
 }

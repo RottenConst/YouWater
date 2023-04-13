@@ -5,9 +5,9 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -19,9 +19,10 @@ import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.databinding.FragmentCreateOrderBinding
-import ru.iwater.youwater.screen.adapters.OrderProductAdapter
 import ru.iwater.youwater.screen.dialog.AddAddressDialog
 import ru.iwater.youwater.screen.dialog.AddNoticeDialog
+import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.ProductListViewModel
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -36,7 +37,7 @@ class CreateOrderFragment : BaseFragment(),
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     private val screenComponent = App().buildScreenComponent()
-    val viewModel: OrderViewModel by viewModels { factory }
+    val viewModel: ProductListViewModel by viewModels { factory }
 
     private val productClear = mutableListOf<Product>()
     private var order =
@@ -57,11 +58,11 @@ class CreateOrderFragment : BaseFragment(),
             dateCreate =  java.sql.Date(Calendar.getInstance().timeInMillis)
         )
 
-    private val binding: FragmentCreateOrderBinding by lazy {
-        FragmentCreateOrderBinding.inflate(
-            LayoutInflater.from(this.context)
-        )
-    }
+//    private val binding: FragmentCreateOrderBinding by lazy {
+//        FragmentCreateOrderBinding.inflate(
+//            LayoutInflater.from(this.context)
+//        )
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,246 +77,258 @@ class CreateOrderFragment : BaseFragment(),
         // true - да, false - нет
         val isShowMessage = CreateOrderFragmentArgs.fromBundle(this.requireArguments()).isShowMessage
         val lastOrder = CreateOrderFragmentArgs.fromBundle(this.requireArguments()).lastOrderId
+        val binding = FragmentCreateOrderBinding.inflate(inflater)
         warningPay(isShowMessage)
 
         binding.lifecycleOwner = this
         /**
          * информация о клиенте
          */
-        viewModel.client.observe(viewLifecycleOwner) {
-            binding.tvNameClient.text = it.name
-            binding.tvTelNumber.text = it.contact
-            order.clientId = it.client_id
-            order.name = it.name
-            order.contact = it.contact
-            if (it.email.isNotEmpty()) order.email = it.email
-        }
-
-        viewModel.getInfoLastOrder(lastOrder)
-
-        // выбор адреса доставки
-        viewModel.rawAddress.observe(viewLifecycleOwner) { listRawAddress ->
-            if (!listRawAddress.isNullOrEmpty()) {
-                for (rawAddress in listRawAddress) {
-                    Timber.d("Note in address ${rawAddress.id} ${rawAddress.notice}")
-                }
-                binding.btnSetAddress.text = "Выбрать адрес доставки"
-                val listAddress = mutableListOf<Address>()
-                val addresses = mutableListOf<String>()
-                listRawAddress.forEach { rawAddress ->
-                    val region = rawAddress.fullAddress.split(",")[0]
-                    addresses.add(rawAddress.factAddress)
-                    listAddress.add(viewModel.getAddressFromString(rawAddress.factAddress.split(","), region, rawAddress.id, rawAddress.notice))
-                }
-                binding.btnSetAddress.setOnClickListener {
-                    listAddress.forEach {
-                        Timber.d("List Address ${it.note}")
-                    }
-                    AddAddressDialog.getAddressDialog(childFragmentManager, listAddress, addresses)
-                }
-            } else {
-                // если адресов нету переводим на страницу создания адреса
-                binding.btnSetAddress.text = "Добавить адрес"
-//                binding.tvAddressOrder.setBackgroundColor(Color.WHITE)
-                binding.btnSetAddress.setOnClickListener {
-                    this.findNavController().navigate(
-                        CreateOrderFragmentDirections.actionCreateOrderFragmentToAddAddressFragment(true)
-                    )
-                }
-
-            }
-
-        }
-
-        //выбор даты заказа
-        binding.btnSetTime.text = "Укажите дату"
-        binding.btnSetTime.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            if (order.date.isNotEmpty()) {
-                val year = order.date.split('-')[0].toInt()
-                val month = order.date.split('-')[1].toInt() - 1
-                val day = order.date.split('-')[2].toInt()
-                Timber.d("DATE = $year, $month, $day")
-                calendar.set(year, month, day)
-                getCalendar(calendar)
-            } else {
-                getCalendar(calendar)
-            }
-        }
-        // детали заказа
-        val adapterOrder = OrderProductAdapter()
-        val product = mutableListOf<Product>()
-        binding.rvOrderProduct.adapter = adapterOrder
-        viewModel.products.observe(viewLifecycleOwner) { products ->
-            adapterOrder.submitList(products)
-            productClear.addAll(products)
-            var priceTotal = 0
-            var priceCompleteDiscount = 0
-            var priceComplete = 0
-            var priceTotalDiscount = 0
-            var discount = 0
-            var price = 0
-            product.addAll(products)
-            products.forEach { product ->
-                val prices = product.price.removeSuffix(";")
-                val priceList = prices.split(";")
-                val count = product.count
-                if (product.id == 81 || product.id == 84) {
-                    priceList.forEach {
-                        val priceCount = it.split(":")
-                        if (priceCount[0].toInt() <= count) {
-                            discount = (priceCount[1].toInt() - 15) * count
-                            price = priceCount[1].toInt() * count
-                        }
-                    }
-                    priceCompleteDiscount += discount
-                } else {
-                    priceList.forEach {
-                        val priceCount = it.split(":")
-                        if (priceCount[0].toInt() <= count) {
-                            price = priceCount[1].toInt() * count
-                        }
-                    }
-                    priceComplete += price
-                }
-                val priceOne = if (discount != 0) {
-                    discount / count
-                } else price / count
-                Timber.d("COST ==== $priceOne")
-                val productJs = getJsonProduct(product, priceOne)
-                order.waterEquip.add(productJs)
-                discount = 0
-                priceTotal += price
-                priceTotalDiscount = priceCompleteDiscount + priceComplete
-            }
-            "${priceTotal}₽".also { binding.tvCostOrder.text = it }
-            "${priceTotalDiscount}₽".also { binding.tvTotalSumCost.text = it }
-            order.orderCost = priceTotalDiscount
-        }
-        //выбор оплаты
-        val context = this.context
-        if (context != null) {
-            val typesOfPay = mutableListOf(
-                "Оплата по карте курьеру",
-                "Оплата наличными",
-                "Оплата онлайн",
-                "Выберите способ оплаты",
+        viewModel.getBasket()
+        binding.composeViewCreateOrderScreen.apply {
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.Default
             )
-
-            val spinnerAdapter =
-                ArrayAdapter(context,
-                    R.layout.spinner_item_layout_resource,
-                    R.id.TextView,
-                    typesOfPay)
-
-            binding.spinnerPaymentType.adapter = spinnerAdapter
-            binding.spinnerPaymentType.setSelection(3)
-            //выбор способа оплаты
-            val itemTypePeySelectedListener: AdapterView.OnItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long,
-                    ) {
-                        if (parent?.getItemAtPosition(position) == "Оплата по карте курьеру") order.paymentType = "4"
-                        if (parent?.getItemAtPosition(position) == "Оплата наличными") order.paymentType = "0"
-                        if (parent?.getItemAtPosition(position) == "Оплата онлайн") order.paymentType = "2"
-                        binding.btnCreateOrder.text = if (order.paymentType == "2") "Перейти к оплате" else "Оформить заявку"
-                        typesOfPay.remove("Выберите способ оплаты")
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-                    }
-                }
-            binding.spinnerPaymentType.onItemSelectedListener = itemTypePeySelectedListener
-            if (binding.spinnerPaymentType.isFocused) {
-                spinnerAdapter.notifyDataSetChanged()
-            }
-        }
-
-        binding.cvNoticeOrder.setOnClickListener {
-            AddNoticeDialog.getAddNoticeDialog(childFragmentManager, order.notice)
-        }
-
-        viewModel.myOrder.observe(viewLifecycleOwner) { myOrder ->
-            if (myOrder != null) {
-                when (myOrder.payment_type) {
-                    "0" -> binding.spinnerPaymentType.setSelection(1)
-                    "2" -> binding.spinnerPaymentType.setSelection(2)
-                    "4" -> binding.spinnerPaymentType.setSelection(0)
-                    else -> {}
-                }
-                if (myOrder.notice.isNotEmpty()) {
-                    order.notice = myOrder.notice
-                    binding.tvOrderNotice.text = myOrder.notice
+            setContent {
+                YourWaterTheme {
+                    CreateorderScreen(productListViewModel = viewModel, parentFragmentManager)
                 }
             }
         }
-
-        viewModel.address.observe(viewLifecycleOwner) { address ->
-            if (address != "Адрес устарел, выберете другой") {
-                binding.btnSetAddress.text = address
-            } else {
-                binding.btnSetAddress.text = address
-            }
-        }
-
-        binding.btnCreateOrder.setOnClickListener {
-            Timber.d("PERIOD ${order.period}")
-            if (binding.btnSetAddress.text != "Выбрать адрес доставки" &&
-                binding.btnSetAddress.text != "Адрес устарел, выберете другой" &&
-                binding.btnSetTime.text != "Укажите дату" &&
-                order.period.isNotEmpty() &&
-                order.period != "**:**-**:**" &&
-                order.paymentType == "4") {
-                viewModel.sendAndSaveOrder(order)
-                createOrder(viewModel)
-
-
-            }
-
-            else if (binding.btnSetAddress.text != "Выбрать адрес доставки" &&
-                binding.btnSetAddress.text != "Адрес устарел, выберете другой" &&
-                binding.btnSetTime.text != "Укажите дату" &&
-                order.period.isNotEmpty() &&
-                order.period != "**:**-**:**" &&
-                order.paymentType == "0") {
-                viewModel.sendAndSaveOrder(order)
-                createOrder(viewModel)
-            }
-
-            else if (binding.btnSetAddress.text != "Выбрать адрес доставки" &&
-                binding.btnSetAddress.text != "Адрес устарел, выберете другой" &&
-                binding.btnSetTime.text != "Укажите дату" &&
-                order.period.isNotEmpty() &&
-                order.period != "**:**-**:**" &&
-                order.paymentType == "2") {
-                viewModel.sendAndSaveOrder(order)
-                viewModel.statusOrder.observe(this.viewLifecycleOwner) { status ->
-                    when(status) {
-                        Status.SEND -> {
-                            viewModel.numberOrder.observe(this.viewLifecycleOwner) { numberOrder ->
-                                viewModel.payToCard(numberOrder, amount = order.orderCost * 100, order.contact)//*100
-                                viewModel.dataPayment.observe(this.viewLifecycleOwner) { dataPayment ->
-//                                    Timber.d("SBER LINK: ${dataPayment[0]}; ${dataPayment[1]}")
-                                    val orderId = dataPayment[0].removePrefix("\"").removeSuffix("\"")
-                                    val url = dataPayment[1].removePrefix("\"").removeSuffix("\"")
-                                    this.findNavController().navigate(CreateOrderFragmentDirections.actionCreateOrderFragmentToCardPaymentFragment(url, orderId))
-                                }
-                            }
-                        }
-                        else -> {
-                            warning("Ошибка, возвожно проблемы с интернетом")
-                        }
-                    }
-                }
-            } else {
-                Timber.d("${order.period}, ${order.paymentType}")
-                warning("Уточните основные данные: адрес, время, тип оплаты")
-            }
-        }
+//        viewModel.client.observe(viewLifecycleOwner) {
+//            binding.tvNameClient.text = it.name
+//            binding.tvTelNumber.text = it.contact
+//            order.clientId = it.client_id
+//            order.name = it.name
+//            order.contact = it.contact
+//            if (it.email.isNotEmpty()) order.email = it.email
+//        }
+//
+//        viewModel.getInfoLastOrder(lastOrder)
+//
+//        // выбор адреса доставки
+//        viewModel.rawAddress.observe(viewLifecycleOwner) { listRawAddress ->
+//            if (!listRawAddress.isNullOrEmpty()) {
+//                for (rawAddress in listRawAddress) {
+//                    Timber.d("Note in address ${rawAddress.id} ${rawAddress.notice}")
+//                }
+//                binding.btnSetAddress.text = "Выбрать адрес доставки"
+//                val listAddress = mutableListOf<Address>()
+//                val addresses = mutableListOf<String>()
+//                listRawAddress.forEach { rawAddress ->
+//                    val region = rawAddress.fullAddress.split(",")[0]
+//                    addresses.add(rawAddress.factAddress)
+//                    listAddress.add(viewModel.getAddressFromString(rawAddress.factAddress.split(","), region, rawAddress.id, rawAddress.notice))
+//                }
+//                binding.btnSetAddress.setOnClickListener {
+//                    listAddress.forEach {
+//                        Timber.d("List Address ${it.note}")
+//                    }
+//                    AddAddressDialog.getAddressDialog(childFragmentManager, listAddress, addresses)
+//                }
+//            } else {
+//                // если адресов нету переводим на страницу создания адреса
+//                binding.btnSetAddress.text = "Добавить адрес"
+////                binding.tvAddressOrder.setBackgroundColor(Color.WHITE)
+//                binding.btnSetAddress.setOnClickListener {
+//                    this.findNavController().navigate(
+//                        CreateOrderFragmentDirections.actionCreateOrderFragmentToAddAddressFragment(true)
+//                    )
+//                }
+//
+//            }
+//
+//        }
+//
+//        //выбор даты заказа
+//        binding.btnSetTime.text = "Укажите дату"
+//        binding.btnSetTime.setOnClickListener {
+//            val calendar = Calendar.getInstance()
+//            if (order.date.isNotEmpty()) {
+//                val year = order.date.split('-')[0].toInt()
+//                val month = order.date.split('-')[1].toInt() - 1
+//                val day = order.date.split('-')[2].toInt()
+//                Timber.d("DATE = $year, $month, $day")
+//                calendar.set(year, month, day)
+//                getCalendar(calendar)
+//            } else {
+//                getCalendar(calendar)
+//            }
+//        }
+//        // детали заказа
+//        val adapterOrder = OrderProductAdapter()
+//        val product = mutableListOf<Product>()
+//        binding.rvOrderProduct.adapter = adapterOrder
+//        viewModel.products.observe(viewLifecycleOwner) { products ->
+//            adapterOrder.submitList(products)
+//            productClear.addAll(products)
+//            var priceTotal = 0
+//            var priceCompleteDiscount = 0
+//            var priceComplete = 0
+//            var priceTotalDiscount = 0
+//            var discount = 0
+//            var price = 0
+//            product.addAll(products)
+//            products.forEach { product ->
+//                val prices = product.price.removeSuffix(";")
+//                val priceList = prices.split(";")
+//                val count = product.count
+//                if (product.id == 81 || product.id == 84) {
+//                    priceList.forEach {
+//                        val priceCount = it.split(":")
+//                        if (priceCount[0].toInt() <= count) {
+//                            discount = (priceCount[1].toInt() - 15) * count
+//                            price = priceCount[1].toInt() * count
+//                        }
+//                    }
+//                    priceCompleteDiscount += discount
+//                } else {
+//                    priceList.forEach {
+//                        val priceCount = it.split(":")
+//                        if (priceCount[0].toInt() <= count) {
+//                            price = priceCount[1].toInt() * count
+//                        }
+//                    }
+//                    priceComplete += price
+//                }
+//                val priceOne = if (discount != 0) {
+//                    discount / count
+//                } else price / count
+//                Timber.d("COST ==== $priceOne")
+//                val productJs = getJsonProduct(product, priceOne)
+//                order.waterEquip.add(productJs)
+//                discount = 0
+//                priceTotal += price
+//                priceTotalDiscount = priceCompleteDiscount + priceComplete
+//            }
+//            "${priceTotal}₽".also { binding.tvCostOrder.text = it }
+//            "${priceTotalDiscount}₽".also { binding.tvTotalSumCost.text = it }
+//            order.orderCost = priceTotalDiscount
+//        }
+//        //выбор оплаты
+//        val context = this.context
+//        if (context != null) {
+//            val typesOfPay = mutableListOf(
+//                "Оплата по карте курьеру",
+//                "Оплата наличными",
+//                "Оплата онлайн",
+//                "Выберите способ оплаты",
+//            )
+//
+//            val spinnerAdapter =
+//                ArrayAdapter(context,
+//                    R.layout.spinner_item_layout_resource,
+//                    R.id.TextView,
+//                    typesOfPay)
+//
+//            binding.spinnerPaymentType.adapter = spinnerAdapter
+//            binding.spinnerPaymentType.setSelection(3)
+//            //выбор способа оплаты
+//            val itemTypePeySelectedListener: AdapterView.OnItemSelectedListener =
+//                object : AdapterView.OnItemSelectedListener {
+//                    override fun onItemSelected(
+//                        parent: AdapterView<*>?,
+//                        view: View?,
+//                        position: Int,
+//                        id: Long,
+//                    ) {
+//                        if (parent?.getItemAtPosition(position) == "Оплата по карте курьеру") order.paymentType = "4"
+//                        if (parent?.getItemAtPosition(position) == "Оплата наличными") order.paymentType = "0"
+//                        if (parent?.getItemAtPosition(position) == "Оплата онлайн") order.paymentType = "2"
+//                        binding.btnCreateOrder.text = if (order.paymentType == "2") "Перейти к оплате" else "Оформить заявку"
+//                        typesOfPay.remove("Выберите способ оплаты")
+//                    }
+//
+//                    override fun onNothingSelected(parent: AdapterView<*>?) {
+//                    }
+//                }
+//            binding.spinnerPaymentType.onItemSelectedListener = itemTypePeySelectedListener
+//            if (binding.spinnerPaymentType.isFocused) {
+//                spinnerAdapter.notifyDataSetChanged()
+//            }
+//        }
+//
+//        binding.cvNoticeOrder.setOnClickListener {
+//            AddNoticeDialog.getAddNoticeDialog(childFragmentManager, order.notice)
+//        }
+//
+//        viewModel.myOrder.observe(viewLifecycleOwner) { myOrder ->
+//            if (myOrder != null) {
+//                when (myOrder.payment_type) {
+//                    "0" -> binding.spinnerPaymentType.setSelection(1)
+//                    "2" -> binding.spinnerPaymentType.setSelection(2)
+//                    "4" -> binding.spinnerPaymentType.setSelection(0)
+//                    else -> {}
+//                }
+//                if (myOrder.notice.isNotEmpty()) {
+//                    order.notice = myOrder.notice
+//                    binding.tvOrderNotice.text = myOrder.notice
+//                }
+//            }
+//        }
+//
+//        viewModel.address.observe(viewLifecycleOwner) { address ->
+//            if (address != "Адрес устарел, выберете другой") {
+//                binding.btnSetAddress.text = address
+//            } else {
+//                binding.btnSetAddress.text = address
+//            }
+//        }
+//
+//        binding.btnCreateOrder.setOnClickListener {
+//            Timber.d("PERIOD ${order.period}")
+//            if (binding.btnSetAddress.text != "Выбрать адрес доставки" &&
+//                binding.btnSetAddress.text != "Адрес устарел, выберете другой" &&
+//                binding.btnSetTime.text != "Укажите дату" &&
+//                order.period.isNotEmpty() &&
+//                order.period != "**:**-**:**" &&
+//                order.paymentType == "4") {
+//                viewModel.sendAndSaveOrder(order)
+//                createOrder(viewModel)
+//
+//
+//            }
+//
+//            else if (binding.btnSetAddress.text != "Выбрать адрес доставки" &&
+//                binding.btnSetAddress.text != "Адрес устарел, выберете другой" &&
+//                binding.btnSetTime.text != "Укажите дату" &&
+//                order.period.isNotEmpty() &&
+//                order.period != "**:**-**:**" &&
+//                order.paymentType == "0") {
+//                viewModel.sendAndSaveOrder(order)
+//                createOrder(viewModel)
+//            }
+//
+//            else if (binding.btnSetAddress.text != "Выбрать адрес доставки" &&
+//                binding.btnSetAddress.text != "Адрес устарел, выберете другой" &&
+//                binding.btnSetTime.text != "Укажите дату" &&
+//                order.period.isNotEmpty() &&
+//                order.period != "**:**-**:**" &&
+//                order.paymentType == "2") {
+//                viewModel.sendAndSaveOrder(order)
+//                viewModel.statusOrder.observe(this.viewLifecycleOwner) { status ->
+//                    when(status) {
+//                        Status.SEND -> {
+//                            viewModel.numberOrder.observe(this.viewLifecycleOwner) { numberOrder ->
+//                                viewModel.payToCard(numberOrder, amount = order.orderCost * 100, order.contact)//*100
+//                                viewModel.dataPayment.observe(this.viewLifecycleOwner) { dataPayment ->
+////                                    Timber.d("SBER LINK: ${dataPayment[0]}; ${dataPayment[1]}")
+//                                    val orderId = dataPayment[0].removePrefix("\"").removeSuffix("\"")
+//                                    val url = dataPayment[1].removePrefix("\"").removeSuffix("\"")
+//                                    this.findNavController().navigate(CreateOrderFragmentDirections.actionCreateOrderFragmentToCardPaymentFragment(url, orderId))
+//                                }
+//                            }
+//                        }
+//                        else -> {
+//                            warning("Ошибка, возвожно проблемы с интернетом")
+//                        }
+//                    }
+//                }
+//            } else {
+//                Timber.d("${order.period}, ${order.paymentType}")
+//                warning("Уточните основные данные: адрес, время, тип оплаты")
+//            }
+//        }
         return binding.root
     }
 
@@ -326,7 +339,7 @@ class CreateOrderFragment : BaseFragment(),
             dialog.dismissNow()
         } else {
             order.notice = inputNotice
-            binding.tvOrderNotice.text = inputNotice
+//            binding.tvOrderNotice.text = inputNotice
             dialog.dismissNow()
         }
     }
@@ -338,22 +351,22 @@ class CreateOrderFragment : BaseFragment(),
         addressString: String?,
         notice: String?
     ) {
-        binding.btnSetAddress.text = addressString
+//        binding.btnSetAddress.text = addressString
         if (id != null) {
             order.addressId = id
         }
         if (notice != null) {
-            binding.cvNoticeAddress.visibility = View.VISIBLE
-            binding.tvAddressNotice.text = notice
+//            binding.cvNoticeAddress.visibility = View.VISIBLE
+//            binding.tvAddressNotice.text = notice
         } else {
-            binding.cvNoticeAddress.visibility = View.GONE
+//            binding.cvNoticeAddress.visibility = View.GONE
         }
         dialogFragment.dismissNow()
     }
 
     // отмена выбора адреса
     override fun cancelClick(dialogFragment: DialogFragment) {
-        binding.btnSetAddress.text = "Выбрать адрес доставки"
+//        binding.btnSetAddress.text = "Выбрать адрес доставки"
         order.addressId = 0
         dialogFragment.dismissNow()
     }
@@ -387,26 +400,26 @@ class CreateOrderFragment : BaseFragment(),
         beforeTimeArray: MutableList<String>,
         countBefore: Int
         ) {
-        binding.beforeTimeSpinner.adapter = spinnerAdapterBefore
-        binding.beforeTimeSpinner.setSelection(countBefore)
-        val itemTimeBeforeSelectListener: AdapterView.OnItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    order.period = parent?.getItemAtPosition(position).toString()
-                    beforeTimeArray.remove("**:**-**:**")
-
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                }
-            }
-        binding.beforeTimeSpinner.onItemSelectedListener = itemTimeBeforeSelectListener
-        if (binding.beforeTimeSpinner.isFocused) spinnerAdapterBefore.notifyDataSetChanged()
+//        binding.beforeTimeSpinner.adapter = spinnerAdapterBefore
+//        binding.beforeTimeSpinner.setSelection(countBefore)
+//        val itemTimeBeforeSelectListener: AdapterView.OnItemSelectedListener =
+//            object : AdapterView.OnItemSelectedListener {
+//                override fun onItemSelected(
+//                    parent: AdapterView<*>?,
+//                    view: View?,
+//                    position: Int,
+//                    id: Long
+//                ) {
+//                    order.period = parent?.getItemAtPosition(position).toString()
+//                    beforeTimeArray.remove("**:**-**:**")
+//
+//                }
+//
+//                override fun onNothingSelected(parent: AdapterView<*>?) {
+//                }
+//            }
+//        binding.beforeTimeSpinner.onItemSelectedListener = itemTimeBeforeSelectListener
+//        if (binding.beforeTimeSpinner.isFocused) spinnerAdapterBefore.notifyDataSetChanged()
     }
 
     companion object {
@@ -530,9 +543,9 @@ class CreateOrderFragment : BaseFragment(),
     }
 
     private fun setTimeOrderText(time: String) {
-        binding.btnSetTime.text = time
-        binding.tvTimeSetLogo.visibility = View.VISIBLE
-        binding.cvTimeSet.visibility = View.VISIBLE
+//        binding.btnSetTime.text = time
+//        binding.tvTimeSetLogo.visibility = View.VISIBLE
+//        binding.cvTimeSet.visibility = View.VISIBLE
     }
 
     private fun getJsonProduct(product: Product, priceOne: Int): JsonObject {

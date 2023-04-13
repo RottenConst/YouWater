@@ -1,5 +1,7 @@
 package ru.iwater.youwater.repository
 
+import com.google.gson.JsonObject
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import ru.iwater.youwater.bd.FavoriteProductDao
 import ru.iwater.youwater.bd.ProductDao
 import ru.iwater.youwater.bd.YouWaterDB
@@ -9,6 +11,8 @@ import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.RetrofitFactory
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 import kotlin.Exception
 
@@ -193,8 +197,51 @@ class ProductRepository @Inject constructor(
         }
     }
 
+    suspend fun getDelivery(address: RawAddress): DeliverySchedule? {
+        return try {
+            val region = address.region ?: address.fullAddress.split(",")[0]
+            val city = address.factAddress.split(',')[0]
+            val street = address.factAddress.split(',')[1]
+            val house = address.factAddress.split(',')[2]
+            val jsonAddress = JsonObject().apply {
+                addProperty("region", region)
+                addProperty("city", city)
+                addProperty("floor", house)
+                addProperty("entrance", "")
+                addProperty("street", street)
+                addProperty("house", house)
+                addProperty("building", "")
+                addProperty("flat", "")
+            }
+            return apiWater.getDeliverySchedule(jsonAddress)
+        } catch (e: Exception) {
+            Timber.d("Error getDelivery: $e")
+            null
+        }
+    }
+
+    suspend fun getAddress(): List<RawAddress> {
+        return try {
+            apiWater.getAllAddresses(getAuthClient().clientId)
+        } catch (e: Exception) {
+            Timber.e("Error get address: $e")
+            emptyList()
+        }
+    }
+
     /**
      * получить информацю о клиенте
      */
+    suspend fun getClientInfo(): Client? {
+        try {
+            val client = apiWater.getClientDetail(getAuthClient().clientId)
+            if (client != null) {
+                return client
+            }
+        } catch (e: Exception) {
+            Timber.e("error get client: $e")
+        }
+        return null
+    }
     private fun getAuthClient(): AuthClient = authClient.get()
 }
