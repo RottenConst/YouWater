@@ -1,5 +1,6 @@
 package ru.iwater.youwater.screen.basket
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -80,7 +81,9 @@ fun BasketScreen(productViewModel: ProductListViewModel = viewModel(), navContro
             }
         } else {
             Box(
-                modifier = Modifier.fillMaxSize().weight(1f),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -91,9 +94,10 @@ fun BasketScreen(productViewModel: ProductListViewModel = viewModel(), navContro
             }
         }
         GeneralInfo (
+            modifier = Modifier.padding(bottom = 58.dp),
             priceNoDiscount = priceNoDiscount ?: 0,
             generalCost = generalCost ?: 0,
-            countProducts = productsListInOrder.size
+            isEnable = { productsListInOrder.isNotEmpty() }
         ){
             navController.navigate(
                 BasketFragmentDirections.actionBasketFragmentToCreateOrderFragment(false, 0)
@@ -301,7 +305,7 @@ fun PriceOrderNoDiscount(priceOrderNoDiscount: Int){
 }
 
 @Composable
-fun GeneralInfoOrder(generalPrice: Int, countProducts: Int, toCreateOrder: () -> Unit) {
+fun GeneralInfoOrder(generalPrice: Int, isEnable: () -> Boolean, toCreateOrder: () -> Unit) {
     Box(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
     ) {
@@ -332,7 +336,7 @@ fun GeneralInfoOrder(generalPrice: Int, countProducts: Int, toCreateOrder: () ->
             }
             Button(
                 onClick = { toCreateOrder() },
-                enabled = countProducts > 0,
+                enabled = isEnable(),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(text = stringResource(id = R.string.fragment_basket_checkout_order))
@@ -342,17 +346,19 @@ fun GeneralInfoOrder(generalPrice: Int, countProducts: Int, toCreateOrder: () ->
 }
 
 @Composable
-fun GeneralInfo(priceNoDiscount: Int, generalCost: Int, countProducts: Int, toCreateOrder: () -> Unit) {
+fun GeneralInfo(modifier: Modifier = Modifier, priceNoDiscount: Int, generalCost: Int, isEnable: () -> Boolean, toCreateOrder: () -> Unit) {
         Surface(
-            modifier = Modifier
-                .padding(bottom = 60.dp)
+            modifier = modifier
                 .fillMaxWidth()
                 .height(120.dp),
-            elevation = 8.dp
+            elevation = 8.dp,
+            border = BorderStroke(width = 1.dp, Color.LightGray)
         ) {
-            Column(verticalArrangement = Arrangement.Bottom) {
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
                 PriceOrderNoDiscount(priceNoDiscount)
-                GeneralInfoOrder(generalCost, countProducts) {toCreateOrder()}
+                GeneralInfoOrder(generalCost, isEnable = { isEnable() } ) {toCreateOrder()}
             }
         }
 
@@ -401,7 +407,12 @@ fun GeneralInfoPreview() {
                         {}, {}, {})
                 }
             }
-            GeneralInfo(123, 1, productsList1.size,) {}
+            GeneralInfo(
+                priceNoDiscount = 1,
+                generalCost = 1,
+                isEnable = {productsList1.size> 1},
+                toCreateOrder = {}
+            )
         }
     }
 }
