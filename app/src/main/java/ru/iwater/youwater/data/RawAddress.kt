@@ -11,6 +11,8 @@ data class RawAddress (
     @SerializedName("id")
     @PrimaryKey
     val id: Int,
+    @SerializedName("region")
+    val region: String?,
     @SerializedName("fact_address")
     val factAddress: String,
     @SerializedName("full_address")

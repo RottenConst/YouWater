@@ -9,6 +9,7 @@ import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.RetrofitFactory
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.Exception
 
 /**
  * репоситорий адресов
