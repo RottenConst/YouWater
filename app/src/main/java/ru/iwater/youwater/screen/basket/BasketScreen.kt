@@ -95,6 +95,7 @@ fun BasketScreen(productViewModel: ProductListViewModel = viewModel(), navContro
         }
         GeneralInfo (
             modifier = Modifier.padding(bottom = 58.dp),
+            titleButton = stringResource(id = R.string.fragment_basket_checkout_order),
             priceNoDiscount = priceNoDiscount ?: 0,
             generalCost = generalCost ?: 0,
             isEnable = { productsListInOrder.isNotEmpty() }
@@ -305,7 +306,7 @@ fun PriceOrderNoDiscount(priceOrderNoDiscount: Int){
 }
 
 @Composable
-fun GeneralInfoOrder(generalPrice: Int, isEnable: () -> Boolean, toCreateOrder: () -> Unit) {
+fun GeneralInfoOrder(generalPrice: Int, titleButton: String, isEnable: () -> Boolean, toCreateOrder: () -> Unit) {
     Box(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
     ) {
@@ -339,14 +340,14 @@ fun GeneralInfoOrder(generalPrice: Int, isEnable: () -> Boolean, toCreateOrder: 
                 enabled = isEnable(),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text(text = stringResource(id = R.string.fragment_basket_checkout_order))
+                Text(text = titleButton)
             }
         }
     }
 }
 
 @Composable
-fun GeneralInfo(modifier: Modifier = Modifier, priceNoDiscount: Int, generalCost: Int, isEnable: () -> Boolean, toCreateOrder: () -> Unit) {
+fun GeneralInfo(modifier: Modifier = Modifier, priceNoDiscount: Int, generalCost: Int, isEnable: () -> Boolean, titleButton: String, toCreateOrder: () -> Unit) {
         Surface(
             modifier = modifier
                 .fillMaxWidth()
@@ -358,7 +359,7 @@ fun GeneralInfo(modifier: Modifier = Modifier, priceNoDiscount: Int, generalCost
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 PriceOrderNoDiscount(priceNoDiscount)
-                GeneralInfoOrder(generalCost, isEnable = { isEnable() } ) {toCreateOrder()}
+                GeneralInfoOrder(generalCost, titleButton, isEnable = { isEnable() } ) {toCreateOrder()}
             }
         }
 
@@ -409,6 +410,7 @@ fun GeneralInfoPreview() {
             }
             GeneralInfo(
                 priceNoDiscount = 1,
+                titleButton = stringResource(id = R.string.fragment_basket_checkout_order),
                 generalCost = 1,
                 isEnable = {productsList1.size> 1},
                 toCreateOrder = {}
