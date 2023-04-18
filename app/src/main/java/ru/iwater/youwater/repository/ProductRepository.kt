@@ -261,6 +261,29 @@ class ProductRepository @Inject constructor(
         return emptyList()
     }
 
+    suspend fun getPaymentStatus(orderId: String): Pair<Int, Int> {
+        try {
+            val answer = sberApi.getOrderStatus(UserNameSber, passwordSber, orderId)
+            return Pair(
+                answer["orderNumber"].toString().removePrefix("\"").removeSuffix("\"").toInt(),
+                answer["orderStatus"].toString().toInt()
+            )
+        }catch (e: Exception) {
+            Timber.e("error get status pay: $e")
+        }
+        return Pair(0, 0)
+    }
+
+    suspend fun setStatusPayment(orderId: Int, parameters: JsonObject): Boolean {
+        return try {
+            val answer = apiWater.setStatusPayment(orderId, parameters)
+            answer.isSuccessful
+        }catch (e: Exception) {
+            Timber.e("error set payment status: $e")
+            false
+        }
+    }
+
     /**
      * получить информацю о клиенте
      */

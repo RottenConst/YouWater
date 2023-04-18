@@ -15,6 +15,7 @@ import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.RawAddress
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.repository.ProductRepository
+import ru.iwater.youwater.screen.basket.CardPaymentFragmentDirections
 import ru.iwater.youwater.screen.basket.CreateOrderFragmentDirections
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -369,6 +370,39 @@ class ProductListViewModel @Inject constructor(
                         CreateOrderFragmentDirections.actionCreateOrderFragmentToCardPaymentFragment(url, id)
                     )
                 }
+            }
+        }
+    }
+
+    fun getPaymentStatus(orderId: String, navController: NavController) {
+        viewModelScope.launch {
+            val paymentStatus = productRepo.getPaymentStatus(orderId)
+            if (paymentStatus.second == 2) {
+                val parameters = JsonObject()
+                parameters.addProperty("updated_payment_state", 1)
+                parameters.addProperty("updated_acq", orderId)
+                if (productRepo.setStatusPayment(paymentStatus.first, parameters)) {
+                    navController.navigate(
+                        CardPaymentFragmentDirections.actionCardPaymentFragmentToCompleteOrderFragment(
+                            orderId,
+                            true
+                        )
+                    )
+                } else {
+                    navController.navigate(
+                        CardPaymentFragmentDirections.actionCardPaymentFragmentToCreateOrderFragment(
+                            true,
+                            0
+                        )
+                    )
+                }
+            } else {
+                navController.navigate(
+                    CardPaymentFragmentDirections.actionCardPaymentFragmentToCreateOrderFragment(
+                        true,
+                        0
+                    )
+                )
             }
         }
     }
