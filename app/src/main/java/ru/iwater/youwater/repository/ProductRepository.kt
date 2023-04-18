@@ -1,7 +1,6 @@
 package ru.iwater.youwater.repository
 
 import com.google.gson.JsonObject
-import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import ru.iwater.youwater.bd.FavoriteProductDao
 import ru.iwater.youwater.bd.ProductDao
 import ru.iwater.youwater.bd.YouWaterDB
@@ -10,9 +9,9 @@ import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.RetrofitFactory
+import ru.iwater.youwater.network.RetrofitSberApi
+import ru.iwater.youwater.network.SberPaymentApi
 import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 import kotlin.Exception
 
@@ -25,6 +24,7 @@ class ProductRepository @Inject constructor(
     private val productDao: ProductDao = youWaterDB.productDao()
     private val favoriteDao: FavoriteProductDao = youWaterDB.favoriteProductDao()
     private val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
+    private val sberApi: SberPaymentApi = RetrofitSberApi.makeRetrofit()
 
     /**
      * получить список продуктов добавленых в корзину
@@ -227,6 +227,38 @@ class ProductRepository @Inject constructor(
             Timber.e("Error get address: $e")
             emptyList()
         }
+    }
+
+    suspend fun createOrderApp(order: Order): Int {
+        return try {
+            apiWater.createOrder(order)?.data?.id ?: -1
+        } catch (e: Exception) {
+            Timber.e("error create order: $e")
+            -1
+        }
+    }
+
+    suspend fun payCard(paymentCard: PaymentCard): List<String> {
+        try {
+            val answer = sberApi.registerOrder(
+                userName = paymentCard.userName,
+                password = paymentCard.password,
+                orderNumber = paymentCard.orderNumber,
+                amount = paymentCard.amount,
+                returnUrl = paymentCard.returnUrl,
+                pageView = "MOBILE",
+                phone = paymentCard.phone
+            )
+            val dataPayment = mutableListOf<String>()
+            return run {
+                dataPayment.add(answer["orderId"].toString())
+                dataPayment.add(answer["formUrl"].toString())
+                dataPayment
+            }
+        } catch (e: Exception) {
+            Timber.e("error pay: $e")
+        }
+        return emptyList()
     }
 
     /**

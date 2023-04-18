@@ -80,15 +80,20 @@ interface ApiWater {
         @Body clientData: JsonObject
     ): Response<JsonObject>?
 
-    @POST("OrderCreate/")
-    suspend fun createOrder(
-        @Body order: Order
-    ): Response<JsonObject>
+//    @POST("OrderCreate/")
+//    suspend fun createOrder(
+//        @Body order: Order
+//    ): Response<JsonObject>
 
     @POST("order-app/")
     suspend fun createOrderApp(
         @Body order: Order
     ): Response<JsonObject>
+
+    @POST("order-app/")
+    suspend fun createOrder(
+        @Body order: Order
+    ): OrderApp?
 
     @GET("return_of_applications_client_id/{client_id}/")
     suspend fun getOrderClient(

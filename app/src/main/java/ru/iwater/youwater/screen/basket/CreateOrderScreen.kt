@@ -24,10 +24,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.RawAddress
@@ -35,10 +37,14 @@ import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.ProductListViewModel
+import timber.log.Timber
 import java.util.Calendar
 
 @Composable
-fun CreateorderScreen(productListViewModel: ProductListViewModel = viewModel(), fragmentManager: FragmentManager) {
+fun CreateOrderScreen(
+    productListViewModel: ProductListViewModel = viewModel(),
+    navController: NavController,
+    fragmentManager: FragmentManager) {
 
     productListViewModel.getClient()
     productListViewModel.getAddressList()
@@ -46,7 +52,6 @@ fun CreateorderScreen(productListViewModel: ProductListViewModel = viewModel(), 
     val productsList = productListViewModel.productsList
     val priceNoDiscount by productListViewModel.priceNoDiscount.observeAsState()
     val generalCost by productListViewModel.generalCost.observeAsState()
-//    Timber.d("Product = ${productsList.size}")
     var highSize by remember {
         mutableStateOf(0)
     }
@@ -60,7 +65,32 @@ fun CreateorderScreen(productListViewModel: ProductListViewModel = viewModel(), 
     var dateOrder by rememberSaveable {
         mutableStateOf("")
     }
-    var timesOrder = productListViewModel.timesListOrder
+    var expandedTime by remember {
+        mutableStateOf(false)
+    }
+    var expandedPay by remember {
+        mutableStateOf(false)
+    }
+    val timesOrder = productListViewModel.timesListOrder
+    val typesPayOrder = listOf(
+        "Оплата по карте курьеру",
+        "Оплата наличными",
+        "Оплата онлайн",
+    )
+    var selectedTime by rememberSaveable {
+        mutableStateOf("**:**-**:**")
+    }
+    var selectedPay by rememberSaveable {
+        mutableStateOf("Выберите способ оплаты")
+    }
+    var commentOrder by rememberSaveable {
+        mutableStateOf("")
+    }
+    var titleButtonCreate by rememberSaveable {
+        mutableStateOf("Оформить заявку")
+    }
+
+    val order by productListViewModel.order.observeAsState()
 
 
     Box(
@@ -74,6 +104,7 @@ fun CreateorderScreen(productListViewModel: ProductListViewModel = viewModel(), 
         ) {
             if (client != null) {
                 ClientInfoCard(name = client?.name ?: "", telNumber = client?.contact ?: "")
+                Timber.d("Order = $order")
             }
             AddressAndTimeOrder(
                 addressList = addressList ?: emptyList(),
@@ -82,7 +113,10 @@ fun CreateorderScreen(productListViewModel: ProductListViewModel = viewModel(), 
                 dateOrder = dateOrder,
                 onShowDialog = {checkAddressDialog = !checkAddressDialog},
                 setAddressOrder = {
+                    selectedTime = "**:**-**:**"
+                    dateOrder = ""
                     productListViewModel.getDeliveryOnAddress(it)
+                    Timber.d("Order set address = ${order}")
                     selectedAddress = addressList?.indexOf(it) ?: -1 },
                 showDatePickerDialog = { productListViewModel.getCalendar(
                     calendar = Calendar.getInstance(),
@@ -90,20 +124,43 @@ fun CreateorderScreen(productListViewModel: ProductListViewModel = viewModel(), 
                 ).show(fragmentManager, "SetDateDialog") }
             )
             if (dateOrder.isNotEmpty()) {
-                SetTimeOrderCard(timeListOrder = timesOrder)
+                Timber.d("Date Order = $order")
+                SetTimeOrderCard(
+                    timeListOrder = timesOrder,
+                    selectedTime = selectedTime,
+                    expandedTime = expandedTime,
+                    setTimeOrder = {
+                            timesOrder -> productListViewModel.setTimeOrder(timesOrder)
+                            selectedTime = timesOrder
+                            expandedTime = !expandedTime
+                    }
+                )
             }
             highSize = productsList.size*72
-            DetailsOrder(highSize = highSize, products = productsList, minusCount = {}, addCount = {})
-            TypePayCard()
-            GetComentCard()
+            DetailsOrder(highSize = highSize, products = productsList, minusCount = {productListViewModel.minusCountProduct(it.id)}, addCount = {productListViewModel.plusCountProduct(it.id)})
+            TypePayCard(
+                typesPayOrder = typesPayOrder,
+                selectedPay = selectedPay,
+                expandedPay = expandedPay,
+                setPaymentType = {typePay ->
+                    productListViewModel.setTypePeyOrder(typePay)
+                    selectedPay = typePay
+                    titleButtonCreate = if (typePay == "Оплата онлайн") "Перейти к оплате" else "Оформить заявку"
+                    expandedPay = !expandedPay
+            })
+            GetCommentCard(commentOrder) {comment ->
+                commentOrder = comment
+                productListViewModel.setNoticeOrder(comment)
+            }
         }
         GeneralInfo(
             modifier = Modifier.align(Alignment.BottomCenter),
+            titleButton = titleButtonCreate,
             priceNoDiscount = priceNoDiscount ?: 0,
             generalCost = generalCost ?: 0,
-            isEnable = { productsList.isNotEmpty() }
+            isEnable = { productListViewModel.isTrueOrder(order) }
         ) {
-
+            productListViewModel.sendAndSaveOrder(order, generalCost ?: 0, navController)
         }
     }
 
@@ -334,13 +391,7 @@ private fun SetAddressDialog(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SetTimeOrderCard(timeListOrder: MutableList<String>) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-    var selectedItem by remember {
-        mutableStateOf(timeListOrder.last())
-    }
+fun SetTimeOrderCard(timeListOrder: List<String>, selectedTime: String, expandedTime: Boolean, setTimeOrder: (String) -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -350,35 +401,34 @@ fun SetTimeOrderCard(timeListOrder: MutableList<String>) {
     ) {
         ExposedDropdownMenuBox(
             modifier = Modifier.fillMaxWidth(),
-            expanded = expanded,
+            expanded = expandedTime,
             onExpandedChange = {
-                expanded = !expanded
-                timeListOrder.remove("**:**-**:**")
+                setTimeOrder("**:**-**:**")
             }
         ) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = selectedItem,
+                value = selectedTime,
                 onValueChange = {},
                 readOnly = true,
                 label = { Text(text = stringResource(id = R.string.fragment_create_order_time_order))},
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTime)
                 },
             )
             ExposedDropdownMenu(
                 modifier = Modifier.fillMaxWidth(),
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+                expanded = expandedTime,
+                onDismissRequest = { setTimeOrder("**:**-**:**") }
             ) {
-                timeListOrder.forEach {typePey ->
+                timeListOrder.forEach {timeOrder ->
                     DropdownMenuItem(
                         onClick = {
-                            selectedItem = typePey
-                            expanded = !expanded
+                            setTimeOrder(timeOrder)
+//                            setExpanded()
                         }
                     ) {
-                        Text(text = typePey)
+                        Text(text = timeOrder)
                     }
                 }
 
@@ -415,6 +465,7 @@ fun DetailsOrder(highSize: Int, products: List<Product>, minusCount: (Product) -
                     productGallery = product.gallery,
                     productCount = count,
                     productsPrise = {product.getPriceOnCount(count)},
+                    priseNoDiscount = {product.getPriceNoDiscount(count)},
                     minusCount = {
                         if (count > 1) count--
                         minusCount(product)
@@ -435,6 +486,7 @@ fun ItemProductInOrder(
     productGallery: String,
     productCount: Int,
     productsPrise: (Int) -> Int,
+    priseNoDiscount: (Int) -> Int,
     minusCount: () -> Unit,
     addCount: () -> Unit
 ) {
@@ -461,7 +513,7 @@ fun ItemProductInOrder(
                         tint = Color.LightGray
                     )
                 }
-                PriceAndCount(productCount = productCount, productsPrise = productsPrise)
+                PriceAndCount(productCount = productCount, productsPrise = productsPrise, priceNoDiscount = priseNoDiscount)
                 IconButton(onClick = { addCount() }) {
                     Icon(
                         imageVector = Icons.Default.AddCircle,
@@ -475,7 +527,7 @@ fun ItemProductInOrder(
 }
 
 @Composable
-fun PriceAndCount(productCount: Int, productsPrise: (Int) -> Int) {
+fun PriceAndCount(productCount: Int, productsPrise: (Int) -> Int, priceNoDiscount:(Int) -> Int) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -487,6 +539,14 @@ fun PriceAndCount(productCount: Int, productsPrise: (Int) -> Int) {
             textAlign = TextAlign.Center,
             color = Blue500
         )
+        if (priceNoDiscount(productCount) != productsPrise(productCount)) {
+            Text(
+                text = "${priceNoDiscount(productCount)}",
+                style = YouWaterTypography.caption,
+                textDecoration = TextDecoration.LineThrough,
+                color = Color.Gray
+            )
+        }
         Text(
             text = "$productCount шт.",
             style = YouWaterTypography.caption,
@@ -498,19 +558,7 @@ fun PriceAndCount(productCount: Int, productsPrise: (Int) -> Int) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TypePayCard() {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-    val listItems = mutableListOf(
-        "Оплата по карте курьеру",
-        "Оплата наличными",
-        "Оплата онлайн",
-        "Выберите способ оплаты"
-    )
-    var selectedItem by remember {
-        mutableStateOf(listItems.last())
-    }
+fun TypePayCard(typesPayOrder: List<String>, selectedPay: String, expandedPay: Boolean, setPaymentType: (String) -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -520,32 +568,31 @@ fun TypePayCard() {
     ) {
         ExposedDropdownMenuBox(
             modifier = Modifier.fillMaxWidth(),
-            expanded = expanded,
+            expanded = expandedPay,
             onExpandedChange = {
-                expanded = !expanded
-                listItems.remove("Выберите способ оплаты")
+                setPaymentType("Выберите способ оплаты")
+
             }
         ) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = selectedItem,
+                value = selectedPay,
                 onValueChange = {},
                 readOnly = true,
                 label = { Text(text = "вид оплаты")},
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedPay)
                 },
             )
             ExposedDropdownMenu(
                 modifier = Modifier.fillMaxWidth(),
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+                expanded = expandedPay,
+                onDismissRequest = { setPaymentType("Выберите способ оплаты") }
             ) {
-                listItems.forEach {typePey ->
+                typesPayOrder.forEach {typePey ->
                     DropdownMenuItem(
                         onClick = {
-                            selectedItem = typePey
-                            expanded = !expanded
+                            setPaymentType(typePey)
                         }
                     ) {
                         Text(text = typePey)
@@ -559,10 +606,7 @@ fun TypePayCard() {
 }
 
 @Composable
-fun GetComentCard() {
-    var coment by remember {
-        mutableStateOf("")
-    }
+fun GetCommentCard(commentOrder: String, setComment: (String) -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -572,8 +616,8 @@ fun GetComentCard() {
     ) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = coment,
-            onValueChange = {coment = it},
+            value = commentOrder,
+            onValueChange = {setComment(it)},
             label = { Text(text = "Коментарий для курьера")},
 
         )
@@ -638,11 +682,12 @@ fun CreateOrderScreenPreview() {
                         productsList.find { product -> it.id == product.id }?.count = it.count++
                     }
                 )
-                TypePayCard()
-                GetComentCard()
+//                TypePayCard()
+//                GetCommentCard()
             }
             GeneralInfo(
                 modifier = Modifier.align(Alignment.BottomCenter),
+                titleButton = "qweqwe",
                 priceNoDiscount = generalPrice,
                 generalCost = generalPrice,
                 isEnable = { generalPrice > 0 }

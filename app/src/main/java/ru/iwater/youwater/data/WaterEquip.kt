@@ -4,7 +4,8 @@ import androidx.annotation.Keep
 
 @Keep
 data class WaterEquip(
+    val amount: Int,
     val id: Int,
-    val price: Int,
-    val amount: Int
+    val name: String,
+    val price: Int
 )
