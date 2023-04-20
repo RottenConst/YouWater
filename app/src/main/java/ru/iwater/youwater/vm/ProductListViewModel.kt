@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.Client
 import ru.iwater.youwater.data.Common
 import ru.iwater.youwater.data.Exception
+import ru.iwater.youwater.data.MyOrder
 import ru.iwater.youwater.data.Order
 import ru.iwater.youwater.data.PaymentCard
 import ru.iwater.youwater.data.Product
@@ -46,23 +47,30 @@ class ProductListViewModel @Inject constructor(
     private val _timesListOrder = listOf<String>().toMutableStateList()
     val timesListOrder: List<String> get() = _timesListOrder
 
-    private val _order: MutableLiveData<Order> = MutableLiveData(Order(
-        clientId = 0,
-        acqOrderId = 0,
-        notice = "",
-        waterEquip = mutableListOf(),
-        period = "",
-        orderCost = 0,
-        paymentType = "",
-        status = 0,
-        email = "",
-        contact = "",
-        date = "",
-        addressId = 0,
-        name = "",
-        dateCreate =  java.sql.Date(Calendar.getInstance().timeInMillis)
-    ))
+    private val _order: MutableLiveData<Order> = MutableLiveData(
+        Order(
+            clientId = 0,
+            acqOrderId = 0,
+            notice = "",
+            waterEquip = mutableListOf(),
+            period = "",
+            orderCost = 0,
+            paymentType = "",
+            status = 0,
+            email = "",
+            contact = "",
+            date = "",
+            addressId = 0,
+            name = "",
+            dateCreate = java.sql.Date(Calendar.getInstance().timeInMillis)
+        )
+    )
     val order: LiveData<Order> get() = _order
+
+    private val _createdOrder: MutableLiveData<MyOrder> = MutableLiveData(
+        MyOrder("", "", "", emptyList(), "", -1, 0)
+    )
+    val completedOrder: LiveData<MyOrder> get() = _createdOrder
 
     private val disabledDays = mutableListOf<Common>()
     private val exceptions = mutableListOf<Exception>()
@@ -74,9 +82,10 @@ class ProductListViewModel @Inject constructor(
     fun isTrueOrder(order: Order?): Boolean {
         return order?.clientId != 0 &&
                 order?.period?.isNotEmpty() == true && order.period != "**:**-**:**" &&
-                !order.paymentType.isNullOrEmpty() && order.paymentType != "Выберите способ оплаты"  &&
+                !order.paymentType.isNullOrEmpty() && order.paymentType != "Выберите способ оплаты" &&
                 !order.email.isNullOrEmpty() && order.name.isNotEmpty() && order.date.isNotEmpty() && order.orderCost == 0
     }
+
     fun getClient() {
         viewModelScope.launch {
             val client = productRepo.getClientInfo()
@@ -197,7 +206,7 @@ class ProductListViewModel @Inject constructor(
                 setDateOrder(it)
                 _timesListOrder.addAll(getTimeList(year, monthOfYear, dayOfMonth))
             }
-         }, thisYear,month,day)
+        }, thisYear, month, day)
 
         datePickerDialog.setTitle("Укажите время заказа")
         datePickerDialog.firstDayOfWeek = Calendar.MONDAY
@@ -220,7 +229,13 @@ class ProductListViewModel @Inject constructor(
         return datePickerDialog
     }
 
-    private fun disableOnDelivery(minDate: Calendar, maxDate: Calendar, disabledDays: List<Common>, exceptions: List<Exception>, datePickerDialog: DatePickerDialog) {
+    private fun disableOnDelivery(
+        minDate: Calendar,
+        maxDate: Calendar,
+        disabledDays: List<Common>,
+        exceptions: List<Exception>,
+        datePickerDialog: DatePickerDialog
+    ) {
         var loopDate = minDate
         while (minDate.before(maxDate)) {
             val dayOfWeek = loopDate[Calendar.DAY_OF_WEEK]
@@ -240,38 +255,49 @@ class ProductListViewModel @Inject constructor(
         }
     }
 
-    private fun disableDay(day: Int, dayOfWeek: Int, loopDate: Calendar, datePickerDialog: DatePickerDialog) {
-        when(day) {
+    private fun disableDay(
+        day: Int,
+        dayOfWeek: Int,
+        loopDate: Calendar,
+        datePickerDialog: DatePickerDialog
+    ) {
+        when (day) {
             1 -> if (dayOfWeek == Calendar.MONDAY) {
                 val disables = arrayOfNulls<Calendar>(1)
                 disables[0] = loopDate
                 datePickerDialog.disabledDays = disables
             }
+
             2 -> if (dayOfWeek == Calendar.TUESDAY) {
                 val disables = arrayOfNulls<Calendar>(1)
                 disables[0] = loopDate
                 datePickerDialog.disabledDays = disables
             }
+
             3 -> if (dayOfWeek == Calendar.WEDNESDAY) {
                 val disables = arrayOfNulls<Calendar>(1)
                 disables[0] = loopDate
                 datePickerDialog.disabledDays = disables
             }
+
             4 -> if (dayOfWeek == Calendar.THURSDAY) {
                 val disables = arrayOfNulls<Calendar>(1)
                 disables[0] = loopDate
                 datePickerDialog.disabledDays = disables
             }
+
             5 -> if (dayOfWeek == Calendar.FRIDAY) {
                 val disables = arrayOfNulls<Calendar>(1)
                 disables[0] = loopDate
                 datePickerDialog.disabledDays = disables
             }
+
             6 -> if (dayOfWeek == Calendar.SATURDAY) {
                 val disables = arrayOfNulls<Calendar>(1)
                 disables[0] = loopDate
                 datePickerDialog.disabledDays = disables
             }
+
             7 -> if (dayOfWeek == Calendar.SUNDAY) {
                 val disables = arrayOfNulls<Calendar>(1)
                 disables[0] = loopDate
@@ -291,15 +317,15 @@ class ProductListViewModel @Inject constructor(
         val exception = exceptionTime.filter { it.date == date }
         val commons = deliveryTime.filter { it.day_num == orderDate }
         val times = if (commons.isNotEmpty() || exception.isNotEmpty()) {
-                if (exception.isNotEmpty()) {
-                    addTime(exception[0].part_types)
-                } else {
-                    Timber.d("Common ${commons[0].part_types.size}")
-                    commons[0].part_types.forEach {
-                        Timber.d("part_types = $it")
-                    }
-                    addTime(commons[0].part_types)
+            if (exception.isNotEmpty()) {
+                addTime(exception[0].part_types)
+            } else {
+                Timber.d("Common ${commons[0].part_types.size}")
+                commons[0].part_types.forEach {
+                    Timber.d("part_types = $it")
                 }
+                addTime(commons[0].part_types)
+            }
         } else emptyList()
         return times
     }
@@ -309,14 +335,18 @@ class ProductListViewModel @Inject constructor(
             part_types.size == 2 -> {
                 arrayListOf("09:00-16:00", "17:00-22:00", "19:00-22:00")
             }
+
             part_types[0] == 0 -> {
                 arrayListOf("09:00-16:00")
             }
-            else -> {arrayListOf("17:00-22:00", "19:00-22:00")}
+
+            else -> {
+                arrayListOf("17:00-22:00", "19:00-22:00")
+            }
         }
     }
 
-    fun setTypePeyOrder(typeOrder: String){
+    fun setTypePeyOrder(typeOrder: String) {
         when (typeOrder) {
             "Оплата по карте курьеру" -> _order.value?.paymentType = "4"
             "Оплата наличными" -> _order.value?.paymentType = "0"
@@ -357,17 +387,24 @@ class ProductListViewModel @Inject constructor(
 
                     navController.navigate(
                         CreateOrderFragmentDirections.actionCreateOrderFragmentToCompleteOrderFragment(
-                            orderId.toString(),
-                            false
+                            orderId,
+                            true
                         )
                     )
                 } else {
-                    val paymentCard = PaymentCard(orderNumber = orderId.toString(), amount = orderCost * 100, phone = order.contact)
+                    val paymentCard = PaymentCard(
+                        orderNumber = orderId.toString(),
+                        amount = orderCost * 100,
+                        phone = order.contact
+                    )
                     val dataPayment = productRepo.payCard(paymentCard)
                     val id = dataPayment[0].removePrefix("\"").removeSuffix("\"")
                     val url = dataPayment[1].removePrefix("\"").removeSuffix("\"")
                     navController.navigate(
-                        CreateOrderFragmentDirections.actionCreateOrderFragmentToCardPaymentFragment(url, id)
+                        CreateOrderFragmentDirections.actionCreateOrderFragmentToCardPaymentFragment(
+                            url,
+                            id
+                        )
                     )
                 }
             }
@@ -377,6 +414,7 @@ class ProductListViewModel @Inject constructor(
     fun getPaymentStatus(orderId: String, navController: NavController) {
         viewModelScope.launch {
             val paymentStatus = productRepo.getPaymentStatus(orderId)
+            Timber.d("STATUS ${paymentStatus.first} ${paymentStatus.second}")
             if (paymentStatus.second == 2) {
                 val parameters = JsonObject()
                 parameters.addProperty("updated_payment_state", 1)
@@ -384,7 +422,7 @@ class ProductListViewModel @Inject constructor(
                 if (productRepo.setStatusPayment(paymentStatus.first, parameters)) {
                     navController.navigate(
                         CardPaymentFragmentDirections.actionCardPaymentFragmentToCompleteOrderFragment(
-                            orderId,
+                            paymentStatus.first,
                             true
                         )
                     )
@@ -405,5 +443,45 @@ class ProductListViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun clearBasket() {
+        viewModelScope.launch {
+            val products = productRepo.getProductListOfCategory()
+            products.forEach {
+                productRepo.deleteProductFromBasket(it)
+            }
+        }
+    }
+
+    fun getOrderCrm(orderId: Int) {
+        viewModelScope.launch {
+            val orderFromCrm = productRepo.getOrder(orderId)
+            if (orderFromCrm != null) {
+//                val address = getStringAddress(order)
+
+                val listProduct = mutableListOf<Product>()
+                orderFromCrm.water_equip.forEach {
+                    val product = productRepo.getProduct(it.id)
+                    if (product != null) {
+                        if (product.category != 20) {
+                            product.count = it.amount
+                            listProduct.add(product)
+                        }
+                    }
+                }
+
+            _createdOrder.value = MyOrder(
+                    address = orderFromCrm.address,
+                    cash = orderFromCrm.order_cost,
+                    date = "${orderFromCrm.date};${orderFromCrm.period}",
+                    products = listProduct,
+                    typeCash = orderFromCrm.payment_type,
+                    status = orderFromCrm.status,
+                    id = orderFromCrm.id
+                )
+            }
+        }
+
     }
 }

@@ -4,16 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.OrderViewModel
-import ru.iwater.youwater.data.PaymentStatus
 import ru.iwater.youwater.databinding.FragmentCompleteOrderBinding
 import ru.iwater.youwater.screen.adapters.MyOrderAdapter
+import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.ProductListViewModel
 import javax.inject.Inject
 
 class CompleteOrderFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder {
@@ -21,7 +22,7 @@ class CompleteOrderFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder {
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     private val screenComponent = App().buildScreenComponent()
-    val viewModel: OrderViewModel by viewModels { factory }
+    val viewModel: ProductListViewModel by viewModels { factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,34 +36,18 @@ class CompleteOrderFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder {
         val orderId = CompleteOrderFragmentArgs.fromBundle(this.requireArguments()).orderId
         val isPaid = CompleteOrderFragmentArgs.fromBundle(this.requireArguments()).isPaid
         val binding = FragmentCompleteOrderBinding.inflate(inflater)
+        val navController = NavHostFragment.findNavController(this)
         binding.lifecycleOwner = this
-        val adapter = MyOrderAdapter(this)
-        binding.cardOrderPay.adapter = adapter
-        viewModel.products.observe(viewLifecycleOwner) {
-            viewModel.clearProduct(it)
-        }
-        if (isPaid) {
-            viewModel.getPaymentStatus(orderId)
-            viewModel.paymentStatus.observe(viewLifecycleOwner) {
-                when (it) {
-                    PaymentStatus.SUCCESSFULLY -> {
-
-                    }
-                    else -> {
-                        binding.ivPayComplete.setImageResource(R.drawable.ic_cancel)
-                        binding.tvLogoPayComplete.text = "Ошибка, не удалось оплатить заказ"
-                        binding.tvOrderPayComment.text = ""
-                    }
+        viewModel.clearBasket()
+        binding.composeViewCompleteOrder.apply {
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.Default
+            )
+            setContent {
+                YourWaterTheme {
+                    CompleteOrderScreen(productListViewModel = viewModel, orderId = orderId, isPaid = isPaid, navController = navController)
                 }
             }
-        } else {
-            viewModel.getOrderCrm(orderId.toInt())
-        }
-        viewModel.listMyOrder.observe(this.viewLifecycleOwner) { myOrder ->
-            adapter.submitList(myOrder)
-        }
-        binding.btnGoHome.setOnClickListener {
-            findNavController().navigate(CompleteOrderFragmentDirections.actionCompleteOrderFragmentToHomeFragment())
         }
         return binding.root
     }

@@ -89,6 +89,9 @@ fun CreateOrderScreen(
     var titleButtonCreate by rememberSaveable {
         mutableStateOf("Оформить заявку")
     }
+    var isCreateOrder by rememberSaveable {
+        mutableStateOf(false)
+    }
 
     val order by productListViewModel.order.observeAsState()
 
@@ -158,8 +161,9 @@ fun CreateOrderScreen(
             titleButton = titleButtonCreate,
             priceNoDiscount = priceNoDiscount ?: 0,
             generalCost = generalCost ?: 0,
-            isEnable = { productListViewModel.isTrueOrder(order) }
+            isEnable = { productListViewModel.isTrueOrder(order) && !isCreateOrder  }
         ) {
+            isCreateOrder = !isCreateOrder
             productListViewModel.sendAndSaveOrder(order, generalCost ?: 0, navController)
         }
     }
@@ -532,13 +536,6 @@ fun PriceAndCount(productCount: Int, productsPrise: (Int) -> Int, priceNoDiscoun
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "${productsPrise(productCount)}P",
-            style = YouWaterTypography.caption,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            color = Blue500
-        )
         if (priceNoDiscount(productCount) != productsPrise(productCount)) {
             Text(
                 text = "${priceNoDiscount(productCount)}",
@@ -547,6 +544,13 @@ fun PriceAndCount(productCount: Int, productsPrise: (Int) -> Int, priceNoDiscoun
                 color = Color.Gray
             )
         }
+        Text(
+            text = "${productsPrise(productCount)}P",
+            style = YouWaterTypography.caption,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            color = Blue500
+        )
         Text(
             text = "$productCount шт.",
             style = YouWaterTypography.caption,

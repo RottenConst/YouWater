@@ -269,7 +269,7 @@
         android:label="CompleteOrderFragment" >
         <argument
             android:name="orderId"
-            app:argType="string" />
+            app:argType="integer" />
         <action
             android:id="@+id/action_completeOrderFragment_to_homeFragment"
             app:destination="@id/homeFragment"

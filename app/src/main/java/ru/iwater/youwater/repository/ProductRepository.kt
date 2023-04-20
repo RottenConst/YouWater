@@ -284,6 +284,20 @@ class ProductRepository @Inject constructor(
         }
     }
 
+    suspend fun getOrder(orderId: Int): OrderFromCRM? {
+       return try {
+            val listOrder = apiWater.getOrderClient(getAuthClient().clientId)
+            return if (listOrder.isNullOrEmpty()) {
+                null
+            } else {
+                listOrder.first { it.id == orderId }
+            }
+        } catch (e: Exception) {
+            Timber.e("error get order: $e")
+            null
+        }
+    }
+
     /**
      * получить информацю о клиенте
      */
