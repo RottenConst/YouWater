@@ -4,27 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
-import ru.iwater.youwater.data.StatusLoading
-import ru.iwater.youwater.data.OrderViewModel
+import ru.iwater.youwater.data.ClientProfileViewModel
 import ru.iwater.youwater.databinding.FragmentMyOrdersBinding
 import ru.iwater.youwater.screen.adapters.MyOrderAdapter
+import ru.iwater.youwater.theme.YourWaterTheme
 import javax.inject.Inject
 
-class MyOrdersFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder, SwipeRefreshLayout.OnRefreshListener {
+class MyOrdersFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder {
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     val screenComponent = App().buildScreenComponent()
-    val viewModel: OrderViewModel by viewModels { factory }
-
-    val binding: FragmentMyOrdersBinding by lazy { FragmentMyOrdersBinding.inflate(LayoutInflater.from(this.context)) }
+    val viewModel: ClientProfileViewModel by viewModels { factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,24 +33,25 @@ class MyOrdersFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder, Swipe
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val binding = FragmentMyOrdersBinding.inflate(inflater)
+        val navController = NavHostFragment.findNavController(this)
         binding.lifecycleOwner = this
-        binding.refreshContainer.setOnRefreshListener(this)
-        viewModel.getOrderFromCrm()
-        val myOrderAdapter = MyOrderAdapter(this)
-        binding.rvOrders.adapter = myOrderAdapter
-        viewModel.listMyOrder.observe(this.viewLifecycleOwner) { myOrders ->
-            myOrderAdapter.submitList(myOrders)
-            if (myOrders.isNullOrEmpty()) binding.tvNothingOrderText.visibility = View.VISIBLE
-            else binding.tvNothingOrderText.visibility = View.GONE
+        binding.composeViewMyOrdersScreen.apply {
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.Default
+            )
+            setContent {
+                YourWaterTheme {
+                    MyOrdersScreen(viewModel, navController)
+                }
+            }
         }
-        statusLoad()
         return binding.root
     }
 
-    override fun onRefresh() {
-        if (!binding.rvOrders.isFocused) {
-            viewModel.getOrderFromCrm()
-        }
+    override fun onResume() {
+        super.onResume()
+        viewModel.getOrderCrm()
     }
 
     override fun onClickReplayButton(idOrder: Int) {
@@ -60,21 +59,6 @@ class MyOrdersFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder, Swipe
             MyOrdersFragmentDirections.actionMyOrdersFragmentToCreateOrderFragment(false, idOrder)
         )
 
-    }
-
-    private fun statusLoad() {
-        viewModel.statusLoad.observe(this.viewLifecycleOwner) { statusLoad ->
-            when(statusLoad) {
-                StatusLoading.LOADING -> binding.refreshContainer.isRefreshing = true
-                StatusLoading.DONE -> binding.refreshContainer.isRefreshing = false
-                StatusLoading.EMPTY -> binding.refreshContainer.isRefreshing = false
-                else -> {
-                    Toast.makeText(this.context, "Ошибка", Toast.LENGTH_SHORT).show()
-                    binding.refreshContainer.isRefreshing = false
-                }
-
-            }
-        }
     }
 
     companion object {

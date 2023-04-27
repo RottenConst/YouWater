@@ -120,6 +120,34 @@ class ProductListViewModel @Inject constructor(
         }
     }
 
+    fun getInfoLastOrder(orderId: Int) {
+        viewModelScope.launch {
+            if (orderId != 0) {
+                val repeatOrder = productRepo.getOrder(orderId)
+                if (repeatOrder != null) {
+
+//                    clearBasket()
+                    val addressList = productRepo.getAddress()
+                    val address = addressList.find { it.id == repeatOrder.address_id }
+                    if (address != null) {
+                        getDeliveryOnAddress(address)
+                    }
+                    Timber.d("Product Size = ${repeatOrder.water_equip.size}")
+                    val products = repeatOrder.water_equip.map {
+                        val product = productRepo.getProduct(it.id)
+                        product?.count = it.amount
+                        product
+                    }
+                    _productsList.addAll(products.filterNotNull().filter { it.category != 20 })
+                    getCostProduct()
+                    getPriceNoDiscount()
+                    _order.value?.paymentType = repeatOrder.payment_type
+                    _order.value?.notice = repeatOrder.notice
+                }
+            }
+        }
+    }
+
     private fun getCostProduct() {
         var generalCostProducts = 0
         productsList.forEach { product ->

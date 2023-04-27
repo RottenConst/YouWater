@@ -38,7 +38,7 @@ class CreateOrderFragment : BaseFragment() {
         // показывать сообщение о неудачной оплате:
         // true - да, false - нет
         val isShowMessage = CreateOrderFragmentArgs.fromBundle(this.requireArguments()).isShowMessage
-//        val lastOrder = CreateOrderFragmentArgs.fromBundle(this.requireArguments()).lastOrderId
+        val lastOrder = CreateOrderFragmentArgs.fromBundle(this.requireArguments()).lastOrderId
         val navController = NavHostFragment.findNavController(this)
         val binding = FragmentCreateOrderBinding.inflate(inflater)
         warningPay(isShowMessage)
@@ -47,14 +47,16 @@ class CreateOrderFragment : BaseFragment() {
         /**
          * информация о клиенте
          */
-        viewModel.getBasket()
+        if (lastOrder != 0)
+            viewModel.getInfoLastOrder(lastOrder)
+        else viewModel.getBasket()
         binding.composeViewCreateOrderScreen.apply {
             setViewCompositionStrategy(
                 ViewCompositionStrategy.Default
             )
             setContent {
                 YourWaterTheme {
-                    CreateOrderScreen(productListViewModel = viewModel, navController = navController, parentFragmentManager)
+                    CreateOrderScreen(productListViewModel = viewModel, repeatOrder = lastOrder, navController = navController, parentFragmentManager)
                 }
             }
         }

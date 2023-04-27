@@ -49,16 +49,16 @@ class EditUserDataFragment : BaseFragment() {
         }
         viewModel.client.observe(this.viewLifecycleOwner) { client ->
             //clientId
-            clientId = client.client_id
+//            clientId = client.client_id
             //name
             binding.tvEditName.text.clear()
-            binding.tvEditName.text = Editable.Factory.getInstance().newEditable(client.name)
+//            binding.tvEditName.text = Editable.Factory.getInstance().newEditable(client.name)
             //phone
             binding.tvEditPhone.text.clear()
-            binding.tvEditPhone.text = Editable.Factory.getInstance().newEditable(client.contact)
+//            binding.tvEditPhone.text = Editable.Factory.getInstance().newEditable(client.contact)
             //email
             binding.tvEditEmail.text.clear()
-            binding.tvEditEmail.text = Editable.Factory.getInstance().newEditable(client.email)
+//            binding.tvEditEmail.text = Editable.Factory.getInstance().newEditable(client.email)
         }
         return binding.root
     }

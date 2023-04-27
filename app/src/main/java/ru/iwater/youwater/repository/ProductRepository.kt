@@ -298,6 +298,15 @@ class ProductRepository @Inject constructor(
         }
     }
 
+    suspend fun getOrdersList(): List<OrderFromCRM> {
+        return try {
+            apiWater.getOrderClient(getAuthClient().clientId) ?: emptyList()
+        } catch (e: Exception) {
+            Timber.e("error get ordersList: $e")
+            emptyList()
+        }
+    }
+
     /**
      * получить информацю о клиенте
      */

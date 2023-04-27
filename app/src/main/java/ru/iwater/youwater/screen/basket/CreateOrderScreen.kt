@@ -43,6 +43,7 @@ import java.util.Calendar
 @Composable
 fun CreateOrderScreen(
     productListViewModel: ProductListViewModel = viewModel(),
+    repeatOrder: Int,
     navController: NavController,
     fragmentManager: FragmentManager) {
 
@@ -56,9 +57,7 @@ fun CreateOrderScreen(
         mutableStateOf(0)
     }
     val addressList by productListViewModel.addressList.observeAsState()
-    var selectedAddress by rememberSaveable {
-        mutableStateOf(-1)
-    }
+
     var checkAddressDialog by rememberSaveable {
         mutableStateOf(false)
     }
@@ -95,6 +94,22 @@ fun CreateOrderScreen(
 
     val order by productListViewModel.order.observeAsState()
 
+    var selectedAddress by rememberSaveable {
+        mutableStateOf(-1)
+    }
+
+    if (repeatOrder != 0) {
+        val address = addressList?.find { it.id == order?.addressId }
+        if (address != null) {
+            selectedAddress = addressList?.indexOf(address) ?: -1
+        }
+        when (order?.paymentType) {
+            "4" -> selectedPay = "Оплата по карте курьеру"
+            "0" -> selectedPay = "Оплата наличными"
+            "2" -> selectedPay = "Оплата онлайн"
+        }
+        commentOrder = order?.notice ?: ""
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),

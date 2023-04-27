@@ -55,7 +55,7 @@ fun CompleteOrderScreen(productListViewModel: ProductListViewModel = viewModel()
                 InfoStatusCreate(modifier = modifier, isPaid = isPaid)
             }
                 items(count = 1) {
-                    completeOrder?.let { it1 -> CardOrderInfo(modifier = modifier, it1) }
+                    completeOrder?.let { it1 -> CardOrderInfo(modifier = modifier, it1){ productListViewModel.getInfoLastOrder(it1.id)} }
             }
         }
         HomeButton(modifier = modifier.align(Alignment.BottomCenter)) {
@@ -229,7 +229,7 @@ fun TypePayOrder(modifier: Modifier, typePay: String) {
 }
 
 @Composable
-fun CardOrderInfo(modifier: Modifier, order: MyOrder) {
+fun CardOrderInfo(modifier: Modifier, order: MyOrder, repeatOrder: () -> Unit) {
     Surface(
         modifier = modifier.padding(16.dp),
         shape = RoundedCornerShape(8.dp),
@@ -280,7 +280,7 @@ fun CardOrderInfo(modifier: Modifier, order: MyOrder) {
                     .padding(8.dp)
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                onClick = { /*TODO*/ }) {
+                onClick = { repeatOrder() }) {
                 Text(text = "Повторить заказ")
             }
         }
