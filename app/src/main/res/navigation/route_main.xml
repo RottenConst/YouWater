@@ -240,6 +240,15 @@
             app:destination="@id/userDataFragment"
             app:popUpTo="@id/userDataFragment"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="clientName"
+            app:argType="string" />
+        <argument
+            android:name="clientPhone"
+            app:argType="string" />
+        <argument
+            android:name="clientEmail"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/cardPaymentFragment"

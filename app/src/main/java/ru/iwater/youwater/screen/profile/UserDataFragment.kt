@@ -56,10 +56,13 @@ class UserDataFragment : BaseFragment() {
 
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val clientName = viewModel.client.value?.name ?: ""
+        val clientPhone = viewModel.client.value?.contact ?: ""
+        val clientEmail = viewModel.client.value?.email ?: ""
         when (item.itemId) {
             R.id.edit_profile -> {
                 findNavController().navigate(
-                    UserDataFragmentDirections.actionUserDataFragmentToEditUserDataFragment()
+                    UserDataFragmentDirections.actionUserDataFragmentToEditUserDataFragment(clientName, clientPhone, clientEmail)
                 )
             }
         }

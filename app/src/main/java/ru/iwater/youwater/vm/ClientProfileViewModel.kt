@@ -25,9 +25,12 @@ class ClientProfileViewModel @Inject constructor(
     private val repository: ProductRepository
 ): ViewModel() {
 
-//    private val _client: MutableLiveData<Client?> = MutableLiveData()
     val client: LiveData<Client?> = liveData { emit(getClientInfo()) }
-//        get() = _client
+
+    private var editClientName: String = ""
+    private var editClientPhone: String = ""
+    private var editClientEmail: String = ""
+
     private val _ordersList = listOf<MyOrder>().toMutableStateList()
     val ordersList: List<MyOrder> get() = _ordersList
 
@@ -38,22 +41,27 @@ class ClientProfileViewModel @Inject constructor(
     val statusSend: LiveData<StatusSendData>
         get() = _statusSend
 
-    //отправить данные пользователя на модерацию
-//    fun createAutoTask(clientId: Int, dataCreated: String, clientData: JsonObject) {
-//        viewModelScope.launch {
-//            val clientUserData = ClientUserData(id = clientId, dateCreated = dataCreated, clientData = clientData)
-//            val answer = repository.sendUserData(clientUserData)
-//            if (answer == "user data sent for moderation") _statusSend.value = StatusSendData.SUCCESS
-//                else _statusSend.value = StatusSendData.ERROR
-//        }
-//    }
+    fun setEditClientData(clientName: String, clientPhone: String, clientEmail: String) {
+        editClientName = clientName
+        editClientPhone = clientPhone
+        editClientEmail = clientEmail
+    }
 
-    fun editUserData(clientId: Int, clientData: JsonObject) {
+    fun editUserData() {
         viewModelScope.launch {
-//            val clientUserData = repository.editUserData(clientId, clientData)
-//            if (clientUserData) {
-//                _statusSend.value = StatusSendData.SUCCESS
-//            } else _statusSend.value = StatusSendData.ERROR
+            val clientId = getClientInfo()?.client_id
+            if (clientId != null) {
+                val clientData = JsonObject()
+                clientData.addProperty("name", editClientName)
+                clientData.addProperty("contact", editClientPhone)
+                clientData.addProperty("email", editClientEmail)
+                val clientUserData = repository.editUserData(clientId, clientData)
+                if (clientUserData) {
+                    _statusSend.value = StatusSendData.SUCCESS
+                } else _statusSend.value = StatusSendData.ERROR
+            } else {
+                _statusSend.value = StatusSendData.ERROR
+            }
         }
     }
 

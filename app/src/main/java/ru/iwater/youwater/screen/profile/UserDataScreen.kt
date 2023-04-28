@@ -1,6 +1,5 @@
 package ru.iwater.youwater.screen.profile
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,7 +35,7 @@ fun UserDataScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(),
                 style = YouWaterTypography.subtitle2,
                 color = Blue500,
                 textAlign = TextAlign.Center,
-                modifier = modifier.padding(16.dp)
+                modifier = modifier.padding(16.dp).fillMaxWidth()
             )
         }
     }
@@ -112,7 +111,7 @@ fun EmailInfoClient(modifier: Modifier, email: String) {
 
 @Preview
 @Composable
-fun EditUserDataPreview() {
+fun UserDataPreview() {
     YourWaterTheme {
         val modifier = Modifier
         Column(modifier = modifier

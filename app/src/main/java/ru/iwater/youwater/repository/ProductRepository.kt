@@ -321,5 +321,17 @@ class ProductRepository @Inject constructor(
         }
         return null
     }
+
+    suspend fun editUserData(clientId: Int, clientUserData: JsonObject): Boolean {
+        try {
+            val answer = apiWater.editUserData(clientId, clientUserData)
+            if (answer?.isSuccessful == true) {
+                return answer.body()?.get("status")?.asBoolean == true
+            }
+        } catch (e: java.lang.Exception) {
+            Timber.e("error edit user data: $e")
+        }
+        return false
+    }
     private fun getAuthClient(): AuthClient = authClient.get()
 }
