@@ -92,10 +92,8 @@ fun InputTelNumberField(phone: String, setPhone: (String) -> Unit, isFullPhoneNu
         onValueChange = {number ->
             if (number.length <= NumberDefaults.INPUT_LENGTH) {
                 setPhone(number)
-                Timber.d("TEXT = $phone")
-
+                isFullPhoneNumber(number.length == NumberDefaults.INPUT_LENGTH)
             }
-            isFullPhoneNumber(number.length == NumberDefaults.INPUT_LENGTH)
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
         label = { Text(text = stringResource(id = R.string.login_fragment_tel_number))},
