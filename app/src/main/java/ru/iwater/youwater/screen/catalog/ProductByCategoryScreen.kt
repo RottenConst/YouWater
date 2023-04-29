@@ -23,12 +23,14 @@ fun ProductByCategory(
     catalogId: Int,
     navController: NavController
 ) {
+    val modifier = Modifier
     Column {
         CatalogName(
             name = catalogListViewModel.catalogList.find { typeProduct -> typeProduct.id == catalogId }?.category ?: "",
-            modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+            modifier = modifier.padding(start = 16.dp, top = 16.dp)
         )
         ProductGrid(
+            modifier = modifier.padding(bottom = 60.dp),
             productsList = catalogListViewModel.productList.filter { product -> product.category == catalogId },
             countGrid = 2,
             getAboutProduct = {
@@ -51,6 +53,7 @@ fun ProductByCategory(
 
 @Composable
 fun ProductGrid(
+    modifier: Modifier,
     productsList: List<Product>,
     countGrid: Int,
     getAboutProduct: (Int) -> Unit,
@@ -58,7 +61,7 @@ fun ProductGrid(
     onCheckedFavorite: (Product, Boolean) -> Unit
 ) {
     LazyVerticalGrid(
-        modifier = Modifier.padding(bottom = 60.dp),
+        modifier = modifier,
         columns = GridCells.Fixed(countGrid),
         contentPadding = PaddingValues(8.dp)
     ) {
@@ -105,6 +108,7 @@ fun ProductByCategoryPreview() {
         Column {
             CatalogName(name = "Name Catalog", Modifier.padding(start = 16.dp, top = 16.dp))
             ProductGrid(
+                modifier = Modifier.padding(bottom = 60.dp),
                 productsList = productsList1,
                 countGrid = 2,
                 getAboutProduct = {},
