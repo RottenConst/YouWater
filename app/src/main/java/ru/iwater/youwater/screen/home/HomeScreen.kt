@@ -238,9 +238,9 @@ fun ProductCard(
                 .clickable { getAboutProduct(product.id) }
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
-                ProductInfo(product)
+                ProductInfo(Modifier.weight(1f), product)
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -301,11 +301,11 @@ private fun StatelessFavoriteButton(onFavorite: Boolean, onCheckedFavorite: (Boo
 }
 
 @Composable
-fun ProductInfo(product: Product) {
+fun ProductInfo(modifier: Modifier, product: Product) {
     GlideImage(
         imageModel = { "$ImageUrl/${product.gallery}" },
         loading = {
-            Box(modifier = Modifier.matchParentSize()) {
+            Box(modifier = modifier.matchParentSize()) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -313,7 +313,7 @@ fun ProductInfo(product: Product) {
         },
         failure = {
             Image(
-                modifier = Modifier.matchParentSize(),
+                modifier = modifier.matchParentSize(),
                 painter = painterResource(id = R.drawable.ic_your_water_logo),
                 contentDescription = stringResource(id = R.string.description_image_product),
                 alignment = Alignment.TopCenter
@@ -325,18 +325,18 @@ fun ProductInfo(product: Product) {
             contentDescription = stringResource(id = R.string.description_image_product),
             contentScale = ContentScale.Inside
         ),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(98.dp)
     )
     Text(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(),
         text = product.app_name ?: product.name,
         style = YouWaterTypography.caption,
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.Bold,
-        maxLines = if (product.id == 81 || product.id == 84) 2 else 3
+        maxLines = 3
     )
 }
 
@@ -368,14 +368,14 @@ fun ProductCost(id: Int, minPrice: Int) {
 
 @Composable
 fun ProductPlusButton(addProductInBasket: () -> Unit) {
-    Box(
-        contentAlignment = Alignment.BottomEnd
+    IconButton(
+        onClick = { addProductInBasket() },
+        modifier = Modifier.padding(0.dp).size(24.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_btn_plus),
             contentDescription = stringResource(id = R.string.description_add_product),
             tint = Blue500,
-            modifier = Modifier.clickable { addProductInBasket() }
         )
     }
 }
