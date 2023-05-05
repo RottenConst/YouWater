@@ -93,14 +93,14 @@ fun NameUser(modifier: Modifier,nameUser: String) {
 @Composable
 fun MenuButton(modifier: Modifier, painter: Painter, tint: Color, fontWeight: FontWeight? = null, nameButton: String, description: String, toScreen: () -> Unit) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .height(60.dp)
             .fillMaxWidth()
             .clickable { toScreen() },
         contentAlignment = Alignment.CenterStart
     ){
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .border(width = 1.dp, color = Color.LightGray)
                 .background(color = Color.White),
