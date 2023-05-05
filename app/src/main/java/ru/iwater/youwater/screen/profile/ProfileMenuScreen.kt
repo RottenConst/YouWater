@@ -69,6 +69,13 @@ fun ProfileScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(),n
                 ProfileFragmentDirections.actionProfileFragmentToAddresessFragment()
             )
         }
+        MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_notification), tint = Blue500, nameButton = stringResource(
+            id = R.string.fragment_profile_notifications
+        ), description = "") {
+            navController.navigate(
+                ProfileFragmentDirections.actionProfileFragmentToNotificationFragment()
+            )
+        }
     }
 }
 

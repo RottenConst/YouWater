@@ -27,5 +27,7 @@ data class Client(
     @SerializedName("contact")
     val contact: String,
     @SerializedName("address")
-    val address: String?
+    val address: String?,
+    @SerializedName("mailing_consent")
+    val mailing: Int
 )

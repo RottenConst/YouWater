@@ -283,6 +283,13 @@ class ClientProfileViewModel @Inject constructor(
         return addressJson
     }
 
+    fun setMailing(clientId: Int, isMailing: Boolean) {
+        viewModelScope.launch {
+            repository.setMailing(clientId, isMailing)
+            getClientInfo()
+        }
+    }
+
     private suspend fun getClientInfo(): Client? {
         return repository.getClientInfo()
     }

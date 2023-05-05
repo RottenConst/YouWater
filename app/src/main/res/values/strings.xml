@@ -54,6 +54,8 @@
         <item>Оплата наличными</item>
     </string-array>
 
+    <string name="MailingNotification">Получать уведомления о новых предложениях и акциях</string>
+
 
     <string name="default_notification_channel_name" translatable="true">hello</string>
     <string name="default_notification_channel_id" translatable="false">hello</string>

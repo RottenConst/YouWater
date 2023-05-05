@@ -41,4 +41,5 @@ interface ScreenComponent {
     fun inject(editUserDataFragment: EditUserDataFragment)
     fun inject(cardPaymentFragment: CardPaymentFragment)
     fun inject(completeOrderFragment: CompleteOrderFragment)
+    fun inject(notificationFragment: NotificationFragment)
 }

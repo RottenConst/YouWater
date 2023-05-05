@@ -338,5 +338,20 @@ class ProductRepository @Inject constructor(
         }
     }
 
+    suspend fun setMailing(clientId: Int, isMailing: Boolean) {
+        try {
+            val mailing = JsonObject()
+            if (isMailing) {
+                mailing.addProperty("mailing_consent", 1)
+                apiWater.mailing(clientId, mailing)
+            } else {
+                mailing.addProperty("mailing_consent", 0)
+                apiWater.mailing(clientId, mailing)
+            }
+        } catch (e: Exception) {
+            Timber.e("error set mailing: $e")
+        }
+    }
+
     private fun getAuthClient(): AuthClient = authClient.get()
 }
