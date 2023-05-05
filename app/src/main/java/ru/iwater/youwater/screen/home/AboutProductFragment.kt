@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.vm.AboutProductViewModel
@@ -35,6 +36,7 @@ class AboutProductFragment : BaseFragment() {
     ): View {
         val binding = FragmentAboutProductBinding.inflate(inflater)
         val productId = AboutProductFragmentArgs.fromBundle(requireArguments()).orderId
+        val navController = NavHostFragment.findNavController(this)
         binding.lifecycleOwner = this
         binding.composeViewAboutProductScreen.apply {
             setViewCompositionStrategy(
@@ -42,7 +44,7 @@ class AboutProductFragment : BaseFragment() {
             )
             setContent { 
                 YourWaterTheme {
-                    AboutProductScreen(aboutProductViewModel = viewModel, productId =  productId)
+                    AboutProductScreen(aboutProductViewModel = viewModel, productId =  productId, navController = navController)
                 }
             }
         }

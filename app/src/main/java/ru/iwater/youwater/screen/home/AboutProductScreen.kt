@@ -2,6 +2,7 @@ package ru.iwater.youwater.screen.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import ru.iwater.youwater.R
@@ -34,13 +36,18 @@ import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.AboutProductViewModel
 
 @Composable
-fun AboutProductScreen(aboutProductViewModel: AboutProductViewModel, productId: Int) {
+fun AboutProductScreen(aboutProductViewModel: AboutProductViewModel, productId: Int, navController: NavController) {
     aboutProductViewModel.initProduct(productId)
     val product by aboutProductViewModel.product.observeAsState()
     if (product != null) {
         Column(modifier = Modifier.fillMaxSize()) {
             InfoProduct(product = product!!)
-            ProductPriceInfo(price = product!!.getMinPriceProduct())
+            ProductPriceInfo(price = product!!.getMinPriceProduct()) {
+                navController.navigate(
+                    AboutProductFragmentDirections.actionAboutProductFragmentToPriceBottomSheetFragment(
+                        product!!.price)
+                )
+            }
             AboutProduct(product!!) {aboutProductViewModel.addProductToBasket1(it)}
         }
     }
@@ -96,7 +103,7 @@ fun InfoProduct(product: Product) {
 }
 
 @Composable
-fun ProductPriceInfo(price: Int) {
+fun ProductPriceInfo(price: Int, getPrice: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -110,7 +117,7 @@ fun ProductPriceInfo(price: Int) {
             textAlign = TextAlign.Center,
         )
         Icon(
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = 8.dp).clickable { getPrice() },
             painter = painterResource(id = R.drawable.ic_help_24),
             contentDescription = stringResource(id = R.string.description_image_product),
             tint = Blue500
@@ -245,7 +252,7 @@ fun AboutProductScreenPreview() {
         )
         Column(modifier = Modifier.fillMaxSize()) {
             InfoProduct(product)
-            ProductPriceInfo(product.getMinPriceProduct())
+            ProductPriceInfo(product.getMinPriceProduct()){}
             AboutProduct(product){}
         }
 
