@@ -1,7 +1,6 @@
 package ru.iwater.youwater.repository
 
 import com.google.gson.JsonObject
-import ru.iwater.youwater.bd.FavoriteProductDao
 import ru.iwater.youwater.bd.ProductDao
 import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.data.*
@@ -22,7 +21,6 @@ class ProductRepository @Inject constructor(
 ) {
 
     private val productDao: ProductDao = youWaterDB.productDao()
-    private val favoriteDao: FavoriteProductDao = youWaterDB.favoriteProductDao()
     private val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
     private val sberApi: SberPaymentApi = RetrofitSberApi.makeRetrofit()
 
@@ -59,30 +57,6 @@ class ProductRepository @Inject constructor(
      */
     suspend fun deleteProductFromBasket(product: Product) {
         productDao.delete(product)
-    }
-
-    /**
-     * добавить избранный товар
-     */
-    suspend fun addToFavoriteProduct(favoriteProduct: FavoriteProduct) {
-        favoriteDao.save(favoriteProduct)
-    }
-
-    /**
-     * удалить избранный товар
-     */
-    suspend fun deleteFavoriteProduct(favoriteProduct: FavoriteProduct) {
-        favoriteDao.delete(favoriteProduct)
-    }
-
-    /**
-     * получить список избранных товаров
-     */
-    suspend fun getAllFavoriteProducts(): List<FavoriteProduct>{
-        val favoriteProducts = favoriteDao.getAllProduct()
-        return if (favoriteProducts.isNullOrEmpty()) {
-            emptyList()
-        } else favoriteProducts
     }
 
     suspend fun getFavorite(): Favorite? {
@@ -333,5 +307,36 @@ class ProductRepository @Inject constructor(
         }
         return false
     }
+
+    /**
+     * послать запрос на деактивироватцию адреса
+     */
+    suspend fun inactiveAddress(id: Int): Boolean {
+        return try {
+            val active = apiWater.deleteAddress(id)
+            active.isSuccessful
+        } catch (e: Exception) {
+            Timber.e("delete address error $e")
+            false
+        }
+    }
+
+    /**
+     * отправить запрос на создание адреса
+     */
+    suspend fun createAddress(
+        newAddressParameters: JsonObject
+    ): String? {
+        return try {
+            val response = apiWater.createNewAddress(newAddressParameters)
+            if (response.isSuccessful) {
+                response.body()?.get("message")?.asString
+            } else null
+        } catch (e: Exception) {
+            Timber.e("Error create address: $e")
+            null
+        }
+    }
+
     private fun getAuthClient(): AuthClient = authClient.get()
 }

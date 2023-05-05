@@ -131,11 +131,16 @@ fun CreateOrderScreen(
                 dateOrder = dateOrder,
                 onShowDialog = {checkAddressDialog = !checkAddressDialog},
                 setAddressOrder = {
+                    if (addressList.isNullOrEmpty()) {
+                        navController.navigate(
+                            CreateOrderFragmentDirections.actionCreateOrderFragmentToAddAddressFragment(true)
+                        )
+                    } else {
                     selectedTime = "**:**-**:**"
                     dateOrder = ""
                     productListViewModel.getDeliveryOnAddress(it)
                     Timber.d("Order set address = ${order}")
-                    selectedAddress = addressList?.indexOf(it) ?: -1 },
+                    selectedAddress = addressList?.indexOf(it) ?: -1 }},
                 showDatePickerDialog = { productListViewModel.getCalendar(
                     calendar = Calendar.getInstance(),
                     setDateOrder = {dateOrder = it}
@@ -671,9 +676,6 @@ fun CreateOrderScreenPreview() {
 
     val highSize by rememberSaveable {
         mutableStateOf(72*productsList.size)
-    }
-    var onShowDialog by rememberSaveable {
-        mutableStateOf(false)
     }
     productsList.forEach {product ->
         generalPrice += product.getPriceOnCount(product.count)

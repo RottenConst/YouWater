@@ -25,6 +25,12 @@
     <string name="confirmLogout">Вы уверены, что хотите выйти из своего аккаунта?</string>
     <string name="distributionAnswer">Получать уведомления о новых предложениях и акциях</string>
 
+    <string-array name="regions">
+        <item>Выберете регион</item>
+        <item>Санкт-Петербург</item>
+        <item>Ленинградская область</item>
+    </string-array>
+
 
     <string name="payment_on_card">Оплата по карте</string>
 

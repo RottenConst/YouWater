@@ -121,22 +121,9 @@ interface ApiWater {
         @Path("address_id") addressId: Int
     ): RawAddress?
 
-    @FormUrlEncoded
     @POST("address/")
     suspend fun createNewAddress(
-        @Field("client_id") clientId: Int,
-        @Field("contact") contact: String,
-        @Field("region") region: String,
-        @Field("fact_address") factAddress: String,
-        @Field("address") address: String,
-        @Field("coords") coords: String,
-        @Field("active") active: Int,
-        @Field("full_address") fullAddress: String,
-        @Field("return_tare") returnTare: Int,
-        @Field("phone_contact") phoneContact: String,
-        @Field("name_contact") nameContact: String,
-        @Field("address_json") addressJson: JsonObject,
-        @Field("notice") notice: String
+        @Body parameters: JsonObject
     ): Response<JsonObject>
 
     @PUT("address_delete/{id}/")

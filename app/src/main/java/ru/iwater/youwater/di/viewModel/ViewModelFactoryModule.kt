@@ -43,11 +43,6 @@ abstract class ViewModelFactoryModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(AddressViewModel::class)
-    abstract fun bindingAddressViewModel(addressViewModel: AddressViewModel): ViewModel
-
-    @Binds
-    @IntoMap
     @ViewModelKey(OrderViewModel::class)
     abstract fun bindingOrderViewModel(orderViewModel: OrderViewModel): ViewModel
 

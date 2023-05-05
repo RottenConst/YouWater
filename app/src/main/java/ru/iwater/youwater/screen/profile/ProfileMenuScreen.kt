@@ -41,28 +41,28 @@ fun ProfileScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(),n
         .fillMaxSize()
         .padding(bottom = 60.dp)) {
         NameUser(modifier = modifier, nameUser = client?.name ?: "")
-        MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_orders), nameButton = stringResource(
+        MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_orders), tint = Blue500, nameButton = stringResource(
             id = R.string.fragment_profile_my_orders
         ), description = "") {
             navController.navigate(
                 ProfileFragmentDirections.actionProfileFragmentToMyOrdersFragment()
             )
         }
-        MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_info), nameButton = stringResource(
+        MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_info), tint = Blue500, nameButton = stringResource(
             id = R.string.fragment_profile_my_data
         ), description = "") {
             navController.navigate(
                 ProfileFragmentDirections.actionProfileFragmentToUserDataFragment(false)
             )
         }
-        MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_favorite), nameButton = stringResource(
+        MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_favorite), tint = Blue500, nameButton = stringResource(
             id = R.string.general_favorite
         ), description = "") {
             navController.navigate(
                 ProfileFragmentDirections.actionProfileFragmentToFavoriteFragment()
             )
         }
-        MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_address), nameButton = stringResource(
+        MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_address), tint = Blue500, nameButton = stringResource(
             id = R.string.fragment_profile_addresses
         ), description = "") {
             navController.navigate(
@@ -84,7 +84,7 @@ fun NameUser(modifier: Modifier,nameUser: String) {
 }
 
 @Composable
-fun MenuButton(modifier: Modifier, painter: Painter, nameButton: String, description: String, toScreen: () -> Unit) {
+fun MenuButton(modifier: Modifier, painter: Painter, tint: Color, fontWeight: FontWeight? = null, nameButton: String, description: String, toScreen: () -> Unit) {
     Box(
         modifier = modifier
             .height(60.dp)
@@ -103,12 +103,13 @@ fun MenuButton(modifier: Modifier, painter: Painter, nameButton: String, descrip
             Icon(
                 painter = painter,
                 contentDescription = description,
-                tint = Blue500,
+                tint = tint,
                 modifier = modifier.padding(16.dp)
             )
             Text(
                 text = nameButton,
-                style = YouWaterTypography.h6
+                style = YouWaterTypography.h6,
+                fontWeight = fontWeight
             )
         }
     }
@@ -124,19 +125,19 @@ fun ProfileScreenPreview() {
             .fillMaxSize()
             .padding(bottom = 60.dp)) {
             NameUser(modifier = modifier, nameUser = "Екатерина Иванова")
-            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_orders), nameButton = stringResource(
+            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_orders), tint = Blue500, nameButton = stringResource(
                 id = R.string.fragment_profile_my_orders
             ), description = "") {}
-            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_info), nameButton = stringResource(
+            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_info), tint = Blue500, nameButton = stringResource(
                 id = R.string.fragment_profile_my_data
             ), description = "") {}
-            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_favorite), nameButton = stringResource(
+            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_favorite), tint = Blue500, nameButton = stringResource(
                 id = R.string.general_favorite
             ), description = "") {}
-            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_address), nameButton = stringResource(
+            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_address), tint = Blue500, nameButton = stringResource(
                 id = R.string.fragment_profile_addresses
             ), description = "") {}
-            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_notification), nameButton = stringResource(
+            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_notification), tint = Blue500, nameButton = stringResource(
                 id = R.string.general_notice
             ), description = "") {}
         }
