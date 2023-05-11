@@ -100,11 +100,6 @@ interface ApiWater {
         @Path("client_id") clientId: Int
     ): List<OrderFromCRM>?
 
-    @POST("creating_auto_task")
-    suspend fun sendUserData(
-        @Body editClientData: ClientUserData
-    ): AutoTaskData?
-
     @PUT("client_detail/{client_id}/")
     suspend fun editUserData(
         @Path("client_id") clientId: Int,

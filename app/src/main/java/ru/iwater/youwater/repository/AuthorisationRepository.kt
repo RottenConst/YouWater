@@ -3,7 +3,6 @@ package ru.iwater.youwater.repository
 import com.google.gson.JsonObject
 import ru.iwater.youwater.data.AuthClient
 import ru.iwater.youwater.data.Client
-import ru.iwater.youwater.data.ClientUserData
 import ru.iwater.youwater.data.PhoneStatusClient
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
@@ -101,18 +100,6 @@ class AuthorisationRepository @Inject constructor(
             Timber.e("error set mailing: $e")
         }
 
-    }
-
-    suspend fun sendUserData(clientUserData: ClientUserData): String {
-        try {
-            val answer = apiAuth.sendUserData(clientUserData)
-            if (answer?.id != null) {
-                return "user data sent for moderation"
-            }
-        } catch (e: java.lang.Exception) {
-            Timber.e("error send user data: $e")
-        }
-        return "user data not send"
     }
 
     suspend fun editUserData(clientId: Int, clientUserData: JsonObject): Boolean {

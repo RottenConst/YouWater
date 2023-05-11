@@ -19,8 +19,6 @@ data class Order(
     var period: String,
     @SerializedName("order_cost")
     var orderCost: Int,
-//    @SerializedName("address")
-//    var address: String,
     @SerializedName("payment_type")
     var paymentType: String?,
     @SerializedName("status")
@@ -31,8 +29,6 @@ data class Order(
     var contact: String,
     @SerializedName("date")
     var date: String,
-//    @SerializedName("address_json")
-//    var addressJson: JsonObject,
     @SerializedName("address_id")
     var addressId: Int,
     @SerializedName("name")

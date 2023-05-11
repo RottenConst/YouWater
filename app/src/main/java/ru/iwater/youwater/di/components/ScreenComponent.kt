@@ -37,7 +37,6 @@ interface ScreenComponent {
     fun inject(favoriteFragment: FavoriteFragment)
     fun inject(createOrderFragment: CreateOrderFragment)
     fun inject(myOrdersFragment: MyOrdersFragment)
-    fun inject(bankCardFragment: BankCardFragment)
     fun inject(editUserDataFragment: EditUserDataFragment)
     fun inject(cardPaymentFragment: CardPaymentFragment)
     fun inject(completeOrderFragment: CompleteOrderFragment)
