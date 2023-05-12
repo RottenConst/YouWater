@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,8 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -116,10 +119,7 @@ fun OtpTextFieldTheme(pinCode: String = "", setPinCode: (String) -> Unit, color:
         val focusRequester = remember { FocusRequester() }
         BasicTextField(
             modifier = Modifier
-                .focusRequester(focusRequester)
-                .onFocusChanged {
-                                focusRequester.requestFocus()
-                },
+                .focusRequester(focusRequester),
             value = pinCode,
             onValueChange = {
                 when {
@@ -150,6 +150,10 @@ fun OtpTextFieldTheme(pinCode: String = "", setPinCode: (String) -> Unit, color:
                 }
             }
         )
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
     }
 }
 
