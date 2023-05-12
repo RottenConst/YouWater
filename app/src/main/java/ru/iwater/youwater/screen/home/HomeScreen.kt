@@ -23,10 +23,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.network.ImageUrl
@@ -40,45 +43,85 @@ fun HomeScreen(
     catalogListViewModel: CatalogListViewModel = viewModel(),
     navController: NavController
 ) {
+    val lastOrder by catalogListViewModel.lastOrder.observeAsState()
     val promoBanner by catalogListViewModel.promoBanners.observeAsState()
     val promoListState = rememberLazyListState()
     val productsList = catalogListViewModel.productList
-    Column {
-        PromoAction(promo = promoBanner, promoListState) {
-            navController.navigate(
-                HomeFragmentDirections.actionHomeFragmentToBannerInfoBottomSheetFragment(
-                    it!!.name,
-                    it.description
-                )
-            )
-        }
-        if (productsList.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else {
-            ProductContent(
-                catalogList = catalogListViewModel.catalogList,
-                productsList = productsList,
-                getAboutProduct = {
-                    navController.navigate(
-                        HomeFragmentDirections.actionShowAboutProductFragment(
-                            it
-                        )
-                    )
-                },
-                addProductInBasket = { catalogListViewModel.addProductToBasket(it) },
-                onCheckedFavorite = { product, onFavorite ->
-                    catalogListViewModel.onChangeFavorite(
-                        productId = product.id,
-                        onFavorite = onFavorite
-                    )
+    var itemBanner = 0
+    LaunchedEffect(Unit) {
+        catalogListViewModel.viewModelScope.launch {
+            while (itemBanner <= (promoBanner?.size ?: 0)) {
+                delay(5000)
+                if (itemBanner != promoBanner?.size) {
+                    itemBanner++
+                    promoListState.scrollToItem(itemBanner)
+                } else {
+                    itemBanner = 0
+                    promoListState.scrollToItem(itemBanner)
                 }
-            )
+            }
         }
     }
+
+    Scaffold(
+        floatingActionButton = {
+            if (lastOrder != null) {
+                FloatingActionButton(onClick = {
+                    navController.navigate(
+                        HomeFragmentDirections.actionHomeFragmentToCreateOrderFragment(
+                            false,
+                            lastOrder!!
+                        )
+                    )
+                }, modifier = Modifier.padding(bottom = 60.dp)) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_basket_icon),
+                        contentDescription = "Повторить последний заказ"
+                    )
+                }
+            }
+        })
+    {paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            PromoAction(promo = promoBanner, promoListState) {
+                navController.navigate(
+                    HomeFragmentDirections.actionHomeFragmentToBannerInfoBottomSheetFragment(
+                        it!!.name,
+                        it.description
+                    )
+                )
+            }
+            if (productsList.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                ProductContent(
+                    catalogList = catalogListViewModel.catalogList,
+                    productsList = productsList,
+                    getAboutProduct = {
+                        navController.navigate(
+                            HomeFragmentDirections.actionShowAboutProductFragment(
+                                it
+                            )
+                        )
+                    },
+                    addProductInBasket = { catalogListViewModel.addProductToBasket(it) },
+                    onCheckedFavorite = { product, onFavorite ->
+                        catalogListViewModel.onChangeFavorite(
+                            productId = product.id,
+                            onFavorite = onFavorite
+                        )
+                    }
+                )
+            }
+        }
+    }
+
+
 }
 
 @Composable
@@ -370,7 +413,9 @@ fun ProductCost(id: Int, minPrice: Int) {
 fun ProductPlusButton(addProductInBasket: () -> Unit) {
     IconButton(
         onClick = { addProductInBasket() },
-        modifier = Modifier.padding(0.dp).size(24.dp)
+        modifier = Modifier
+            .padding(0.dp)
+            .size(24.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_btn_plus),
