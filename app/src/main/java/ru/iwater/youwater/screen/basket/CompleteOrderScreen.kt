@@ -55,7 +55,9 @@ fun CompleteOrderScreen(productListViewModel: ProductListViewModel = viewModel()
                 InfoStatusCreate(modifier = modifier, isPaid = isPaid)
             }
                 items(count = 1) {
-                    completeOrder?.let { it1 -> CardOrderInfo(modifier = modifier, it1){ productListViewModel.getInfoLastOrder(it1.id)} }
+                    if (completeOrder != null) {
+                    CardOrderInfo(modifier = modifier, completeOrder!!){ productListViewModel.getInfoLastOrder(
+                        completeOrder!!.id)} }
             }
         }
         HomeButton(modifier = modifier.align(Alignment.BottomCenter)) {
