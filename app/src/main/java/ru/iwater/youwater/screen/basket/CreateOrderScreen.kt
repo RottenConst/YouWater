@@ -272,30 +272,30 @@ fun AddressAndTimeOrder(
                 )
             }
             if (selectedAddress != -1) {
-                if (!addressList[selectedAddress].notice.isNullOrEmpty()) {
-                    Divider(color = Color.LightGray, thickness = 1.dp)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            modifier = Modifier.padding(end = 8.dp),
-                            imageVector = Icons.Outlined.Edit,
-                            tint = Blue500,
-                            contentDescription = stringResource(id = R.string.info_product)
-                        )
-                        Text(
-                            text = "Комментарий к адресу: ${addressList[selectedAddress].notice}",
-                            style = YouWaterTypography.body1,
-                            textAlign = TextAlign.Center,
-                            color = Blue500,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
+//                if (!addressList[selectedAddress].notice.isNullOrEmpty()) {
+//                    Divider(color = Color.LightGray, thickness = 1.dp)
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(8.dp),
+//                        horizontalArrangement = Arrangement.SpaceBetween,
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        Icon(
+//                            modifier = Modifier.padding(end = 8.dp),
+//                            imageVector = Icons.Outlined.Edit,
+//                            tint = Blue500,
+//                            contentDescription = stringResource(id = R.string.info_product)
+//                        )
+//                        Text(
+//                            text = "Комментарий к адресу: ${addressList[selectedAddress].notice}",
+//                            style = YouWaterTypography.body1,
+//                            textAlign = TextAlign.Center,
+//                            color = Blue500,
+//                            modifier = Modifier.weight(1f)
+//                        )
+//                    }
+//                }
                 Divider(color = Color.LightGray, thickness = 1.dp)
                 Row(
                     modifier = Modifier
@@ -528,7 +528,7 @@ fun ItemProductInOrder(
                     text = productName,
                     style = YouWaterTypography.caption,
                     textAlign = TextAlign.Start,
-                    modifier = Modifier.width(156.dp)
+                    modifier = Modifier.width(156.dp).weight(1f)
                 )
                 IconButton(onClick = { minusCount() }) {
                     Icon(
