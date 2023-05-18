@@ -21,8 +21,8 @@ android {
         applicationId "ru.iwater.youwater"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 15
-        versionName "1.0.4"
+        versionCode 26
+        versionName "1.2.6"
         manifestPlaceholders = [GOOGLE_MAPS_API_KEY:getApiKey()]
 
         multiDexEnabled true
@@ -32,9 +32,9 @@ android {
 
     buildTypes {
         release {
-            shrinkResources true
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            shrinkResources true
+//            minifyEnabled true
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
         applicationVariants.all { variant ->
@@ -73,7 +73,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
 
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.fragment:fragment-ktx:1.5.7'
