@@ -50,7 +50,11 @@ data class Product(
                 priceList.forEach {
                     val priceCount = it.split(':')
                     if(priceCount[0].toInt() <= count) {
-                        price = (priceCount[1].toInt() - 15) * count
+                        price = if (count < 10) {
+                            (priceCount[1].toInt() - 30) * count
+                        } else {
+                            (priceCount[1].toInt() - 10) * count
+                        }
                     }
                 }
                 price
@@ -59,7 +63,11 @@ data class Product(
                 priceList.forEach {
                     val priceCount = it.split(':')
                     if(priceCount[0].toInt() <= count) {
-                        price = (priceCount[1].toInt() - 15) * count
+                        price = if (count < 10) {
+                            (priceCount[1].toInt() - 30) * count
+                        } else {
+                            (priceCount[1].toInt() - 10) * count
+                        }
                     }
                 }
                 price
