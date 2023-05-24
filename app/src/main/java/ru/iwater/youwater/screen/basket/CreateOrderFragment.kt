@@ -181,8 +181,14 @@ class CreateOrderFragment : BaseFragment(),
                 if (product.id == 81 || product.id == 84) {
                     priceList.forEach {
                         val priceCount = it.split(":")
+                        Timber.d("Price Count ${priceCount[0]}")
                         if (priceCount[0].toInt() <= count) {
-                            discount = (priceCount[1].toInt() - 15) * count
+//                            discount = (priceCount[1].toInt() - 15) * count
+                            discount = if (count < 10) {
+                                (priceCount[1].toInt() - 30) * count
+                            } else {
+                                (priceCount[1].toInt() - 10) * count
+                            }
                             price = priceCount[1].toInt() * count
                         }
                     }

@@ -40,13 +40,13 @@ fun TextView.bindCostProduct(product: Product?) {
             81 -> {
                 if (product.price.isNotEmpty()) {
                     val price = product.price.split(";")[0].split(":")[1]
-                    "от ${price.toInt() - 15}₽".also { text = it }
+                    "от ${price.toInt() - 30}₽".also { text = it }
                 }
             }
             84 -> {
                 if (product.price.isNotEmpty()) {
                     val price = product.price.split(";")[0].split(":")[1]
-                    "от ${price.toInt() - 15}₽".also { text = it }
+                    "от ${price.toInt() - 30}₽".also { text = it }
                 }
             }
             else -> {
@@ -66,13 +66,13 @@ fun TextView.bindCostFavoriteProduct(product: FavoriteProduct?) {
             81 -> {
                 if (product.price.isNotEmpty()) {
                     val price = product.price.split(";")[0].split(":")[1]
-                    "от ${price.toInt() - 15}₽".also { text = it }
+                    "от ${price.toInt() - 30}₽".also { text = it }
                 }
             }
             84 -> {
                 if (product.price.isNotEmpty()) {
                     val price = product.price.split(";")[0].split(":")[1]
-                    "от ${price.toInt() - 15}₽".also { text = it }
+                    "от ${price.toInt() - 30}₽".also { text = it }
                 }
             }
             else -> {
@@ -198,7 +198,12 @@ fun TextView.bindPriceProduct(product: Product?) {
                     val priceCount = it.split(":")
                     if (priceCount[0].toInt() <= count) {
                         Timber.d("Place = ${priceCount[1].toInt()}")
-                        price = (priceCount[1].toInt() - 15) * count
+//                        price = (priceCount[1].toInt() - 15) * count
+                        price = if (count < 10) {
+                            (priceCount[1].toInt() - 30) * count
+                        } else {
+                            (priceCount[1].toInt() - 10) * count
+                        }
                     }
                 }
             }
@@ -208,7 +213,12 @@ fun TextView.bindPriceProduct(product: Product?) {
                     val priceCount = it.split(":")
                     if (priceCount[0].toInt() <= count) {
                         Timber.d("Place = ${priceCount[1].toInt()}")
-                        price = (priceCount[1].toInt() - 15) * count
+//                        price = (priceCount[1].toInt() - 15) * count
+                        price = if (count < 10) {
+                            (priceCount[1].toInt() - 30) * count
+                        } else {
+                            (priceCount[1].toInt() - 10) * count
+                        }
                     }
                 }
             }
@@ -243,7 +253,12 @@ fun TextView.bindBtnPriceProduct(product: Product?) {
                     val priceCount = it.split(":")
                     if (priceCount[0].toInt() <= count) {
                         Timber.d("Place = ${priceCount[1].toInt()}")
-                        price = (priceCount[1].toInt() - 15) * count
+//                        price = (priceCount[1].toInt() - 15) * count
+                        price = if (count < 10) {
+                            (priceCount[1].toInt() - 30) * count
+                        } else {
+                            (priceCount[1].toInt() - 10) * count
+                        }
                     }
                 }
             }
@@ -253,7 +268,12 @@ fun TextView.bindBtnPriceProduct(product: Product?) {
                     val priceCount = it.split(":")
                     if (priceCount[0].toInt() <= count) {
                         Timber.d("Place = ${priceCount[1].toInt()}")
-                        price = (priceCount[1].toInt() - 15) * count
+//                        price = (priceCount[1].toInt() - 15) * count
+                        price = if (count < 10) {
+                            (priceCount[1].toInt() - 30) * count
+                        } else {
+                            (priceCount[1].toInt() - 10) * count
+                        }
                     }
                 }
             }
