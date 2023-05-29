@@ -8,16 +8,14 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseFragment
 import ru.iwater.youwater.databinding.FragmentCompleteOrderBinding
-import ru.iwater.youwater.screen.adapters.MyOrderAdapter
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.ProductListViewModel
 import javax.inject.Inject
 
-class CompleteOrderFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder {
+class CompleteOrderFragment : BaseFragment() {
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
@@ -56,11 +54,5 @@ class CompleteOrderFragment : BaseFragment(), MyOrderAdapter.onReplayLastOrder {
         @JvmStatic
         fun newInstance() =
             CompleteOrderFragment()
-    }
-
-    override fun onClickReplayButton(idOrder: Int) {
-        findNavController().navigate(
-            CompleteOrderFragmentDirections.actionCompleteOrderFragmentToCreateOrderFragment(false, idOrder)
-        )
     }
 }

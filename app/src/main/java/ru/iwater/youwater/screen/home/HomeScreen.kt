@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.delay
@@ -33,6 +34,7 @@ import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.network.ImageUrl
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
@@ -41,8 +43,10 @@ import ru.iwater.youwater.vm.CatalogListViewModel
 @Composable
 fun HomeScreen(
     catalogListViewModel: CatalogListViewModel = viewModel(),
-    navController: NavController
+    navController: NavHostController
+//    navController: NavController
 ) {
+    catalogListViewModel.getProductsList()
     val lastOrder by catalogListViewModel.lastOrder.observeAsState()
     val promoBanner by catalogListViewModel.promoBanners.observeAsState()
     val promoListState = rememberLazyListState()
@@ -73,7 +77,7 @@ fun HomeScreen(
                             lastOrder!!
                         )
                     )
-                }, modifier = Modifier.padding(bottom = 60.dp)) {
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_basket_icon),
                         contentDescription = "Повторить последний заказ"
@@ -103,11 +107,12 @@ fun HomeScreen(
                     catalogList = catalogListViewModel.catalogList,
                     productsList = productsList,
                     getAboutProduct = {
-                        navController.navigate(
-                            HomeFragmentDirections.actionShowAboutProductFragment(
-                                it
-                            )
-                        )
+//                        navController.navigate(
+//                            HomeFragmentDirections.actionShowAboutProductFragment(
+//                                it
+//                            )
+//                        )
+                        navController.navigate(MainNavRoute.AboutProductScreen.withArgs(it.toString()))
                     },
                     addProductInBasket = { catalogListViewModel.addProductToBasket(it) },
                     onCheckedFavorite = { product, onFavorite ->
@@ -142,7 +147,7 @@ fun ProductContent(
     getAboutProduct: (Int) -> Unit,
     onCheckedFavorite: (Product, Boolean) -> Unit
 ) {
-    LazyColumn(modifier = Modifier.padding(bottom = 60.dp)) {
+    LazyColumn {
         items(catalogList.size) { catalogIndex ->
             ProductsByCategoryRow(
                 categoryName = catalogList[catalogIndex].category,

@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import ru.iwater.youwater.R
@@ -33,7 +34,10 @@ import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.ProductListViewModel
 
 @Composable
-fun BasketScreen(productViewModel: ProductListViewModel = viewModel(), navController: NavController) {
+fun BasketScreen(
+    productViewModel: ProductListViewModel = viewModel(),
+    navController: NavHostController
+) {
     val productsListInOrder = productViewModel.productsList
     val priceNoDiscount by productViewModel.priceNoDiscount.observeAsState()
     val generalCost by productViewModel.generalCost.observeAsState()

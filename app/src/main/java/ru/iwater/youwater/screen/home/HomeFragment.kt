@@ -43,7 +43,7 @@ class HomeFragment : BaseFragment() {
             )
             setContent {
                 YourWaterTheme {
-                    HomeScreen(catalogListViewModel = viewModel, navController)
+//                    HomeScreen(catalogListViewModel = viewModel, navController)
                 }
             }
         }

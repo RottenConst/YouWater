@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import ru.iwater.youwater.R
@@ -30,7 +31,9 @@ import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.CatalogListViewModel
 
 @Composable
-fun CatalogScreen(viewModel: CatalogListViewModel, navController: NavController) {
+fun CatalogScreen(
+    viewModel: CatalogListViewModel,
+    navController: NavHostController) {
 
     CatalogList(
         catalogList = viewModel.catalogList.sortedBy { it.priority },

@@ -44,7 +44,7 @@ class AboutProductFragment : BaseFragment() {
             )
             setContent { 
                 YourWaterTheme {
-                    AboutProductScreen(aboutProductViewModel = viewModel, productId =  productId, navController = navController)
+//                    AboutProductScreen(aboutProductViewModel = viewModel, productId =  productId, navController = navController)
                 }
             }
         }

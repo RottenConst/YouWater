@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import ru.iwater.youwater.R
@@ -34,11 +35,20 @@ import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.AboutProductViewModel
+import ru.iwater.youwater.vm.CatalogListViewModel
 
 @Composable
-fun AboutProductScreen(aboutProductViewModel: AboutProductViewModel, productId: Int, navController: NavController) {
-    aboutProductViewModel.initProduct(productId)
-    val product by aboutProductViewModel.product.observeAsState()
+fun AboutProductScreen(
+    catalogListViewModel: CatalogListViewModel,
+//    aboutProductViewModel: AboutProductViewModel,
+    productId: Int,
+    navController: NavHostController
+//    navController: NavController
+) {
+//    aboutProductViewModel.initProduct(productId)
+    catalogListViewModel.initProduct(productId = productId)
+    val product by catalogListViewModel.product.observeAsState()
+//    val product by aboutProductViewModel.product.observeAsState()
     if (product != null) {
         Column(modifier = Modifier.fillMaxSize()) {
             InfoProduct(product = product!!)
@@ -48,7 +58,10 @@ fun AboutProductScreen(aboutProductViewModel: AboutProductViewModel, productId: 
                         product!!.price)
                 )
             }
-            AboutProduct(product!!) {aboutProductViewModel.addProductToBasket1(it)}
+            AboutProduct(product!!) {
+//                aboutProductViewModel.addProductToBasket(it)
+                catalogListViewModel.addProductCountToBasket(it)
+            }
         }
     }
 }
@@ -117,7 +130,9 @@ fun ProductPriceInfo(price: Int, getPrice: () -> Unit) {
             textAlign = TextAlign.Center,
         )
         Icon(
-            modifier = Modifier.padding(start = 8.dp).clickable { getPrice() },
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .clickable { getPrice() },
             painter = painterResource(id = R.drawable.ic_help_24),
             contentDescription = stringResource(id = R.string.description_image_product),
             tint = Blue500

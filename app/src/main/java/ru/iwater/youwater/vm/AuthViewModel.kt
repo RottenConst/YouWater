@@ -5,12 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.AuthClient
 import ru.iwater.youwater.repository.AuthorisationRepository
-import ru.iwater.youwater.screen.login.LoginFragmentDirections
-import ru.iwater.youwater.screen.login.RegisterFragmentDirections
+import ru.iwater.youwater.screen.navigation.StartNavRoute
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -35,7 +34,11 @@ class AuthViewModel @Inject constructor(
 
     private val clientAuth = authorisationRepository.getAuthClient()
 
-    fun authPhone(phone: String, navController: NavController) {
+    fun authPhone(
+        phone: String,
+//        navController: NavController
+        navController: NavHostController
+    ) {
         val telNum =
             StringBuilder(phone).insert(0, "+7(").insert(6, ") ").insert(11, '-').toString()
         viewModelScope.launch {
@@ -47,17 +50,20 @@ class AuthViewModel @Inject constructor(
                         .show()
                 }
                 authPhone.status -> {
-                    navController.navigate(
-                        LoginFragmentDirections.actionLoginFragmentToEnterPinCodeFragment(
-                            telNum,
-                            authPhone.clientId
-                        )
-                    )
+//                    navController.navigate(
+//                        LoginFragmentDirections.actionLoginFragmentToEnterPinCodeFragment(
+//                            telNum,
+//                            authPhone.clientId
+//                        )
+//                    )
+                    Timber.d("auth ${authPhone.clientId}")
+                    navController.navigate(StartNavRoute.EnterPinCodeScreen.withArgs(telNum, authPhone.clientId.toString()))
                 }
                 else -> {
-                    navController.navigate(
-                        LoginFragmentDirections.actionLoginFragmentToRegisterFragment(telNum)
-                    )
+//                    navController.navigate(
+//                        LoginFragmentDirections.actionLoginFragmentToRegisterFragment(telNum)
+//                    )
+                    navController.navigate(StartNavRoute.RegisterScreen.withArgs(telNum))
                 }
             }
         }
@@ -96,7 +102,8 @@ class AuthViewModel @Inject constructor(
         name: String,
         email: String,
         isMailing: Boolean,
-        navController: NavController
+//        navController: NavController
+        navController: NavHostController
     ) {
         val registerClient = authorisationRepository.registerClient(
             phone, name, email
@@ -117,15 +124,17 @@ class AuthViewModel @Inject constructor(
         isMailing: Boolean,
         phone: String,
         clientId: Int,
-        navController: NavController
+        navController: NavHostController
+//        navController: NavController
     ) {
         if (authorisationRepository.authPhone(phone)?.status == true) {
             authorisationRepository.setMailing(clientId, isMailing)
             navController.navigate(
-                RegisterFragmentDirections.actionRegisterFragmentToEnterPinCodeFragment(
-                    phone,
-                    clientId
-                )
+                StartNavRoute.EnterPinCodeScreen.withArgs(phone, clientId.toString())
+//                RegisterFragmentDirections.actionRegisterFragmentToEnterPinCodeFragment(
+//                    phone,
+//                    clientId
+//                )
             )
         } else {
             Toast.makeText(navController.context, "ошибка соединения", Toast.LENGTH_SHORT).show()

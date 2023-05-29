@@ -12,7 +12,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
-import ru.iwater.youwater.data.PaymentStatus.*
 import ru.iwater.youwater.vm.ProductListViewModel
 
 @SuppressLint("SetJavaScriptEnabled")

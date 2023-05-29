@@ -11,19 +11,28 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.CatalogListViewModel
 
 @Composable
-fun MainScreen() {
+fun MainScreen(catalogListViewModel: CatalogListViewModel) {
     val navController = rememberNavController()
     Scaffold(
         topBar = { TopBar() },
-        bottomBar = { BottomNavBar() },
-        content = { padding ->
-            Box(modifier = Modifier.padding(padding)) {
-                Navigation(navController)
-            }
-        }
-    )
+        bottomBar = { BottomNavBar(navController) },
+//        content = { padding ->
+//            Box(modifier = Modifier.padding(padding)) {
+//                Navigation(navController)
+//            }
+//        }
+    ) { paddingValues ->
+        MainNavGraph(
+            modifier = Modifier.padding(
+                bottom = paddingValues.calculateBottomPadding()
+            ),
+            navController = navController,
+            catalogListViewModel = catalogListViewModel
+        )
+    }
 }
 
 @Composable
@@ -51,6 +60,6 @@ fun Navigation(navController: NavHostController) {
 @Composable
 fun MainScreenPreview() {
     YourWaterTheme {
-        MainScreen()
+//        MainScreen()
     }
 }

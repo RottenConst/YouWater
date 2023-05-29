@@ -45,7 +45,7 @@ class BasketFragment : BaseFragment() {
             )
             setContent {
                 YourWaterTheme {
-                    BasketScreen(viewModel, navController)
+//                    BasketScreen(viewModel, navController)
                 }
             }
         }

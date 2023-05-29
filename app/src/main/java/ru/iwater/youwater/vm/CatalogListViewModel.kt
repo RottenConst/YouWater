@@ -34,6 +34,10 @@ class CatalogListViewModel @Inject constructor(
     val catalogList: List<TypeProduct>
         get() = _catalogList
 
+    //продукт
+    private val _product: MutableLiveData<Product?> = MutableLiveData()
+    val product: LiveData<Product?> get() = _product
+
     init {
         getCatalogList()
     }
@@ -68,6 +72,32 @@ class CatalogListViewModel @Inject constructor(
                 product.onFavoriteClick = true
             }
             _statusData.value = StatusData.DONE
+        }
+    }
+
+    //инициалезация товара
+    fun initProduct(productId: Int) {
+        viewModelScope.launch {
+            val product = repository.getProduct(productId)
+            if (product != null) {
+                product.count = 1
+                _product.value = product
+            }
+        }
+    }
+
+    fun addProductCountToBasket(product: Product) {
+        viewModelScope.launch {
+            val dbProduct = repository.getProductFromDB(product.id)
+            try {
+                if (dbProduct == null) {
+                    repository.addProductInBasket(product = product)
+                } else {
+                    repository.updateProductInBasket(product = product)
+                }
+            } catch (e: Exception) {
+                Timber.d("Error add in basket: $e")
+            }
         }
     }
 
