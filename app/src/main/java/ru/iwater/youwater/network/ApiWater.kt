@@ -95,7 +95,12 @@ interface ApiWater {
         @Body order: Order
     ): OrderApp?
 
-    @GET("return_of_applications_client_id/{client_id}/")
+//    @GET("return_of_applications_client_id/{client_id}/")
+//    suspend fun getOrderClient(
+//        @Path("client_id") clientId: Int
+//    ): List<OrderFromCRM>?
+
+    @GET("client-orders-app/{client_id}/")
     suspend fun getOrderClient(
         @Path("client_id") clientId: Int
     ): List<OrderFromCRM>?

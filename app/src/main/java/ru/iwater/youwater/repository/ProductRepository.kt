@@ -272,9 +272,20 @@ class ProductRepository @Inject constructor(
         }
     }
 
+//    suspend fun getOrdersList(): List<OrderCrmListItem> {
+//        return try {
+//            val order = apiWater.getOrderClient1(getAuthClient().clientId) ?: emptyList()
+//            order
+//        } catch (e: Exception) {
+//            Timber.e("error get ordersList: $e")
+//            emptyList()
+//        }
+//    }
+
     suspend fun getOrdersList(): List<OrderFromCRM> {
         return try {
-            apiWater.getOrderClient(getAuthClient().clientId) ?: emptyList()
+            val order = apiWater.getOrderClient(getAuthClient().clientId) ?: emptyList()
+            order
         } catch (e: Exception) {
             Timber.e("error get ordersList: $e")
             emptyList()
