@@ -6,7 +6,11 @@ import android.content.Intent
 import android.content.IntentSender
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -16,10 +20,20 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import ru.iwater.youwater.R
+import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseActivity
+import ru.iwater.youwater.screen.navigation.MainStartScreen
+import ru.iwater.youwater.screen.navigation.StartNavGraph
+import ru.iwater.youwater.vm.AuthViewModel
 import timber.log.Timber
+import javax.inject.Inject
 
 class StartActivity : BaseActivity() {
+
+    @Inject
+    lateinit var factory: ViewModelProvider.Factory
+    private val screenComponent = App().buildScreenComponent()
+    private val viewModel: AuthViewModel by viewModels { factory }
 
     private val appUpdateManager: AppUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
     private val appUpdatedListener: InstallStateUpdatedListener by lazy {
@@ -36,7 +50,11 @@ class StartActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        screenComponent.inject(this)
+//        setContentView(R.layout.activity_main)
+        setContent {
+            MainStartScreen(viewModel, this)
+        }
 
         checkForAppUpdate()
     }

@@ -20,15 +20,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.R
 import ru.iwater.youwater.vm.AuthViewModel
 import ru.iwater.youwater.theme.YouWaterTypography
-import timber.log.Timber
 import kotlin.math.absoluteValue
 
 @Composable
-fun LoginScreen(authViewModel: AuthViewModel, navController: NavController) {
+fun LoginScreen(
+    authViewModel: AuthViewModel,
+    navController: NavHostController
+//    navController: NavController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()

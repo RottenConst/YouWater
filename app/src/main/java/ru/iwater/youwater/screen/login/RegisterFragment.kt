@@ -42,7 +42,7 @@ class RegisterFragment : Fragment() {
 
             setContent {
                 YourWaterTheme {
-                    RegisterScreen(viewModel, phoneNumber, this@RegisterFragment.findNavController())
+//                    RegisterScreen(viewModel, phoneNumber, this@RegisterFragment.findNavController())
                 }
             }
         }

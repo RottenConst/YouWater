@@ -44,7 +44,7 @@ class LoginFragment : BaseFragment() {
 
             setContent {
                 YourWaterTheme {
-                    LoginScreen(viewModel, navController)
+//                    LoginScreen(viewModel, navController)
                 }
             }
         }

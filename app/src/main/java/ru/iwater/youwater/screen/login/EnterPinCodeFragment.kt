@@ -39,9 +39,9 @@ class EnterPinCodeFragment : Fragment() {
                 ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
             )
             setContent {
-                YourWaterTheme {
-                    EnterPinCodeScreen(phone = phoneNumber, clientId, this.context, viewModel, this@EnterPinCodeFragment.requireActivity())
-                }
+//                YourWaterTheme {
+//                    EnterPinCodeScreen(phone = phoneNumber, clientId, this.context, viewModel, this@EnterPinCodeFragment.requireActivity())
+//                }
             }
         }
         return binding.root

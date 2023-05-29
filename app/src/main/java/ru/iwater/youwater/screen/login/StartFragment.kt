@@ -42,7 +42,11 @@ class StartFragment : BaseFragment() {
 
             setContent {
                 YourWaterTheme {
-                    StartAppScreen(fragmentActivity, viewModel, navController)
+//                    StartAppScreen(
+////                        fragmentActivity,
+//                        viewModel,
+//                        navController
+//                    )
                 }
             }
         }

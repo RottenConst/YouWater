@@ -18,21 +18,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.vm.AuthViewModel
 import ru.iwater.youwater.vm.StatusSession
 import ru.iwater.youwater.screen.MainActivity
+import ru.iwater.youwater.screen.StartActivity
+import ru.iwater.youwater.screen.navigation.StartNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 
 @Composable
 fun StartAppScreen(
-    fragmentActivity: FragmentActivity,
+//    fragmentActivity: FragmentActivity,
+    startActivity: StartActivity,
     authViewModel: AuthViewModel,
-    navController: NavController
+    navController: NavHostController
 ) {
     authViewModel.checkSession()
     val statusSession by authViewModel.statusSession.observeAsState()
@@ -46,13 +48,15 @@ fun StartAppScreen(
             StatusSession.TRY -> {
                 StartLogoContent(visibleStartButton = false) { navController.navigate(StartFragmentDirections.actionStartFragmentToLoginFragment()) }
                 MainActivity.start(navController.context)
-                fragmentActivity.finish()
+//                fragmentActivity.finish()
+                startActivity.finish()
             }
             StatusSession.FALSE -> {
-                StartLogoContent(visibleStartButton = true) { navController.navigate(R.id.loginFragment) }
+                StartLogoContent(visibleStartButton = true) { navController.navigate(StartNavRoute.LoginScreen.path) }
             }
             StatusSession.ERROR -> {
-                StartLogoContent(visibleStartButton = true) { navController.navigate(R.id.loginFragment) }
+//                StartLogoContent(visibleStartButton = true) { navController.navigate(R.id.loginFragment) }
+                StartLogoContent(visibleStartButton = true) { navController.navigate(StartNavRoute.LoginScreen.path) }
             }
         }
     }

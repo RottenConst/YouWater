@@ -4,7 +4,6 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,10 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusTarget
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -33,12 +29,20 @@ import ru.iwater.youwater.R
 import ru.iwater.youwater.vm.AuthViewModel
 import ru.iwater.youwater.vm.StatusPinCode.*
 import ru.iwater.youwater.screen.MainActivity
+import ru.iwater.youwater.screen.StartActivity
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YourWaterTheme
 import timber.log.Timber
 
 @Composable
-fun EnterPinCodeScreen(phone: String, clientId: Int, context: Context?, viewModel: AuthViewModel, fragmentActivity: FragmentActivity) {
+fun EnterPinCodeScreen(
+    phone: String,
+    clientId: Int,
+    context: Context?,
+    viewModel: AuthViewModel,
+//    fragmentActivity: FragmentActivity
+    startActivity: StartActivity
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -52,7 +56,8 @@ fun EnterPinCodeScreen(phone: String, clientId: Int, context: Context?, viewMode
         when (statusPinCode) {
             DONE -> {
                 Timber.d("DONE")
-                fragmentActivity.finish()
+//                fragmentActivity.finish()
+                startActivity.finish()
                 MainActivity.start(context)
             }
             ERROR -> {

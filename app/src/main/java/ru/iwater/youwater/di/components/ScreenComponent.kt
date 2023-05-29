@@ -3,6 +3,8 @@ package ru.iwater.youwater.di.components
 import dagger.Component
 import ru.iwater.youwater.di.viewModel.ViewModelFactoryModule
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
+import ru.iwater.youwater.screen.MainActivity
+import ru.iwater.youwater.screen.StartActivity
 import ru.iwater.youwater.screen.basket.BasketFragment
 import ru.iwater.youwater.screen.basket.CardPaymentFragment
 import ru.iwater.youwater.screen.basket.CompleteOrderFragment
@@ -28,6 +30,8 @@ interface ScreenComponent {
     fun inject(enterPinCodeFragment: EnterPinCodeFragment)
     fun inject(registerFragment: RegisterFragment)
     fun inject(startFragment: StartFragment)
+    fun inject(startActivity: StartActivity)
+    fun inject(mainActivity: MainActivity)
     fun inject(profileFragment: ProfileFragment)
     fun inject(userDataFragment: UserDataFragment)
     fun inject(aboutProductFragment: AboutProductFragment)

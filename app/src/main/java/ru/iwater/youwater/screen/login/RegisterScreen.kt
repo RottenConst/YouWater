@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
 import ru.iwater.youwater.theme.YouWaterTypography
@@ -26,7 +27,11 @@ import ru.iwater.youwater.theme.YourWaterTheme
 import timber.log.Timber
 
 @Composable
-fun RegisterScreen(viewModel: AuthViewModel, phone: String, navController: NavController) {
+fun RegisterScreen(
+    viewModel: AuthViewModel,
+    phone: String,
+    navController: NavHostController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
