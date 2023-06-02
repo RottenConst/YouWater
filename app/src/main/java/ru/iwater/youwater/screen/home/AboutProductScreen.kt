@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -24,43 +25,72 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.network.ImageUrl
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.AboutProductViewModel
-import ru.iwater.youwater.vm.CatalogListViewModel
+import ru.iwater.youwater.vm.WatterViewModel
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AboutProductScreen(
-    catalogListViewModel: CatalogListViewModel,
-//    aboutProductViewModel: AboutProductViewModel,
+    watterViewModel: WatterViewModel,
     productId: Int,
     navController: NavHostController
-//    navController: NavController
 ) {
-//    aboutProductViewModel.initProduct(productId)
-    catalogListViewModel.initProduct(productId = productId)
-    val product by catalogListViewModel.product.observeAsState()
-//    val product by aboutProductViewModel.product.observeAsState()
-    if (product != null) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            InfoProduct(product = product!!)
-            ProductPriceInfo(price = product!!.getMinPriceProduct()) {
-                navController.navigate(
-                    AboutProductFragmentDirections.actionAboutProductFragmentToPriceBottomSheetFragment(
-                        product!!.price)
-                )
-            }
-            AboutProduct(product!!) {
-//                aboutProductViewModel.addProductToBasket(it)
-                catalogListViewModel.addProductCountToBasket(it)
+    watterViewModel.initProduct(productId = productId)
+    val product by watterViewModel.product.observeAsState()
+    val priceProduct = product?.price
+    val prices = priceProduct?.removeSuffix(";")
+    val priceList = prices?.split(";")
+
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden
+    )
+    val showModalSheet = rememberSaveable {
+        mutableStateOf(false)
+    }
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
+        sheetContent = {
+            PriceListScreen(prices = priceList ?: emptyList())
+        }
+    ) {
+        Scaffold(scaffoldState = scaffoldState) { paddingValues ->
+            if (product != null) {
+                Column(modifier = Modifier.fillMaxSize().padding(paddingValues = paddingValues)) {
+                    InfoProduct(product = product!!)
+                    ProductPriceInfo(price = product!!.getMinPriceProduct()) {
+                        showModalSheet.value = !showModalSheet.value
+                        scope.launch {
+                            sheetState.show()
+                        }
+                    }
+                    AboutProduct(product!!) {
+                        watterViewModel.addProductCountToBasket(it)
+                        scope.launch {
+                            val result = scaffoldState.snackbarHostState.showSnackbar(
+                                message = "${it.app_name} добавлен в корзину",
+                                actionLabel = "Корзина"
+                            )
+                            when (result) {
+                                SnackbarResult.ActionPerformed -> {
+                                    navController.navigate(MainNavRoute.BasketScreen.path)
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+                }
             }
         }
     }

@@ -11,7 +11,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,33 +27,43 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.ClientProfileViewModel
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
-fun EditUserDataScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(), name: String, phone: String, email: String) {
+fun EditUserDataScreen(
+    watterViewModel: WatterViewModel = viewModel(),
+) {
+
+    LaunchedEffect(Unit) {
+        watterViewModel.getClientInfo()
+    }
+
+
+
     val modifier = Modifier
+    val client by watterViewModel.client.observeAsState()
     var clientName by rememberSaveable {
-        mutableStateOf(name)
+        mutableStateOf(client?.name)
     }
     var phoneClient by rememberSaveable {
-        mutableStateOf(phone)
+        mutableStateOf(client?.contact)
     }
     var emailClient by rememberSaveable {
-        mutableStateOf(email)
+        mutableStateOf(client?.email)
     }
     Column(modifier = modifier.fillMaxSize()) {
         NameEditClient(
             modifier = modifier,
-            name = clientName,
+            name = clientName ?: "",
             editUserName = {
                 clientName = it
-                clientProfileViewModel.setEditClientData(
-                    clientName = clientName,
-                    clientPhone = phoneClient,
-                    clientEmail = emailClient
+                watterViewModel.setEditClientData(
+                    clientName = clientName ?: "",
+                    clientPhone = phoneClient ?: "",
+                    clientEmail = emailClient ?: ""
                 )
             },
             clearName = {
@@ -60,13 +72,13 @@ fun EditUserDataScreen(clientProfileViewModel: ClientProfileViewModel = viewMode
         )
         PhoneEditClient(
             modifier = modifier,
-            phone = phoneClient,
+            phone = phoneClient ?: "",
             editUserPhone = {
                 phoneClient = it
-                clientProfileViewModel.setEditClientData(
-                    clientName = clientName,
+                watterViewModel.setEditClientData(
+                    clientName = clientName ?: "",
                     clientPhone = it,
-                    clientEmail = emailClient
+                    clientEmail = emailClient ?: ""
                 )
             },
             clearPhone = {
@@ -75,12 +87,12 @@ fun EditUserDataScreen(clientProfileViewModel: ClientProfileViewModel = viewMode
         )
         EmailEditClient(
             modifier = modifier,
-            email = emailClient,
+            email = emailClient ?: "",
             editUserEmail = {
                 emailClient = it
-                clientProfileViewModel.setEditClientData(
-                    clientName = clientName,
-                    clientPhone = phoneClient,
+                watterViewModel.setEditClientData(
+                    clientName = clientName ?: "",
+                    clientPhone = phoneClient ?: "",
                     clientEmail = it
                 )
             },

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -16,16 +17,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.ClientProfileViewModel
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
-fun UserDataScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(), sendUserData: Boolean) {
-    val client by clientProfileViewModel.client.observeAsState()
+fun UserDataScreen(
+    watterViewModel: WatterViewModel = viewModel(),
+    sendUserData: Boolean
+) {
+    LaunchedEffect(Unit) {
+        watterViewModel.getClientInfo()
+    }
+
+    val client by watterViewModel.client.observeAsState()
     val modifier = Modifier
-    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(horizontal = 16.dp)) {
         NameInfoClient(modifier = modifier, name = client?.name ?: "")
         PhoneInfoClient(modifier = modifier, phone = client?.contact ?: "")
         EmailInfoClient(modifier = modifier, email = client?.email ?: "")
@@ -35,7 +45,9 @@ fun UserDataScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(),
                 style = YouWaterTypography.subtitle2,
                 color = Blue500,
                 textAlign = TextAlign.Center,
-                modifier = modifier.padding(16.dp).fillMaxWidth()
+                modifier = modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
             )
         }
     }

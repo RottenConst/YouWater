@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -26,54 +27,62 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.ClientProfileViewModel
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
-fun ProfileScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(),navController: NavController) {
+fun ProfileScreen(
+    watterViewModel: WatterViewModel = viewModel(),
+    navController: NavHostController
+) {
+    LaunchedEffect(Unit) {
+        watterViewModel.getClientInfo()
+    }
+
     val modifier = Modifier
-    val client by clientProfileViewModel.client.observeAsState()
+    val client by watterViewModel.client.observeAsState()
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(bottom = 60.dp)) {
+    ) {
         NameUser(modifier = modifier, nameUser = client?.name ?: "")
         MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_orders), tint = Blue500, nameButton = stringResource(
             id = R.string.fragment_profile_my_orders
         ), description = "") {
             navController.navigate(
-                ProfileFragmentDirections.actionProfileFragmentToMyOrdersFragment()
+                MainNavRoute.MyOrderScreen.path
             )
         }
         MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_info), tint = Blue500, nameButton = stringResource(
             id = R.string.fragment_profile_my_data
         ), description = "") {
             navController.navigate(
-                ProfileFragmentDirections.actionProfileFragmentToUserDataFragment(false)
+                MainNavRoute.UserDataScreen.withArgs(false.toString())
             )
         }
         MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_favorite), tint = Blue500, nameButton = stringResource(
             id = R.string.general_favorite
         ), description = "") {
             navController.navigate(
-                ProfileFragmentDirections.actionProfileFragmentToFavoriteFragment()
+                MainNavRoute.FavoriteProductScreen.path
             )
         }
         MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_address), tint = Blue500, nameButton = stringResource(
             id = R.string.fragment_profile_addresses
         ), description = "") {
             navController.navigate(
-                ProfileFragmentDirections.actionProfileFragmentToAddresessFragment()
+                MainNavRoute.AddressesScreen.path
             )
         }
         MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_notification), tint = Blue500, nameButton = stringResource(
             id = R.string.fragment_profile_notifications
         ), description = "") {
             navController.navigate(
-                ProfileFragmentDirections.actionProfileFragmentToNotificationFragment()
+                MainNavRoute.NotificationScreen.path
             )
         }
     }

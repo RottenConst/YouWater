@@ -364,5 +364,9 @@ class ProductRepository @Inject constructor(
         }
     }
 
+    fun deleteClient() {
+        authClient.remove()
+    }
+
     private fun getAuthClient(): AuthClient = authClient.get()
 }

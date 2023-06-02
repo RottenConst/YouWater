@@ -11,16 +11,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.NavController
-import ru.iwater.youwater.vm.ProductListViewModel
+import androidx.navigation.NavHostController
+import ru.iwater.youwater.vm.WatterViewModel
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun LoadUrl(
-    productListViewModel: ProductListViewModel,
+    watterViewModel: WatterViewModel,
     orderId: String,
-    url: String,
-    navController: NavController
+    navController: NavHostController
 ) {
     val endLink = "http://605d3ea8e59a.ngrok.io"
     var endUrl by rememberSaveable {

@@ -19,28 +19,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.TypeProduct
 import ru.iwater.youwater.network.ImageUrl
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.CatalogListViewModel
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
 fun CatalogScreen(
-    viewModel: CatalogListViewModel,
-    navController: NavHostController) {
+    watterViewModel: WatterViewModel,
+    navController: NavHostController
+) {
 
     CatalogList(
-        catalogList = viewModel.catalogList.sortedBy { it.priority },
+        catalogList = watterViewModel.catalogList.sortedBy { it.priority },
         countColumn = 2
     ) {
         navController.navigate(
-            CatalogFragmentDirections.actionShowTypeCatalog(it.id, it.category)
+            MainNavRoute.ProductsByCategoryScreen.withArgs(it.id.toString())
         )
     }
 }
@@ -106,7 +107,7 @@ fun CatalogList(
     getProductThisCategory: (TypeProduct) -> Unit
 ) {
     LazyVerticalGrid(
-        modifier = Modifier.padding(bottom = 60.dp),
+        modifier = Modifier,
         columns = GridCells.Fixed(countColumn),
         contentPadding = PaddingValues(8.dp)
     ) {

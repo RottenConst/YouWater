@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Close
 import androidx.compose.material.icons.sharp.LocationOn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,17 +29,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.ClientProfileViewModel
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
-fun AddressesScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(), navController: NavController) {
+fun AddressesScreen(
+    watterViewModel: WatterViewModel = viewModel(),
+    navController: NavHostController
+) {
+
+    LaunchedEffect(Unit){
+        watterViewModel.getAddressesList()
+    }
+
     val modifier = Modifier
-    val addressList = clientProfileViewModel.addressesList
+    val addressList = watterViewModel.addressesList
     Column(modifier = modifier.fillMaxSize()) {
         MenuButton(
             modifier = modifier,
@@ -48,7 +58,7 @@ fun AddressesScreen(clientProfileViewModel: ClientProfileViewModel = viewModel()
             description = ""
         ) {
             navController.navigate(
-                AddressesFragmentDirections.actionAddresessFragmentToAddAddressFragment(false)
+                MainNavRoute.AddAddressScreen.withArgs(false.toString())
             )
         }
         LazyColumn(modifier = modifier.fillMaxWidth()) {
@@ -58,7 +68,7 @@ fun AddressesScreen(clientProfileViewModel: ClientProfileViewModel = viewModel()
                     address = addressList[addressIndex].factAddress,
                     notice = addressList[addressIndex].notice,
                     deleteAddress = {
-                        clientProfileViewModel.inActiveAddress(addressList[addressIndex].id)
+                        watterViewModel.inActiveAddress(addressList[addressIndex].id)
                     }
                 )
             }

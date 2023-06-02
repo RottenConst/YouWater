@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -17,18 +18,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.ClientProfileViewModel
 import ru.iwater.youwater.data.MyOrder
 import ru.iwater.youwater.data.Product
-import ru.iwater.youwater.data.StatusData
 import ru.iwater.youwater.screen.basket.CardOrderInfo
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.utils.StatusData
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
-fun MyOrdersScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(), navController: NavController) {
+fun MyOrdersScreen(
+    watterViewModel: WatterViewModel = viewModel(),
+    navController: NavController
+) {
+    LaunchedEffect(Unit) {
+        watterViewModel.getOrderCrm()
+    }
+
     val modifier = Modifier
-    val statusData by clientProfileViewModel.statusData.observeAsState()
-    val myOrdersList = clientProfileViewModel.ordersList
+    val statusData by watterViewModel.statusData.observeAsState()
+    val myOrdersList = watterViewModel.ordersList
     when (statusData) {
         StatusData.LOAD -> {
             Box(modifier = Modifier.fillMaxSize(),
@@ -43,7 +52,7 @@ fun MyOrdersScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(),
 
                     items(count = myOrdersList.size) {
                         CardOrderInfo(modifier = modifier, order = myOrdersList[it]) {navController.navigate(
-                            MyOrdersFragmentDirections.actionMyOrdersFragmentToCreateOrderFragment(false, myOrdersList[it].id)
+                            MainNavRoute.CreateOrderScreen.withArgs(false.toString(), myOrdersList[it].id.toString())
                         )}
                     }
                 }

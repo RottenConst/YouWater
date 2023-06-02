@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -17,22 +18,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.Product
-import ru.iwater.youwater.data.StatusData
 import ru.iwater.youwater.screen.catalog.ProductGrid
 import ru.iwater.youwater.screen.home.CatalogName
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.CatalogListViewModel
+import ru.iwater.youwater.utils.StatusData
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
 fun FavoriteScreen(
-    catalogListViewModel: CatalogListViewModel = viewModel(),
-    navController: NavController
+    watterViewModel: WatterViewModel = viewModel(),
+    navController: NavHostController
 ) {
+
+    LaunchedEffect(Unit) {
+        watterViewModel.getFavoriteProductList()
+    }
+
     val modifier = Modifier
-    val statusData by catalogListViewModel.statusData.observeAsState()
+    val statusData by watterViewModel.statusData.observeAsState()
     when (statusData) {
         StatusData.LOAD -> {
             Box(modifier = Modifier.fillMaxSize(),
@@ -42,23 +49,23 @@ fun FavoriteScreen(
             }
         }
         StatusData.DONE -> {
-            if (catalogListViewModel.productList.isNotEmpty()) {
+            if (watterViewModel.productList.isNotEmpty()) {
                 Column(modifier = modifier
                     .fillMaxSize()
                     .padding(16.dp)) {
                     CatalogName(name = stringResource(id = R.string.general_favorite), modifier = modifier)
                     ProductGrid(
                         modifier = modifier,
-                        productsList = catalogListViewModel.productList,
+                        productsList = watterViewModel.productList,
                         countGrid = 2,
                         getAboutProduct = {
                             navController.navigate(
-                                FavoriteFragmentDirections.actionFavoriteFragmentToAboutProductFragment(it)
+                                MainNavRoute.AboutProductScreen.withArgs(it.toString())
                             )
                         },
-                        addProductInBasket = {catalogListViewModel.addProductToBasket(it)},
+                        addProductInBasket = {watterViewModel.addProductToBasket(it)},
                         onCheckedFavorite = { product, isFavorite ->
-                            catalogListViewModel.onChangeFavorite(productId = product.id, isFavorite)
+                            watterViewModel.onChangeFavorite(productId = product.id, isFavorite)
                         }
                     )
                 }

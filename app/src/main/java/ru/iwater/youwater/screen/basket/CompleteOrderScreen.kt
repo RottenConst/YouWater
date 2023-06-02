@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.sharp.CheckCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -35,20 +36,31 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.MyOrder
 import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.ProductListViewModel
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
-fun CompleteOrderScreen(productListViewModel: ProductListViewModel = viewModel(), orderId: Int, isPaid: Boolean, navController: NavController) {
+fun CompleteOrderScreen(
+    watterViewModel: WatterViewModel = viewModel(),
+    orderId: Int,
+    isPaid: Boolean,
+    navController: NavHostController
+) {
+    LaunchedEffect(Unit) {
+        watterViewModel.clearBasket()
+        watterViewModel.getOrderCrm(orderId)
+    }
+
     val modifier = Modifier
-    productListViewModel.getOrderCrm(orderId)
-    val completeOrder by productListViewModel.completedOrder.observeAsState()
+
+    val completeOrder by watterViewModel.completedOrder.observeAsState()
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = modifier.padding(bottom = 80.dp)) {
             item {
@@ -56,13 +68,15 @@ fun CompleteOrderScreen(productListViewModel: ProductListViewModel = viewModel()
             }
                 items(count = 1) {
                     if (completeOrder != null) {
-                    CardOrderInfo(modifier = modifier, completeOrder!!){ productListViewModel.getInfoLastOrder(
-                        completeOrder!!.id)} }
+                    CardOrderInfo(modifier = modifier, completeOrder!!){ navController.navigate(
+                        MainNavRoute.CreateOrderScreen.withArgs(false.toString(), completeOrder!!.id.toString())
+                    )} }
             }
         }
         HomeButton(modifier = modifier.align(Alignment.BottomCenter)) {
             navController.navigate(
-                CompleteOrderFragmentDirections.actionCompleteOrderFragmentToHomeFragment()
+//                CompleteOrderFragmentDirections.actionCompleteOrderFragmentToHomeFragment()
+                MainNavRoute.HomeScreen.path
             )
         }
     }
@@ -185,7 +199,7 @@ fun PriceOrder(modifier: Modifier, priceOder: String) {
         )
         Text(
             modifier = modifier.padding(8.dp),
-            text = "${priceOder}P",
+            text = "${priceOder}₽",
             style = YouWaterTypography.subtitle2,
             color = Blue500,
             fontWeight = FontWeight.Bold
@@ -291,7 +305,9 @@ fun CardOrderInfo(modifier: Modifier, order: MyOrder, repeatOrder: () -> Unit) {
 
 @Composable
 fun ProductsOrderList(modifier: Modifier, products: List<Product>) {
-    Box(modifier = modifier.height(((products.size + 1)*66).dp).fillMaxWidth()) {
+    Box(modifier = modifier
+        .height(((products.size + 1) * 66).dp)
+        .fillMaxWidth()) {
         LazyColumn {
             item {
                 Text(

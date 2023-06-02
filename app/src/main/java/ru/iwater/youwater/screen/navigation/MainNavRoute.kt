@@ -16,27 +16,43 @@ sealed class MainNavRoute(val path: String) {
 
     object BasketScreen: MainNavRoute("basket")
 
-    object CreateOrderScreen: MainNavRoute("createOrder")
+    object CreateOrderScreen: MainNavRoute("createOrder") {
+        const val isShowMessage = "isShowMessage"
+        const val lastOrderId = "lastOrderId"
+    }
 
-    object CardPaymentScreen: MainNavRoute("cardPayment")
+    object CardPaymentScreen: MainNavRoute("cardPayment") {
+        const val orderId = "orderId"
+    }
 
-    object CompleetOrderScreen: MainNavRoute("completeOrder")
+    object CompleteOrderScreen: MainNavRoute("completeOrder") {
+        const val orderId = "orderId"
+        const val isPaid = "isPaid"
+    }
 
     object ProfileMenuScreen: MainNavRoute("profile")
 
     object MyOrderScreen: MainNavRoute("myOrder")
 
-    object UserDataScreen: MainNavRoute("user")
+    object UserDataScreen: MainNavRoute("user") {
+        const val sendUserData = "sendUserData"
+    }
 
-    object EditUserDataSceen: MainNavRoute("editUser")
+    object EditUserDataScreen: MainNavRoute("editUser")
 
     object FavoriteProductScreen: MainNavRoute("favorite")
 
     object AddressesScreen: MainNavRoute("addresses")
 
-    object AddAddressScreen: MainNavRoute("addAddress")
+    object AddAddressScreen: MainNavRoute("addAddress") {
+        const val isFromOrder = "isFromOrder"
+    }
 
     object NotificationScreen: MainNavRoute("notification")
+    object AboutCompanyScreen: MainNavRoute("companyInfo")
+    object ContactScreen: MainNavRoute("contact")
+    object DeliveryInfoScreen: MainNavRoute("delivery")
+    object FaqScreen: MainNavRoute("faq")
 
 
     fun withArgs(vararg args: String): String {

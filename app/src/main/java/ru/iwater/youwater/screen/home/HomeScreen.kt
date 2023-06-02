@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -38,22 +38,114 @@ import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.CatalogListViewModel
+import ru.iwater.youwater.vm.WatterViewModel
 
+
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
-    catalogListViewModel: CatalogListViewModel = viewModel(),
+    watterViewModel: WatterViewModel = viewModel(),
     navController: NavHostController
-//    navController: NavController
 ) {
-    catalogListViewModel.getProductsList()
-    val lastOrder by catalogListViewModel.lastOrder.observeAsState()
-    val promoBanner by catalogListViewModel.promoBanners.observeAsState()
+    watterViewModel.getProductsList()
+    val lastOrder by watterViewModel.lastOrder.observeAsState()
+    val promoBanner by watterViewModel.promoBanners.observeAsState()
+    var bannerName by remember {
+        mutableStateOf("")
+    }
+    var bannerDiscription by remember {
+        mutableStateOf("")
+    }
     val promoListState = rememberLazyListState()
-    val productsList = catalogListViewModel.productList
+    val productsList = watterViewModel.productList
     var itemBanner = 0
+
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden
+    )
+    val showModalSheet = rememberSaveable {
+        mutableStateOf(false)
+    }
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
+        sheetContent = {
+            BannerInfoScreen(namePromo = bannerName, promoDescription = bannerDiscription)
+        }
+    ) {
+
+        Scaffold(
+            scaffoldState = scaffoldState,
+            floatingActionButton = {
+                if (lastOrder != null) {
+                    FloatingActionButton(onClick = {
+                        navController.navigate(
+                            MainNavRoute.CreateOrderScreen.withArgs(false.toString(), lastOrder.toString())
+                        )
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_basket_icon),
+                            contentDescription = "Повторить последний заказ"
+                        )
+                    }
+                }
+            })
+        {paddingValues ->
+            Column(modifier = Modifier.padding(paddingValues)) {
+                PromoAction(promo = promoBanner, promoListState) {
+                    bannerName = it?.name ?: ""
+                    bannerDiscription = it?.description ?: ""
+                    showModalSheet.value = !showModalSheet.value
+                    scope.launch {
+                        sheetState.show()
+                    }
+
+                }
+                if (productsList.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    ProductContent(
+                        catalogList = watterViewModel.catalogList,
+                        productsList = productsList,
+                        getAboutProduct = {
+                            navController.navigate(MainNavRoute.AboutProductScreen.withArgs(it.toString()))
+                        },
+                        addProductInBasket = {
+                            watterViewModel.addProductToBasket(it)
+                            scope.launch {
+                                val result = scaffoldState.snackbarHostState.showSnackbar(
+                                    message = "${it.app_name} добавлен в корзину",
+                                    actionLabel = "Корзина"
+                                )
+                                when (result) {
+                                    SnackbarResult.ActionPerformed -> {
+                                        navController.navigate(MainNavRoute.BasketScreen.path)
+                                    }
+                                    else -> {}
+                                }
+                            }
+                                             },
+                        onCheckedFavorite = { product, onFavorite ->
+                            watterViewModel.onChangeFavorite(
+                                productId = product.id,
+                                onFavorite = onFavorite
+                            )
+                        }
+                    )
+                }
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
-        catalogListViewModel.viewModelScope.launch {
+        watterViewModel.viewModelScope.launch {
             while (itemBanner <= (promoBanner?.size ?: 0)) {
                 delay(5000)
                 if (itemBanner != promoBanner?.size) {
@@ -67,64 +159,7 @@ fun HomeScreen(
         }
     }
 
-    Scaffold(
-        floatingActionButton = {
-            if (lastOrder != null) {
-                FloatingActionButton(onClick = {
-                    navController.navigate(
-                        HomeFragmentDirections.actionHomeFragmentToCreateOrderFragment(
-                            false,
-                            lastOrder!!
-                        )
-                    )
-                }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_basket_icon),
-                        contentDescription = "Повторить последний заказ"
-                    )
-                }
-            }
-        })
-    {paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            PromoAction(promo = promoBanner, promoListState) {
-                navController.navigate(
-                    HomeFragmentDirections.actionHomeFragmentToBannerInfoBottomSheetFragment(
-                        it!!.name,
-                        it.description
-                    )
-                )
-            }
-            if (productsList.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                ProductContent(
-                    catalogList = catalogListViewModel.catalogList,
-                    productsList = productsList,
-                    getAboutProduct = {
-//                        navController.navigate(
-//                            HomeFragmentDirections.actionShowAboutProductFragment(
-//                                it
-//                            )
-//                        )
-                        navController.navigate(MainNavRoute.AboutProductScreen.withArgs(it.toString()))
-                    },
-                    addProductInBasket = { catalogListViewModel.addProductToBasket(it) },
-                    onCheckedFavorite = { product, onFavorite ->
-                        catalogListViewModel.onChangeFavorite(
-                            productId = product.id,
-                            onFavorite = onFavorite
-                        )
-                    }
-                )
-            }
-        }
-    }
+
 
 
 }

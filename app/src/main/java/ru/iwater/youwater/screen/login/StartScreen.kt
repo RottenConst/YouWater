@@ -31,7 +31,6 @@ import ru.iwater.youwater.theme.YourWaterTheme
 
 @Composable
 fun StartAppScreen(
-//    fragmentActivity: FragmentActivity,
     startActivity: StartActivity,
     authViewModel: AuthViewModel,
     navController: NavHostController
@@ -48,14 +47,12 @@ fun StartAppScreen(
             StatusSession.TRY -> {
                 StartLogoContent(visibleStartButton = false) { navController.navigate(StartFragmentDirections.actionStartFragmentToLoginFragment()) }
                 MainActivity.start(navController.context)
-//                fragmentActivity.finish()
                 startActivity.finish()
             }
             StatusSession.FALSE -> {
                 StartLogoContent(visibleStartButton = true) { navController.navigate(StartNavRoute.LoginScreen.path) }
             }
             StatusSession.ERROR -> {
-//                StartLogoContent(visibleStartButton = true) { navController.navigate(R.id.loginFragment) }
                 StartLogoContent(visibleStartButton = true) { navController.navigate(StartNavRoute.LoginScreen.path) }
             }
         }

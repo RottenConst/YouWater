@@ -9,6 +9,7 @@ import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -21,14 +22,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.ClientProfileViewModel
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
-fun NotificationScreen(clientProfileViewModel: ClientProfileViewModel = viewModel()) {
-    val client by clientProfileViewModel.client.observeAsState()
+fun NotificationScreen(watterViewModel: WatterViewModel = viewModel()) {
+    LaunchedEffect(Unit) {
+        watterViewModel.getClientInfo()
+    }
+    val client by watterViewModel.client.observeAsState()
     val modifier = Modifier
     if (client != null) {
         var check by rememberSaveable {
@@ -51,7 +55,7 @@ fun NotificationScreen(clientProfileViewModel: ClientProfileViewModel = viewMode
                 checked = check,
                 onCheckedChange = {
                     check = it
-                    clientProfileViewModel.setMailing(client?.client_id!!, it)
+                    watterViewModel.setMailing(client?.client_id!!, it)
                 },
                 modifier.padding(8.dp),
                 colors = SwitchDefaults.colors(checkedThumbColor = Blue500, uncheckedThumbColor = Color.LightGray)

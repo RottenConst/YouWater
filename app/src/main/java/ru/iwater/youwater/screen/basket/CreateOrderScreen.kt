@@ -1,5 +1,6 @@
 package ru.iwater.youwater.screen.basket
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,34 +30,36 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.data.RawAddress
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.ProductListViewModel
+import ru.iwater.youwater.vm.WatterViewModel
 import timber.log.Timber
 import java.util.Calendar
 
 @Composable
 fun CreateOrderScreen(
-    productListViewModel: ProductListViewModel = viewModel(),
+    watterViewModel: WatterViewModel = viewModel(),
     repeatOrder: Int,
-    navController: NavController,
-    fragmentManager: FragmentManager) {
-
-    productListViewModel.getClient()
-    productListViewModel.getAddressList()
-    val client by productListViewModel.client.observeAsState()
-    val productsList = productListViewModel.productsList
-    val priceNoDiscount by productListViewModel.priceNoDiscount.observeAsState()
-    val generalCost by productListViewModel.generalCost.observeAsState()
+    isShowMessage: Boolean,
+    navController: NavHostController,
+    fragmentManager: FragmentManager
+) {
+    watterViewModel.getClient()
+    watterViewModel.getAddressList()
+    val client by watterViewModel.client.observeAsState()
+    val productsList = watterViewModel.productsInBasket
+    val priceNoDiscount by watterViewModel.priceNoDiscount.observeAsState()
+    val generalCost by watterViewModel.generalCost.observeAsState()
     var highSize by remember {
         mutableStateOf(0)
     }
-    val addressList by productListViewModel.addressList.observeAsState()
+    val addressList by watterViewModel.addressList.observeAsState()
 
     var checkAddressDialog by rememberSaveable {
         mutableStateOf(false)
@@ -70,7 +73,7 @@ fun CreateOrderScreen(
     var expandedPay by remember {
         mutableStateOf(false)
     }
-    val timesOrder = productListViewModel.timesListOrder
+    val timesOrder = watterViewModel.timesListOrder
     val typesPayOrder = listOf(
         "Оплата по карте курьеру",
         "Оплата наличными",
@@ -92,13 +95,22 @@ fun CreateOrderScreen(
         mutableStateOf(false)
     }
 
-    val order by productListViewModel.order.observeAsState()
+    val order by watterViewModel.order.observeAsState()
 
     var selectedAddress by rememberSaveable {
         mutableStateOf(-1)
     }
 
+    if (isShowMessage) {
+        Toast.makeText(navController.context, "Извините оплатить заказ не удалось, попробуйте выбрать другой тип оплаты или отредактировать заказ", Toast.LENGTH_LONG).show()
+    }
+
     if (repeatOrder != 0) {
+        Timber.d("Repeat order $repeatOrder")
+
+        LaunchedEffect(Unit) {
+            watterViewModel.getInfoLastOrder(repeatOrder)
+        }
         val address = addressList?.find { it.id == order?.addressId }
         if (address != null) {
             selectedAddress = addressList?.indexOf(address) ?: -1
@@ -133,15 +145,14 @@ fun CreateOrderScreen(
                 setAddressOrder = {
                     if (addressList.isNullOrEmpty()) {
                         navController.navigate(
-                            CreateOrderFragmentDirections.actionCreateOrderFragmentToAddAddressFragment(true)
+                            MainNavRoute.AddAddressScreen.withArgs(true.toString())
                         )
                     } else {
                     selectedTime = "**:**-**:**"
                     dateOrder = ""
-                    productListViewModel.getDeliveryOnAddress(it)
-                    Timber.d("Order set address = ${order}")
+                    watterViewModel.getDeliveryOnAddress(it)
                     selectedAddress = addressList?.indexOf(it) ?: -1 }},
-                showDatePickerDialog = { productListViewModel.getCalendar(
+                showDatePickerDialog = { watterViewModel.getCalendar(
                     calendar = Calendar.getInstance(),
                     setDateOrder = {dateOrder = it}
                 ).show(fragmentManager, "SetDateDialog") }
@@ -153,27 +164,27 @@ fun CreateOrderScreen(
                     selectedTime = selectedTime,
                     expandedTime = expandedTime,
                     setTimeOrder = {
-                            timesOrder -> productListViewModel.setTimeOrder(timesOrder)
+                            timesOrder -> watterViewModel.setTimeOrder(timesOrder)
                             selectedTime = timesOrder
                             expandedTime = !expandedTime
                     }
                 )
             }
             highSize = productsList.size*72
-            DetailsOrder(highSize = highSize, products = productsList, minusCount = {productListViewModel.minusCountProduct(it.id)}, addCount = {productListViewModel.plusCountProduct(it.id)})
+            DetailsOrder(highSize = highSize, products = productsList, minusCount = {watterViewModel.minusCountProduct(it.id)}, addCount = {watterViewModel.plusCountProduct(it.id)})
             TypePayCard(
                 typesPayOrder = typesPayOrder,
                 selectedPay = selectedPay,
                 expandedPay = expandedPay,
                 setPaymentType = {typePay ->
-                    productListViewModel.setTypePeyOrder(typePay)
+                    watterViewModel.setTypePeyOrder(typePay)
                     selectedPay = typePay
                     titleButtonCreate = if (typePay == "Оплата онлайн") "Перейти к оплате" else "Оформить заявку"
                     expandedPay = !expandedPay
             })
             GetCommentCard(commentOrder) {comment ->
                 commentOrder = comment
-                productListViewModel.setNoticeOrder(comment)
+                watterViewModel.setNoticeOrder(comment)
             }
         }
         GeneralInfo(
@@ -181,10 +192,10 @@ fun CreateOrderScreen(
             titleButton = titleButtonCreate,
             priceNoDiscount = priceNoDiscount ?: 0,
             generalCost = generalCost ?: 0,
-            isEnable = { productListViewModel.isTrueOrder(order) && !isCreateOrder  }
+            isEnable = { watterViewModel.isTrueOrder(order) && !isCreateOrder  }
         ) {
             isCreateOrder = !isCreateOrder
-            productListViewModel.sendAndSaveOrder(order, generalCost ?: 0, navController)
+            watterViewModel.sendAndSaveOrder(order, generalCost ?: 0, navController)
         }
     }
 

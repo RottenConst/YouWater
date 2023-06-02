@@ -10,39 +10,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.screen.home.CatalogName
 import ru.iwater.youwater.screen.home.ProductCard
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.CatalogListViewModel
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
 fun ProductByCategory(
-    catalogListViewModel: CatalogListViewModel = viewModel(),
+    watterViewModel: WatterViewModel = viewModel(),
     catalogId: Int,
-    navController: NavController
+    navController: NavHostController
 ) {
     val modifier = Modifier
     Column {
         CatalogName(
-            name = catalogListViewModel.catalogList.find { typeProduct -> typeProduct.id == catalogId }?.category ?: "",
+            name = watterViewModel.catalogList.find { typeProduct -> typeProduct.id == catalogId }?.category ?: "",
             modifier = modifier.padding(start = 16.dp, top = 16.dp)
         )
         ProductGrid(
-            modifier = modifier.padding(bottom = 60.dp),
-            productsList = catalogListViewModel.productList.filter { product -> product.category == catalogId },
+            modifier = modifier,
+            productsList = watterViewModel.productList.filter { product -> product.category == catalogId },
             countGrid = 2,
             getAboutProduct = {
                 navController.navigate(
-                    CatalogProductFragmentDirections.actionCatalogProductFragmentToAboutProductFragment(
-                        it
-                    )
+                    MainNavRoute.AboutProductScreen.withArgs(it.toString())
                 )
             },
-            addProductInBasket = { catalogListViewModel.addProductToBasket(it) },
+            addProductInBasket = { watterViewModel.addProductToBasket(it) },
             onCheckedFavorite = { product, isFavorite ->
-                catalogListViewModel.onChangeFavorite(
+                watterViewModel.onChangeFavorite(
                     productId = product.id,
                     isFavorite
                 )

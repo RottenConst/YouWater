@@ -21,26 +21,30 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.network.ImageUrl
+import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.ProductListViewModel
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
 fun BasketScreen(
-    productViewModel: ProductListViewModel = viewModel(),
+    watterViewModel: WatterViewModel = viewModel(),
     navController: NavHostController
 ) {
-    val productsListInOrder = productViewModel.productsList
-    val priceNoDiscount by productViewModel.priceNoDiscount.observeAsState()
-    val generalCost by productViewModel.generalCost.observeAsState()
+    LaunchedEffect(Unit) {
+        watterViewModel.getBasket()
+    }
+    val productsListInOrder = watterViewModel.productsInBasket
+    val priceNoDiscount by watterViewModel.priceNoDiscount.observeAsState()
+    val generalCost by watterViewModel.generalCost.observeAsState()
+
     Column {
         if (productsListInOrder.isNotEmpty()) {
             LazyColumn(
@@ -64,20 +68,20 @@ fun BasketScreen(
                         costProducts = { product.getPriceOnCount(count) },
                         count = count,
                         deleteProduct = {
-                            productViewModel.deleteProductFromBasket(product.id)
+                            watterViewModel.deleteProductFromBasket(product.id)
                         },
                         plusCount = {
                             if (product.category != 20) {
                                 count = it + 1
-                                productViewModel.plusCountProduct(product.id)
+                                watterViewModel.plusCountProduct(product.id)
                             }
                         },
                         minusCount = {
                             if (it > 1) {
                                 count = it - 1
-                                productViewModel.minusCountProduct(product.id)
+                                watterViewModel.minusCountProduct(product.id)
                             } else
-                                count = 1
+                                watterViewModel.deleteProductFromBasket(product.id)
                         }
                     )
 
@@ -98,14 +102,15 @@ fun BasketScreen(
             }
         }
         GeneralInfo (
-            modifier = Modifier.padding(bottom = 58.dp),
+            modifier = Modifier,
             titleButton = stringResource(id = R.string.fragment_basket_checkout_order),
             priceNoDiscount = priceNoDiscount ?: 0,
             generalCost = generalCost ?: 0,
             isEnable = { productsListInOrder.isNotEmpty() }
         ){
             navController.navigate(
-                BasketFragmentDirections.actionBasketFragmentToCreateOrderFragment(false, 0)
+//                BasketFragmentDirections.actionBasketFragmentToCreateOrderFragment(false, 0)
+                MainNavRoute.CreateOrderScreen.withArgs(false.toString(), "0")
             )
         }
     }
@@ -304,7 +309,7 @@ fun PriceOrderNoDiscount(priceOrderNoDiscount: Int){
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = stringResource(id = R.string.fragment_basket_total_sum_order))
-            Text(text = "$priceOrderNoDiscount", fontWeight = FontWeight.Bold)
+            Text(text = "$priceOrderNoDiscount₽", fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -331,7 +336,7 @@ fun GeneralInfoOrder(generalPrice: Int, titleButton: String, isEnable: () -> Boo
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "$generalPrice",
+                        text = "$generalPrice₽",
                         style = YouWaterTypography.h6,
                         fontWeight = FontWeight.Bold,
                         color = Blue500,

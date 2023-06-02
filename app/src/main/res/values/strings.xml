@@ -33,6 +33,7 @@
 
 
     <string name="payment_on_card">Оплата по карте</string>
+    <string name="payment_on_card_logo">Оплата</string>
 
     <string name="home">Главная</string>
     <string name="catalog">Каталог</string>
@@ -41,6 +42,7 @@
     <string name="info_product">Информация о товаре</string>
     <string name="complete_order_label">Оформление заказа</string>
     <string name="Search">Искать</string>
+    <string name="Exit">Выход</string>
 
     <string name="time_order">Время заказа</string>
 
@@ -78,6 +80,7 @@
     <string name="item_order_info_order">Детали заказа:</string>
     <string name="item_order_total_sum">Итого:</string>
     <string name="item_order_description_complete_order">Оформление заявки</string>
+    <string name="item_order_description_complete_order_logo">Оформление заявки завершено</string>
     <string name="item_order_replay_order">Повторить заказ</string>
 
 
@@ -112,6 +115,7 @@
     <string name="fragment_user_data_last_name">Фамилия</string>
     <string name="fragment_user_data_phone">Телефон</string>
     <string name="fragment_user_data_email">Электронная почта</string>
+    <string name="edit_user_data">Изменить данные</string>
 
     <!-- fragment register -->
     <string name="fragment_register_register_text">Регистрация</string>

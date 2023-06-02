@@ -13,11 +13,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.iwater.youwater.R
+import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.screen.profile.MenuButton
 import ru.iwater.youwater.theme.Blue500
 
 @Composable
-fun ContactScreen(contactFragment: ContactFragment) {
+fun ContactScreen(mainActivity: MainActivity) {
     val modifier = Modifier
     Column(modifier = modifier.fillMaxSize()) {
         MenuButton(
@@ -31,7 +32,7 @@ fun ContactScreen(contactFragment: ContactFragment) {
             val callIntent: Intent = Uri.parse("tel:+78129477993").let { number ->
                 Intent(Intent.ACTION_DIAL, number)
             }
-            contactFragment.startActivity(callIntent)
+            mainActivity.startActivity(callIntent)
         }
         MenuButton(
             modifier = modifier.size(64.dp),
@@ -43,7 +44,7 @@ fun ContactScreen(contactFragment: ContactFragment) {
         {
             val sendMail = Intent(Intent.ACTION_SENDTO)
             sendMail.data = Uri.parse("mailto:info@yourwater.ru")
-            contactFragment.startActivity(sendMail)
+            mainActivity.startActivity(sendMail)
         }
         MenuButton(
             modifier = modifier.size(64.dp),
@@ -55,7 +56,7 @@ fun ContactScreen(contactFragment: ContactFragment) {
         {
             val callBoss = Intent(Intent.ACTION_SENDTO)
             callBoss.data = Uri.parse("mailto:nadobnikov@allforwater.ru")
-            contactFragment.startActivity(callBoss)
+            mainActivity.startActivity(callBoss)
         }
         MenuButton(
             modifier = modifier.size(64.dp),
@@ -66,7 +67,7 @@ fun ContactScreen(contactFragment: ContactFragment) {
         ) {
             val openTelegram = Intent(Intent.ACTION_VIEW)
             openTelegram.data = Uri.parse("https://t.me/yourwater_ru_bot")
-            contactFragment.startActivity(openTelegram)
+            mainActivity.startActivity(openTelegram)
         }
         MenuButton(
             modifier = modifier.size(64.dp),
@@ -77,7 +78,7 @@ fun ContactScreen(contactFragment: ContactFragment) {
         ) {
             val openVK = Intent(Intent.ACTION_VIEW)
             openVK.data = Uri.parse("https://vk.com/write-23344137")
-            contactFragment.startActivity(openVK)
+            mainActivity.startActivity(openVK)
         }
         MenuButton(
             modifier = modifier.size(64.dp),
@@ -88,7 +89,7 @@ fun ContactScreen(contactFragment: ContactFragment) {
         ) {
             val openWhatsApp = Intent(Intent.ACTION_VIEW)
             openWhatsApp.data = Uri.parse("https://wa.me/78129477993")
-            contactFragment.startActivity(openWhatsApp)
+            mainActivity.startActivity(openWhatsApp)
         }
         MenuButton(
             modifier = modifier.size(64.dp),
@@ -99,7 +100,7 @@ fun ContactScreen(contactFragment: ContactFragment) {
         ) {
             val openInsta = Intent(Intent.ACTION_VIEW)
             openInsta.data = Uri.parse("https://instagram.com/yourwater_delivery")
-            contactFragment.startActivity(openInsta)
+            mainActivity.startActivity(openInsta)
         }
 
     }

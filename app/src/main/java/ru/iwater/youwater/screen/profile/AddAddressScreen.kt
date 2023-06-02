@@ -29,15 +29,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
-import ru.iwater.youwater.data.ClientProfileViewModel
 import ru.iwater.youwater.screen.login.ButtonEnter
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
-fun AddAddressScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(), navController: NavController, isFromOrder: Boolean) {
+fun AddAddressScreen(
+    watterViewModel: WatterViewModel = viewModel(),
+    navController: NavHostController,
+    isFromOrder: Boolean
+) {
     val modifier = Modifier
     var selectRegion by remember {
         mutableStateOf("Выберете регион")
@@ -96,7 +100,7 @@ fun AddAddressScreen(clientProfileViewModel: ClientProfileViewModel = viewModel(
         SetAltContact(contact = contact, setContact = {contact = it})
         isEnabledButton = selectRegion != "Выберете регион" && city.isNotEmpty() && street.isNotEmpty() && house.isNotEmpty()
         ButtonEnter(text = stringResource(id = R.string.fragment_create_order_add_address_to_order), isEnabledButton = isEnabledButton) {
-            clientProfileViewModel.createNewAddress(region = selectRegion, city = city, street = street, house = house, building = structure, entrance = entrance, floor = floor, flat = apartment, contact = contact, notice = notice, isFromOrder, navController = navController)
+            watterViewModel.createNewAddress(region = selectRegion, city = city, street = street, house = house, building = structure, entrance = entrance, floor = floor, flat = apartment, contact = contact, notice = notice, isFromOrder, navController = navController)
         }
     }
 }
@@ -113,6 +117,7 @@ fun TitleAddAddress(modifier: Modifier) {
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SetRegion(
     regionList: List<String>,
