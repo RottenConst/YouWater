@@ -8,8 +8,7 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="ru.iwater.youwater.screen.home.HomeFragment"
-        android:label="@string/home"
-        tools:layout="@layout/fragment_home">
+        android:label="@string/home">
         <action
             android:id="@+id/action_showAboutProductFragment"
             app:destination="@id/aboutProductFragment"
@@ -35,8 +34,7 @@
     <fragment
         android:id="@+id/catalogFragment"
         android:name="ru.iwater.youwater.screen.catalog.CatalogFragment"
-        android:label="@string/catalog"
-        tools:layout="@layout/fragment_catalog">
+        android:label="@string/catalog">
         <action
             android:id="@+id/action_showTypeCatalog"
             app:destination="@id/catalogProductFragment"
@@ -45,8 +43,7 @@
     <fragment
         android:id="@+id/basketFragment"
         android:name="ru.iwater.youwater.screen.basket.BasketFragment"
-        android:label="@string/basket"
-        tools:layout="@layout/fragment_basket" >
+        android:label="@string/basket">
         <action
             android:id="@+id/action_basketFragment_to_createOrderFragment"
             app:destination="@id/createOrderFragment" />
@@ -54,8 +51,7 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="ru.iwater.youwater.screen.profile.ProfileFragment"
-        android:label="@string/profile"
-        tools:layout="@layout/fragment_profile">
+        android:label="@string/profile">
         <action
             android:id="@+id/action_profileFragment_to_userDataFragment"
             app:destination="@id/userDataFragment" />
@@ -118,8 +114,7 @@
     <fragment
         android:id="@+id/userDataFragment"
         android:name="ru.iwater.youwater.screen.profile.UserDataFragment"
-        android:label="@string/fragment_profile_my_data"
-        tools:layout="@layout/fragment_user_data">
+        android:label="@string/fragment_profile_my_data">
         <action
             android:id="@+id/action_userDataFragment_to_editUserDataFragment"
             app:destination="@id/editUserDataFragment" />
@@ -216,8 +211,7 @@
     <fragment
         android:id="@+id/contactFragment"
         android:name="ru.iwater.youwater.screen.more.ContactFragment"
-        android:label="@string/send_text"
-        tools:layout="@layout/fragment_contact" />
+        android:label="@string/send_text" />
     <fragment
         android:id="@+id/aboutCompanyFragment"
         android:name="ru.iwater.youwater.screen.more.AboutCompanyFragment"
@@ -229,8 +223,7 @@
     <fragment
         android:id="@+id/faqFragment"
         android:name="ru.iwater.youwater.screen.more.FaqFragment"
-        android:label="@string/faq_label"
-        tools:layout="@layout/fragment_faq" />
+        android:label="@string/faq_label" />
     <fragment
         android:id="@+id/editUserDataFragment"
         android:name="ru.iwater.youwater.screen.profile.EditUserDataFragment"
