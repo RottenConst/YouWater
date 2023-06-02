@@ -213,7 +213,7 @@ fun ProductsByCategoryRow(
             if (productsList != null) {
                 items(
                     count = productsList.size,
-                    key = { product -> productsList[product].id }) { productIndex ->
+                    ) { productIndex ->
                     ProductCard(
                         product = productsList[productIndex],
                         getAboutProduct = getAboutProduct,
