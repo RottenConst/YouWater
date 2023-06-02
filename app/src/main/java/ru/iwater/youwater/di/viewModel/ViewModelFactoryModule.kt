@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
-import ru.iwater.youwater.data.*
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.vm.*
 
@@ -18,26 +17,11 @@ abstract class ViewModelFactoryModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(CatalogListViewModel::class)
-    abstract fun bindCatalogListViewModel(catalogListViewModel: CatalogListViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(ProductListViewModel::class)
-    abstract fun bindProductListViewModel(productListViewModel: ProductListViewModel): ViewModel
+    @ViewModelKey(WatterViewModel::class)
+    abstract fun bindCatalogListViewModel(watterViewModel: WatterViewModel): ViewModel
 
     @Binds
     @IntoMap
     @ViewModelKey(AuthViewModel::class)
     abstract fun bindAuthViewModel(authViewModel: AuthViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(ClientProfileViewModel::class)
-    abstract fun bindClientProfileViewModel(clientProfileViewModel: ClientProfileViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(AboutProductViewModel::class)
-    abstract fun bindingAboutProductViewModel(aboutProductViewModel: AboutProductViewModel): ViewModel
 }

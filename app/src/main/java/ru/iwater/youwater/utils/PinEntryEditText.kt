@@ -8,11 +8,9 @@ import android.graphics.Paint
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide.init
 import ru.iwater.youwater.R
 
 class PinEntryEditText: AppCompatEditText {
@@ -20,7 +18,7 @@ class PinEntryEditText: AppCompatEditText {
     private var mSpace = 24f //24 dp by default, space between the lines
     private var mNumChars = 4f
     private var mLineSpacing = 8f //8dp by default, height of the text from our lines
-    private var mClickListener: View.OnClickListener? = null
+    private var mClickListener: OnClickListener? = null
     private var mLineStroke = 1f //1dp by default
     private var mLineStrokeSelected = 2f //2dp by default
     private var mLinesPaint: Paint? = null
@@ -134,7 +132,7 @@ class PinEntryEditText: AppCompatEditText {
      * Setting click listener in view
      * @param l OnClickListener
      */
-    override fun setOnClickListener(l: View.OnClickListener?) {
+    override fun setOnClickListener(l: OnClickListener?) {
         mClickListener = l
     }
 

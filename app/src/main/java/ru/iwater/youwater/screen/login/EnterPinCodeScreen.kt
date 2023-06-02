@@ -24,14 +24,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
 import ru.iwater.youwater.R
 import ru.iwater.youwater.vm.AuthViewModel
-import ru.iwater.youwater.vm.StatusPinCode.*
 import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.screen.StartActivity
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.utils.StatusPinCode.*
 import timber.log.Timber
 
 @Composable
@@ -39,8 +38,7 @@ fun EnterPinCodeScreen(
     phone: String,
     clientId: Int,
     context: Context?,
-    viewModel: AuthViewModel,
-//    fragmentActivity: FragmentActivity
+    authViewModel: AuthViewModel,
     startActivity: StartActivity
 ) {
     Column(
@@ -52,11 +50,10 @@ fun EnterPinCodeScreen(
         val infoPinCode = stringResource(id = R.string.fragment_enter_pin_code_info_code)
         var isCheckPinCode by rememberSaveable { mutableStateOf(false) }
         var pinCode by rememberSaveable{ mutableStateOf("") }
-        val statusPinCode by viewModel.statusPinCode.observeAsState()
+        val statusPinCode by authViewModel.statusPinCode.observeAsState()
         when (statusPinCode) {
             DONE -> {
                 Timber.d("DONE")
-//                fragmentActivity.finish()
                 startActivity.finish()
                 MainActivity.start(context)
             }
@@ -81,7 +78,7 @@ fun EnterPinCodeScreen(
             isFullPinCode = {isCheckPinCode = it}
         )
         if (isCheckPinCode) {
-            viewModel.checkPin(pinCode, clientId)
+            authViewModel.checkPin(pinCode, clientId)
         }
         DescriptionText(text = "$infoPinCode $phone")
     }

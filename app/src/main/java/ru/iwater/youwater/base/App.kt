@@ -10,7 +10,7 @@ import ru.iwater.youwater.di.components.DaggerScreenComponent
 import ru.iwater.youwater.di.components.ScreenComponent
 import timber.log.Timber
 
-class App() : Application() {
+class App : Application() {
 
     companion object {
         lateinit var appComponent: AppComponent
