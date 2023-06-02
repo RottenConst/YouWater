@@ -71,7 +71,7 @@ private fun addEnterPinCodeScreen(
             phone = args?.getString(StartNavRoute.EnterPinCodeScreen.phoneNumber)!!,
             clientId = args.getInt(StartNavRoute.EnterPinCodeScreen.clientId),
             context = navController.context,
-            viewModel = authViewModel,
+            authViewModel = authViewModel,
             startActivity = startActivity
         )
     }
@@ -93,7 +93,7 @@ private fun addRegisterScreen(
         val args = navBackStackEntry.arguments
 
         RegisterScreen(
-            viewModel = authViewModel,
+            authViewModel = authViewModel,
             phone = args?.getString(StartNavRoute.RegisterScreen.phoneNumber)!!, navController = navController)
     }
 }

@@ -37,16 +37,16 @@ fun LoadUrl(
                         endUrl =
                             url?.removeRange(endLink.lastIndex + 2, url.lastIndex + 1).toString()
                         if (endUrl.contentEquals("http://605d3ea8e59a.ngrok.io/") || endUrl.contentEquals("https://605d3ea8e59a.ngrok.io")) {
-                            productListViewModel.getPaymentStatus(orderId, navController)
+                            watterViewModel.getPaymentStatus(orderId, navController)
                         }
                         super.onPageStarted(view, url, favicon)
                     }
                 }
                 settings.javaScriptEnabled = true
-                loadUrl(url)
+                loadUrl("https://secure-payment-gateway.ru/payment/merchants/sbersafe_sberid/mobile_payment_ru.html?mdOrder=$orderId")
             }
         }, update = {
-            it.loadUrl(url)
+            it.loadUrl("https://secure-payment-gateway.ru/payment/merchants/sbersafe_sberid/mobile_payment_ru.html?mdOrder=$orderId")
         }
         )
     }

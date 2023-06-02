@@ -10,11 +10,11 @@ import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.AuthClient
 import ru.iwater.youwater.repository.AuthorisationRepository
 import ru.iwater.youwater.screen.navigation.StartNavRoute
+import ru.iwater.youwater.utils.StatusPinCode
+import ru.iwater.youwater.utils.StatusSession
 import timber.log.Timber
 import javax.inject.Inject
 
-enum class StatusPinCode { ERROR, DONE, NET_ERROR }
-enum class StatusSession { TRY, FALSE, ERROR }
 
 class AuthViewModel @Inject constructor(
     private val authorisationRepository: AuthorisationRepository
@@ -34,9 +34,12 @@ class AuthViewModel @Inject constructor(
 
     private val clientAuth = authorisationRepository.getAuthClient()
 
+    /* проверка телефона:
+        существует в базе - переход на экран ввода пин кода
+        не сужествует - переход на экран регистации
+     */
     fun authPhone(
         phone: String,
-//        navController: NavController
         navController: NavHostController
     ) {
         val telNum =
@@ -60,6 +63,9 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    /*
+        проверка пин кода
+     */
     fun checkPin(pinCode: String, clientId: Int) {
         viewModelScope.launch {
             val clientFullAuth = authorisationRepository.checkCode(clientId, pinCode)
@@ -78,6 +84,9 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    /*
+        проверка сессии пльзователя
+     */
     fun checkSession() {
         viewModelScope.launch {
             when (authorisationRepository.checkSession(clientAuth)) {
@@ -88,6 +97,9 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    /*
+        Регистрация клинта
+     */
     suspend fun registerClient(
         phone: String,
         name: String,

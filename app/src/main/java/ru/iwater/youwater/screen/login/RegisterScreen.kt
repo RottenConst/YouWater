@@ -17,7 +17,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
@@ -28,7 +27,7 @@ import timber.log.Timber
 
 @Composable
 fun RegisterScreen(
-    viewModel: AuthViewModel,
+    authViewModel: AuthViewModel,
     phone: String,
     navController: NavHostController
 ) {
@@ -51,8 +50,8 @@ fun RegisterScreen(
         RegisterNameField(nameClient = nameClient, setNameClient = {nameClient = it})
         RegisterEmailClient(emailClient = emailClient, setEmailClient = {emailClient = it})
         ButtonRegisterClient(isEnabledButton = (nameClient.isNotEmpty() && emailClient.isNotEmpty())) {
-            viewModel.viewModelScope.launch {
-                viewModel.registerClient(phone, nameClient, emailClient, checkMessage, navController)
+            authViewModel.viewModelScope.launch {
+                authViewModel.registerClient(phone, nameClient, emailClient, checkMessage, navController)
             }
         }
         CheckMessage(

@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -23,7 +22,6 @@ import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseActivity
 import ru.iwater.youwater.screen.navigation.MainStartScreen
-import ru.iwater.youwater.screen.navigation.StartNavGraph
 import ru.iwater.youwater.vm.AuthViewModel
 import timber.log.Timber
 import javax.inject.Inject
@@ -51,7 +49,6 @@ class StartActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         screenComponent.inject(this)
-//        setContentView(R.layout.activity_main)
         setContent {
             MainStartScreen(viewModel, this)
         }
@@ -96,6 +93,7 @@ class StartActivity : BaseActivity() {
         snackbar.show()
     }
 
+    @Suppress("DEPRECATION")
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

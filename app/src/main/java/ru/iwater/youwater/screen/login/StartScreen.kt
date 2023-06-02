@@ -21,13 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.vm.AuthViewModel
-import ru.iwater.youwater.vm.StatusSession
 import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.screen.StartActivity
 import ru.iwater.youwater.screen.navigation.StartNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.utils.StatusSession
 
 @Composable
 fun StartAppScreen(

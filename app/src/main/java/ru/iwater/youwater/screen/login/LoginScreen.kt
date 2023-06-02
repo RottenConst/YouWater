@@ -19,7 +19,6 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.R
@@ -31,7 +30,6 @@ import kotlin.math.absoluteValue
 fun LoginScreen(
     authViewModel: AuthViewModel,
     navController: NavHostController
-//    navController: NavController
 ) {
     Column(
         modifier = Modifier
