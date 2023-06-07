@@ -152,6 +152,11 @@ class MainActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        YouWaterDB.getDestroyDataBase()
+    }
+
     companion object {
         fun start(context: Context?) {
             if (context != null) {
