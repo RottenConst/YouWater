@@ -43,10 +43,10 @@ fun LoadUrl(
                     }
                 }
                 settings.javaScriptEnabled = true
-                loadUrl("https://secure-payment-gateway.ru/payment/merchants/sbersafe_sberid/mobile_payment_ru.html?mdOrder=$orderId")
+                loadUrl("https://securecardpayment.ru/payment/merchants/sbersafe_sberid/mobile_payment_ru.html?mdOrder=$orderId")
             }
         }, update = {
-            it.loadUrl("https://secure-payment-gateway.ru/payment/merchants/sbersafe_sberid/mobile_payment_ru.html?mdOrder=$orderId")
+            it.loadUrl("https://securecardpayment.ru/payment/merchants/sbersafe_sberid/mobile_payment_ru.html?mdOrder=$orderId")
         }
         )
     }
