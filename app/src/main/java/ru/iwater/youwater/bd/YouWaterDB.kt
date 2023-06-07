@@ -8,13 +8,11 @@ import ru.iwater.youwater.data.*
 import ru.iwater.youwater.utils.ProductConverter
 
 @Database(
-    version = 4,
+    version = 7,
     entities = [
         Product::class,
         Address::class,
-        FavoriteProduct::class,
-        MyOrder::class,
-        RawAddress::class
+        MyOrder::class
     ],
 //    autoMigrations = [
 //        AutoMigration(from = 1, to = 2)
@@ -25,9 +23,7 @@ import ru.iwater.youwater.utils.ProductConverter
 abstract class YouWaterDB: RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun addressDao(): AddressDao
-    abstract fun favoriteProductDao(): FavoriteProductDao
     abstract fun myOrderDao(): MyOrderDao
-    abstract fun rawAddressDao(): RawAddressDao
 
     companion object {
         private var INSTANCE: YouWaterDB? = null
@@ -53,6 +49,14 @@ abstract class YouWaterDB: RoomDatabase() {
 }
 
 
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "DROP TABLE IF EXISTS BankCard"
+        )
+    }
+}
+
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
@@ -64,7 +68,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-            "ALTER TABLE RawAddress ADD COLUMN region TEXT"
+            "ALTER TABLE RawAddress ADD COLUMN active INTEGER"
         )
     }
 }
@@ -72,7 +76,23 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
 val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-            "DROP TABLE IF EXISTS BankCard"
+            "DROP TABLE IF EXISTS FavoriteProduct"
+        )
+    }
+}
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "ALTER TABLE RawAddress ADD COLUMN region TEXT"
+        )
+    }
+}
+
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "DROP TABLE IF EXISTS RawAddress"
         )
     }
 }
