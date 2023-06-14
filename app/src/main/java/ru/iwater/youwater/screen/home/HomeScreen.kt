@@ -327,7 +327,10 @@ fun ProductCard(
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    ProductCost(product.id, product.getMinPriceProduct())
+                    val priceProduct = product.price
+                    val prices = priceProduct.removeSuffix(";")
+                    val priceList = prices.split(";")
+                    ProductCost(id = product.id, minPrice = product.getMinPriceProduct(), nameProduct = product.name, prices = priceList)
                     ProductPlusButton { addProductInBasket(product) }
                 }
             }
@@ -424,28 +427,102 @@ fun ProductInfo(modifier: Modifier, product: Product) {
 }
 
 @Composable
-fun ProductCost(id: Int, minPrice: Int) {
+fun ProductCost(id: Int, minPrice: Int, nameProduct: String, prices: List<String>) {
+    var openDialog by remember { mutableStateOf(false) }
+    if (openDialog) {
+        AlertDialog(
+            onDismissRequest = { openDialog = false },
+            title = {
+                Text(
+                    text = nameProduct,
+                    textAlign = TextAlign.Center
+                )
+                    },
+            text = {
+                LazyColumn(modifier = Modifier.padding(8.dp)) {
+                    items(prices.size) { itemIndex ->
+                        val price = prices[itemIndex].split(":")
+                        Row(
+                            modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            if (price.first() == "1") {
+                                Text(
+                                    text = "От одной шт.",
+                                    style = YouWaterTypography.subtitle1
+                                )
+                            } else {
+                                Text(
+                                    text = "От ${price.first()} шт.",
+                                    style = YouWaterTypography.subtitle1
+                                )
+                            }
+                            Text(
+                                text = "${price.last()}pyб./шт.",
+                                style = YouWaterTypography.subtitle1
+                            )
+                        }
+                    }
+                }
+            },
+            buttons = {
+                Button(
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    onClick = { openDialog = false }
+                ) {
+                    Text(text = stringResource(id = R.string.general_ok))
+                }
+            }
+        )
+    }
     Box(
         contentAlignment = Alignment.BottomStart
     ) {
         Column {
             if (id == 81 || id == 84) {
                 Text(
-                    text = "${minPrice}₽",
+                    text = "oт ${minPrice}₽",
                     color = Color.Gray,
                     fontWeight = FontWeight.Light,
+                    textAlign = TextAlign.Start,
                     textDecoration = TextDecoration.LineThrough,
-                    style = YouWaterTypography.overline
+                    style = YouWaterTypography.caption
                 )
             }
-            Text(
-                text = if (id == 81 || id == 82) "от ${minPrice - 15}₽" else "от ${minPrice}₽",
-                color = Blue500,
-                style = YouWaterTypography.caption,
-                fontWeight = FontWeight.Bold
-            )
-        }
+            Row(
+                modifier = Modifier.padding(0.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    text = when (id) {
+                        81 -> "от ${minPrice - 30}₽"
+                        84 -> "от ${minPrice - 30}₽"
+                        else -> "от ${minPrice}₽"
+                    },
+                    color = Blue500,
+                    style = YouWaterTypography.body2,
+                    fontWeight = FontWeight.Bold
+                )
+                IconButton(
+                    onClick = {
+                        openDialog = true
+                    },
+                    modifier = Modifier
+                        .size(24.dp)
+                ) {
+                    Icon(
+                        modifier = Modifier.padding(start = 4.dp),
+                        painter = painterResource(id = R.drawable.ic_help_24),
+                        contentDescription = stringResource(id = R.string.description_image_product),
+                        tint = Blue500
+                    )
+                }
+            }
 
+        }
     }
 }
 
