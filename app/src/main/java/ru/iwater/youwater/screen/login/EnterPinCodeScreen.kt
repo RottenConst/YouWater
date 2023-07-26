@@ -79,6 +79,7 @@ fun EnterPinCodeScreen(
         )
         if (isCheckPinCode) {
             authViewModel.checkPin(pinCode, clientId)
+            isCheckPinCode = false
         }
         DescriptionText(text = "$infoPinCode $phone")
     }
