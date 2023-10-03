@@ -8,3 +8,5 @@ enum class StatusData {
 enum class StatusPinCode { ERROR, DONE, NET_ERROR }
 
 enum class StatusSession { TRY, FALSE, ERROR }
+
+enum class StatusPayment { LOAD, PANDING, ERROR, DONE }

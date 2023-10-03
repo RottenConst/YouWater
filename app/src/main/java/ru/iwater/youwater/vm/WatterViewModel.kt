@@ -11,8 +11,11 @@ import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.repository.ProductRepository
+import ru.iwater.youwater.screen.PaymentActivity
 import ru.iwater.youwater.screen.navigation.MainNavRoute
+import ru.iwater.youwater.screen.navigation.PaymentNavRoute
 import ru.iwater.youwater.utils.StatusData
+import ru.iwater.youwater.utils.StatusPayment
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -115,6 +118,13 @@ class WatterViewModel @Inject constructor(
     private val _addressesList = listOf<RawAddress>().toMutableStateList()
     val addressesList: List<RawAddress> get() = _addressesList
 
+    private var _paymentStatus: MutableLiveData<StatusPayment> = MutableLiveData()
+    val paymentStatus: LiveData<StatusPayment>
+        get() = _paymentStatus
+
+    private var telNumber = ""
+    private var checkUrl = ""
+
     init {
         getCatalogList()
     }
@@ -123,6 +133,15 @@ class WatterViewModel @Inject constructor(
         viewModelScope.launch {
             _catalogList.addAll(repository.getCategoryList())
         }
+    }
+
+    private fun getTelNumber() {
+        viewModelScope.launch {
+            val tel = repository.getClientInfo()?.contact
+            Timber.d("tel $tel")
+            telNumber = tel?.removeRange(2, 3)?.removeRange(5, 7)?.removeRange(8, 9).toString()
+        }
+
     }
 
     fun getProductsList() {
@@ -222,6 +241,8 @@ class WatterViewModel @Inject constructor(
             _client.value = repository.getClientInfo()
         }
     }
+
+    fun getAuthClient(): AuthClient = repository.getAuthClient()
 
     fun setEditClientData(clientName: String, clientPhone: String, clientEmail: String) {
         editClientName = clientName
@@ -496,33 +517,66 @@ class WatterViewModel @Inject constructor(
                 val orderId = repository.createOrderApp(order)
                 if (order.paymentType != "2") {
                     navController.navigate(
-                        MainNavRoute.CompleteOrderScreen.withArgs(orderId.toString(), true.toString())
+                        MainNavRoute.CompleteOrderScreen.withArgs(orderId.toString(), false.toString())
                     ) {
                         popUpTo(navController.graph.startDestinationId) {
                             inclusive = false
                         }
                     }
+                    navController.clearBackStack(MainNavRoute.CreateOrderScreen.path)
                     refreshOrder()
                 } else {
-                    val paymentCard = PaymentCard(
-                        orderNumber = orderId.toString(),
-                        amount = orderCost * 100,
-                        phone = order.contact
-                    )
-                    val dataPayment = repository.payCard(paymentCard)
-                    val id = dataPayment[0].removePrefix("\"").removeSuffix("\"")
-//                    val url = dataPayment[1].removePrefix("\"").removeSuffix("\"")
-                    navController.navigate(
-                        MainNavRoute.CardPaymentScreen.withArgs(id)
-                    ) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = false
-                        }
-                    }
+                    Timber.d("Order - $orderId, $orderCost")
+                    getTelNumber()
                     refreshOrder()
+                    navController.clearBackStack(MainNavRoute.CreateOrderScreen.path)
+                    PaymentActivity.startGenerateToken(navController.context, orderId, orderCost, telNumber)
                 }
             }
         }
+    }
+
+    fun createPay(orderId: Int, amount: String, description: String, paymentToken: String, capture: Boolean) {
+        viewModelScope.launch {
+            val dataPayment = repository.createPay(
+                amount, description, paymentToken, capture
+            )
+            when {
+                dataPayment != null && dataPayment.data.status == "succeeded" -> {
+                    Timber.d("succeeded")
+                    _paymentStatus.value = StatusPayment.DONE
+                }
+                dataPayment != null && dataPayment.data.status == "pending" -> {
+                    Timber.d("Check pay")
+                    _paymentStatus.value = StatusPayment.PANDING
+                    val parameters = JsonObject()
+                    parameters.addProperty("updated_payment_state", 1)
+                    parameters.addProperty("updated_acq", dataPayment.data.id)
+                    repository.setStatusPayment(orderId = orderId, parameters)
+                    checkUrl = dataPayment.data.confirmation.confirmation_url
+                }
+                else -> {
+                    errorPay()
+                }
+            }
+        }
+    }
+
+    fun setPaymentStatus(navController: NavHostController) {
+        _paymentStatus.value = StatusPayment.DONE
+        navController.navigate(
+            PaymentNavRoute.CompleteOrderScreen.path
+        )
+    }
+
+    fun getCheckUrl() = checkUrl
+
+    fun startPay() {
+        _paymentStatus.value = StatusPayment.LOAD
+    }
+
+    fun errorPay() {
+        _paymentStatus.value = StatusPayment.ERROR
     }
 
     fun getInfoLastOrder(orderId: Int) {
@@ -553,37 +607,14 @@ class WatterViewModel @Inject constructor(
         }
     }
 
-    fun getPaymentStatus(orderId: String, navController: NavHostController) {
-        viewModelScope.launch {
-            val paymentStatus = repository.getPaymentStatus(orderId)
-            Timber.d("STATUS ${paymentStatus.first} ${paymentStatus.second}")
-            if (paymentStatus.second == 2) {
-                val parameters = JsonObject()
-                parameters.addProperty("updated_payment_state", 1)
-                parameters.addProperty("updated_acq", orderId)
-                if (repository.setStatusPayment(paymentStatus.first, parameters)) {
-                    navController.navigate(
-                        MainNavRoute.CompleteOrderScreen.withArgs(paymentStatus.first.toString(), true.toString())
-                    )
-                } else {
-                    navController.navigate(
-                        MainNavRoute.CreateOrderScreen.withArgs(true.toString(), "0")
-                    )
-                }
-            } else {
-                navController.navigate(
-                    MainNavRoute.CreateOrderScreen.withArgs(true.toString(), "0")
-                )
-            }
-        }
-    }
-
     fun getOrderCrm(orderId: Int) {
         viewModelScope.launch {
+            Timber.d("GET ORDER CRM")
             val orderFromCrm = repository.getOrder(orderId)
+            Timber.d("OrderCRM ${orderFromCrm?.id}")
             if (orderFromCrm != null) {
 //                val address = getStringAddress(order)
-
+                Timber.d("GET ORDER CRM 1")
                 val listProduct = mutableListOf<Product>()
                 orderFromCrm.water_equip.forEach {
                     val product = repository.getProduct(it.id)

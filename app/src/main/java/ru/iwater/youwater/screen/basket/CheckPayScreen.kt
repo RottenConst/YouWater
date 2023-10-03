@@ -18,14 +18,13 @@ import ru.iwater.youwater.vm.WatterViewModel
 @Composable
 fun LoadUrl(
     watterViewModel: WatterViewModel,
-    orderId: String,
     navController: NavHostController
 ) {
-    val endLink = "http://605d3ea8e59a.ngrok.io"
+    val checkUrl = watterViewModel.getCheckUrl()
     var endUrl by rememberSaveable {
         mutableStateOf("")
     }
-    if (!endUrl.contentEquals("http://605d3ea8e59a.ngrok.io/") || !endUrl.contentEquals("https://605d3ea8e59a.ngrok.io")) {
+    if (!endUrl.contentEquals("https://yourwater.ru/")) {
         AndroidView(factory = {
             WebView(it).apply {
                 layoutParams = ViewGroup.LayoutParams(
@@ -34,19 +33,18 @@ fun LoadUrl(
                 )
                 webViewClient = object : WebViewClient() {
                     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                        endUrl =
-                            url?.removeRange(endLink.lastIndex + 2, url.lastIndex + 1).toString()
-                        if (endUrl.contentEquals("http://605d3ea8e59a.ngrok.io/") || endUrl.contentEquals("https://605d3ea8e59a.ngrok.io")) {
-                            watterViewModel.getPaymentStatus(orderId, navController)
+                        endUrl = url.toString()
+                        if (endUrl.contentEquals("https://yourwater.ru/")) {
+                            watterViewModel.setPaymentStatus(navController)
                         }
                         super.onPageStarted(view, url, favicon)
                     }
                 }
                 settings.javaScriptEnabled = true
-                loadUrl("https://securecardpayment.ru/payment/merchants/sbersafe_sberid/mobile_payment_ru.html?mdOrder=$orderId")
+                loadUrl(checkUrl)
             }
         }, update = {
-            it.loadUrl("https://securecardpayment.ru/payment/merchants/sbersafe_sberid/mobile_payment_ru.html?mdOrder=$orderId")
+            it.loadUrl(checkUrl)
         }
         )
     }

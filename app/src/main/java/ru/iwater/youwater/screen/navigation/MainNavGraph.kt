@@ -13,7 +13,6 @@ import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.screen.basket.BasketScreen
 import ru.iwater.youwater.screen.basket.CompleteOrderScreen
 import ru.iwater.youwater.screen.basket.CreateOrderScreen
-import ru.iwater.youwater.screen.basket.LoadUrl
 import ru.iwater.youwater.screen.catalog.CatalogScreen
 import ru.iwater.youwater.screen.catalog.ProductByCategory
 import ru.iwater.youwater.screen.home.AboutProductScreen
@@ -47,8 +46,7 @@ fun MainNavGraph(modifier: Modifier = Modifier, navController: NavHostController
 
         addBasketScreen(watterViewModel, navController, this)
         addCreateOrderScreen(watterViewModel, mainActivity.supportFragmentManager, navController, this)
-        addCardPaymentScreen(watterViewModel = watterViewModel, navController = navController, this)
-        addCompleteOrderScreen(watterViewModel = watterViewModel, navController = navController, this)
+        addCompleteOrderScreen(watterViewModel = watterViewModel, navController = navController, navGraphBuilder = this)
 
         addProfileScreen(watterViewModel, navController, this)
         addMyOrdersScreen(watterViewModel = watterViewModel, navController = navController, this)
@@ -284,47 +282,29 @@ private fun addNotificationScreen(
     }
 }
 
-private fun addCardPaymentScreen(
-    watterViewModel: WatterViewModel,
-    navController: NavHostController,
-    navGraphBuilder: NavGraphBuilder
-) {
-    navGraphBuilder.composable(
-        route = MainNavRoute.CardPaymentScreen.withArgsFormat(MainNavRoute.CardPaymentScreen.orderId),
-        arguments = listOf(
-            navArgument(MainNavRoute.CardPaymentScreen.orderId) {
-                type = NavType.StringType
-            }
-        )
-    ) {navBackStackEntry ->
-        val args = navBackStackEntry.arguments
-
-        LoadUrl(
-            watterViewModel = watterViewModel,
-            orderId = args?.getString(MainNavRoute.CardPaymentScreen.orderId)!!,
-            navController = navController
-        )
-    }
-}
-
 private fun addCompleteOrderScreen(
     watterViewModel: WatterViewModel,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
-        route = MainNavRoute.CompleteOrderScreen.withArgsFormat(MainNavRoute.CompleteOrderScreen.orderId, MainNavRoute.CompleteOrderScreen.isPaid),
+        route = MainNavRoute.CompleteOrderScreen.withArgsFormat(MainNavRoute.CompleteOrderScreen.orderId, MainNavRoute.CompleteOrderScreen.isPayment),
         arguments = listOf(
             navArgument(MainNavRoute.CompleteOrderScreen.orderId) {
                 type = NavType.IntType
             },
-            navArgument(MainNavRoute.CompleteOrderScreen.isPaid) {
+            navArgument(MainNavRoute.CompleteOrderScreen.isPayment) {
                 type = NavType.BoolType
             }
         )
     ) { navBackStackEntry ->
         val args = navBackStackEntry.arguments
-        CompleteOrderScreen(watterViewModel = watterViewModel,orderId = args?.getInt(MainNavRoute.CompleteOrderScreen.orderId)!!, isPaid = args.getBoolean(MainNavRoute.CompleteOrderScreen.isPaid), navController = navController)
+        CompleteOrderScreen(
+            watterViewModel = watterViewModel,
+            orderId = args?.getInt(MainNavRoute.CompleteOrderScreen.orderId)!!,
+            isPayment = args.getBoolean(MainNavRoute.CompleteOrderScreen.isPayment),
+            navController = navController
+        )
     }
 }
 

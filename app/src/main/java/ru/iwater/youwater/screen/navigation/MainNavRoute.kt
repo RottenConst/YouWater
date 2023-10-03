@@ -27,7 +27,7 @@ sealed class MainNavRoute(val path: String) {
 
     object CompleteOrderScreen: MainNavRoute("completeOrder") {
         const val orderId = "orderId"
-        const val isPaid = "isPaid"
+        const val isPayment = "isPayment"
     }
 
     object ProfileMenuScreen: MainNavRoute("profile")

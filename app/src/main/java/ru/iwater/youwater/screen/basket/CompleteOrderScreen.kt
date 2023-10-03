@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
@@ -25,6 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,17 +44,22 @@ import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.MyOrder
 import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.screen.navigation.MainNavRoute
+import ru.iwater.youwater.screen.navigation.PaymentNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.utils.StatusPayment
 import ru.iwater.youwater.vm.WatterViewModel
+import timber.log.Timber
 
 @Composable
 fun CompleteOrderScreen(
+    modifier: Modifier = Modifier,
     watterViewModel: WatterViewModel = viewModel(),
     orderId: Int,
-    isPaid: Boolean,
+    isPayment: Boolean = false,
     navController: NavHostController
 ) {
     LaunchedEffect(Unit) {
@@ -58,37 +67,127 @@ fun CompleteOrderScreen(
         watterViewModel.getOrderCrm(orderId)
     }
 
-    val modifier = Modifier
-
     val completeOrder by watterViewModel.completedOrder.observeAsState()
+    val paymentStatus by watterViewModel.paymentStatus.observeAsState()
+    var pay by remember {
+        mutableStateOf(0)
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = modifier.padding(bottom = 80.dp)) {
             item {
-                InfoStatusCreate(modifier = modifier, isPaid = isPaid)
+                InfoStatusCreate(modifier = modifier, isPayment = isPayment, isPay = paymentStatus, navController = navController, pay) { pay++ }
             }
                 items(count = 1) {
                     if (completeOrder != null) {
-                    CardOrderInfo(modifier = modifier, completeOrder!!){ navController.navigate(
-                        MainNavRoute.CreateOrderScreen.withArgs(false.toString(), completeOrder!!.id.toString())
-                    )} }
+                    CardOrderInfo(modifier = modifier, completeOrder!!)
+                    }
             }
         }
         HomeButton(modifier = modifier.align(Alignment.BottomCenter)) {
-            navController.navigate(
-//                CompleteOrderFragmentDirections.actionCompleteOrderFragmentToHomeFragment()
-                MainNavRoute.HomeScreen.path
-            )
+            if (isPayment) {
+                MainActivity.start(navController.context)
+            } else {
+                navController.navigate(
+                    MainNavRoute.HomeScreen.path
+                )
+            }
         }
     }
 }
 
 @Composable
-fun InfoStatusCreate(modifier: Modifier, isPaid: Boolean) {
+fun InfoStatusCreate(modifier: Modifier, isPayment: Boolean, isPay: StatusPayment?, navController: NavHostController, pay: Int, payPlus: () -> Unit) {
     Column(
         modifier = modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (isPaid) {
+        if (isPayment) {
+            Timber.d("is Payment true")
+            when (isPay) {
+                StatusPayment.DONE -> {
+                    Timber.d("Status DONE")
+                    Icon(
+                        modifier = modifier.size(42.dp, 42.dp),
+                        imageVector = Icons.Sharp.CheckCircle,
+                        contentDescription = "",
+                        tint = Blue500
+                    )
+                    Text(
+                        text = stringResource(id = R.string.fragment_complete_order_complete_text),
+                        style = YouWaterTypography.h6,
+                        fontWeight = FontWeight.Bold,
+                        color = Blue500
+                    )
+                    Text(
+                        text = stringResource(id = R.string.fragment_complete_order_connect_order_delivery),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                StatusPayment.ERROR -> {
+                    Timber.d("Status ERROR")
+                    Icon(
+                        modifier = modifier.size(42.dp, 42.dp),
+                        imageVector = Icons.Rounded.Close,
+                        contentDescription = "",
+                        tint = Color.Red
+                    )
+                    Text(
+                        text = "Ошибка, не удалось оплатить заказ",
+                        style = YouWaterTypography.h6,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        color = Blue500
+                    )
+                }
+
+                StatusPayment.LOAD -> {
+                    Timber.d("Status LOAD")
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                StatusPayment.PANDING -> {
+                    Timber.d("Check Pay2")
+
+                    if (pay == 0) {
+                        Timber.d("Check Pay3")
+                        payPlus()
+                        navController.navigate(
+                            PaymentNavRoute.CheckPaymentScreen.path
+                        ){
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = false
+                            }
+                        }
+                    }
+
+                }
+
+                else -> {
+                    Timber.d("Status NONE")
+//                    Icon(
+//                        modifier = modifier.size(42.dp, 42.dp),
+//                        imageVector = Icons.Rounded.Close,
+//                        contentDescription = "",
+//                        tint = Color.Red
+//                    )
+//                    Text(
+//                        text = "Ошибка, оплата была прервана",
+//                        style = YouWaterTypography.h6,
+//                        fontWeight = FontWeight.Bold,
+//                        textAlign = TextAlign.Center,
+//                        color = Blue500
+//                    )
+                }
+            }
+        } else {
+            Timber.d("is Payment false")
             Icon(
                 modifier = modifier.size(42.dp, 42.dp),
                 imageVector = Icons.Sharp.CheckCircle,
@@ -104,20 +203,6 @@ fun InfoStatusCreate(modifier: Modifier, isPaid: Boolean) {
             Text(
                 text = stringResource(id = R.string.fragment_complete_order_connect_order_delivery),
                 textAlign = TextAlign.Center
-            )
-        } else {
-            Icon(
-                modifier = modifier.size(42.dp, 42.dp),
-                imageVector = Icons.Rounded.Close,
-                contentDescription = "",
-                tint = Color.Red
-            )
-            Text(
-                text = "Ошибка, не удалось оплатить заказ",
-                style = YouWaterTypography.h6,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                color = Blue500
             )
         }
     }
@@ -245,7 +330,7 @@ fun TypePayOrder(modifier: Modifier, typePay: String) {
 }
 
 @Composable
-fun CardOrderInfo(modifier: Modifier, order: MyOrder, repeatOrder: () -> Unit) {
+fun CardOrderInfo(modifier: Modifier, order: MyOrder) {
     Surface(
         modifier = modifier.padding(16.dp),
         shape = RoundedCornerShape(8.dp),
@@ -291,14 +376,6 @@ fun CardOrderInfo(modifier: Modifier, order: MyOrder, repeatOrder: () -> Unit) {
             PriceOrder(modifier = modifier, priceOder = order.cash)
             Divider(color = Color.LightGray, thickness = 1.dp)
             TypePayOrder(modifier = modifier, typePay = order.typeCash ?: "")
-            Button(
-                modifier = modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                onClick = { repeatOrder() }) {
-                Text(text = "Повторить заказ")
-            }
         }
     }
 }
@@ -388,7 +465,7 @@ fun CompleteOrderPreview() {
     YourWaterTheme {
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(modifier = Modifier.padding(bottom = 80.dp)) {
-                item { InfoStatusCreate(modifier = Modifier.fillMaxWidth(), false) }
+//                item { InfoStatusCreate(modifier = Modifier.fillMaxWidth(), isPayment = false, StatusPayment.LOAD) }
                 items(1) {
                 }
         }

@@ -143,9 +143,6 @@ fun TopBar(navController: NavController, onEditUserData: () -> Unit, onExitUser:
         currentRoute.contains(MainNavRoute.CreateOrderScreen.path) -> {
             stringResource(id = R.string.item_order_description_complete_order)
         }
-        currentRoute.contains(MainNavRoute.CompleteOrderScreen.path) -> {
-            stringResource(id = R.string.item_order_description_complete_order_logo)
-        }
         currentRoute.contains(MainNavRoute.CardPaymentScreen.path) -> {
             stringResource(id = R.string.payment_on_card_logo)
         }

@@ -48,7 +48,7 @@
 
     <string name="to_suburbs">В пригороды</string>
 
-<!--    <string name="user_data_sent_for_moderation">Ваши данные отправлены на модерацию.  Мы проверим их корректность и внесём изменения. Спасибо вам за то, что предупреждаете нас.</string>-->
+    <!--    <string name="user_data_sent_for_moderation">Ваши данные отправлены на модерацию.  Мы проверим их корректность и внесём изменения. Спасибо вам за то, что предупреждаете нас.</string>-->
     <string name="fragment_user_data_user_data_sent_for_moderation">Ваши данные изменены.</string>
 
     <string-array name="order_pay">
@@ -275,7 +275,7 @@
 
     <!-- fragment catalog product -->
     <string name="fragment_catalog_product_name_category">Назватие категории</string>
-    
+
     <!-- fragment basket names-->
     <string name="fragment_basket_ball_per_order">Количество баллов за заказ:</string>
     <string name="fragment_basket_total_sum_order">Общая сумма заказа:</string>
@@ -283,7 +283,7 @@
     <string name="fragment_basket_checkout_order">Оформить заказ</string>
     <string name="fragment_basket_sample_sum">3020 ₽</string>
     <string name="fragment_basket_sample_total_sum">3220 ₽</string>
-    
+
     <!-- fragment addresses -->
     <string name="fragment_addresses_no_address_text">У вас не указано ни одного адреса</string>
 
@@ -344,4 +344,9 @@
     <string name="description_ic_delete">Удалить</string>
     <string name="description_add_product">Добавить продукт</string>
     <string name="description_image_background">Изображение фона</string>
+    <string name="title_activity_pey_test">PaymentActivity</string>
+
+    <string name='tokenization_canceled'>Токенизация отменена</string>
+    <string name='tokenization_success'>Токен: %1$s</string>
+    <string name='test_redirect_url'>https://custom.redirect.url/</string>
 </resources>
