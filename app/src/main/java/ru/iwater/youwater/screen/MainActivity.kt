@@ -46,28 +46,29 @@ class MainActivity : BaseActivity() {
 
 
     private val authURLString = "http://docs.iwatercrm.ru:8080/pusher/beams-auth"
-    private val authToken = "mN#h8MjPw3KJ!vi"
-    private val tokenProvider = BeamsTokenProvider(
-        authURLString,
-        object: AuthDataGetter {
-            override fun getAuthData(): AuthData {
-                return AuthData(
-                    headers = hashMapOf("X-Key" to authToken),
-                    queryParams = hashMapOf()
-                )
-            }
-        }
-    )
+    private var authToken = "" //viewModel.getAuthClient().session //"mN#h8MjPw3KJ!vi"
+    private var tokenProvider: BeamsTokenProvider? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         screenComponent.inject(this)
+        authToken = viewModel.getAuthClient().session
+        tokenProvider = BeamsTokenProvider(
+            authURLString,
+            object: AuthDataGetter {
+                override fun getAuthData(): AuthData {
+                    return AuthData(
+                        headers = hashMapOf("X-Key" to authToken),
+                        queryParams = hashMapOf()
+                    )
+                }
+            }
+        )
         authRepository = AuthorisationRepository(screenComponent.clientStorage())
         setContent {
             YourWaterTheme {
                 MainScreen(watterViewModel = viewModel, mainActivity = this)
             }
-
         }
     }
 

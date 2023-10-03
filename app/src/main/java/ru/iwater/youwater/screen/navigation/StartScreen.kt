@@ -7,7 +7,7 @@ import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.AuthViewModel
 
 @Composable
-fun MainStartScreen(authViewModel: AuthViewModel, startActivity: StartActivity) {
+fun StartScreen(authViewModel: AuthViewModel, startActivity: StartActivity) {
     YourWaterTheme {
         val navController = rememberNavController()
         StartNavGraph(navController = navController, authViewModel = authViewModel, startActivity = startActivity)

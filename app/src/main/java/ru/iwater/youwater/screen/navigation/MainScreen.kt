@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.pusher.pushnotifications.PushNotifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,6 +38,7 @@ fun MainScreen(watterViewModel: WatterViewModel, mainActivity: MainActivity) {
                         .setPositiveButton(
                             R.string.general_yes
                         ) { _, _ ->
+                            PushNotifications.clearAllState()
                             val intent = Intent(mainActivity.applicationContext, StartActivity::class.java)
                             intent.flags =
                                 Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
