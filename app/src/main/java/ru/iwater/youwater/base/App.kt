@@ -1,6 +1,7 @@
 package ru.iwater.youwater.base
 
 import android.app.Application
+import com.google.firebase.FirebaseApp
 import com.pusher.pushnotifications.PushNotifications
 import ru.iwater.youwater.di.ContextModule
 import ru.iwater.youwater.di.DataBaseModule
@@ -22,6 +23,7 @@ class App : Application() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
         initAppComponent()
+        FirebaseApp.initializeApp(this)
         PushNotifications.start(applicationContext, instanceID)
         PushNotifications.addDeviceInterest("hello")
     }
