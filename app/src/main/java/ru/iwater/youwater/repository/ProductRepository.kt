@@ -4,12 +4,11 @@ import com.google.gson.JsonObject
 import ru.iwater.youwater.bd.ProductDao
 import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.data.*
+import ru.iwater.youwater.data.payModule.MessagePay
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
 import ru.iwater.youwater.network.RetrofitFactory
-import ru.iwater.youwater.network.RetrofitSberApi
-import ru.iwater.youwater.network.SberPaymentApi
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.Exception
@@ -22,7 +21,6 @@ class ProductRepository @Inject constructor(
 
     private val productDao: ProductDao = youWaterDB.productDao()
     private val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
-    private val sberApi: SberPaymentApi = RetrofitSberApi.makeRetrofit()
 
     /**
      * получить список продуктов добавленых в корзину
@@ -205,6 +203,7 @@ class ProductRepository @Inject constructor(
 
     suspend fun createOrderApp(order: Order): Int {
         return try {
+            Timber.d("Create order app?")
             apiWater.createOrder(order)?.data?.id ?: -1
         } catch (e: Exception) {
             Timber.e("error create order: $e")
@@ -212,40 +211,19 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    suspend fun payCard(paymentCard: PaymentCard): List<String> {
-        try {
-            val answer = sberApi.registerOrder(
-                userName = paymentCard.userName,
-                password = paymentCard.password,
-                orderNumber = paymentCard.orderNumber,
-                amount = paymentCard.amount,
-                returnUrl = paymentCard.returnUrl,
-                pageView = "MOBILE",
-                phone = paymentCard.phone
-            )
-            val dataPayment = mutableListOf<String>()
-            return run {
-                dataPayment.add(answer["orderId"].toString())
-                dataPayment.add(answer["formUrl"].toString())
-                dataPayment
+
+    suspend fun createPay(amount: String, description: String, paymentToken: String, capture: Boolean): MessagePay? {
+        return try {
+            val payment = apiWater.createPay(amount, description, paymentToken, capture)
+            if (payment?.message == "Order created") {
+                payment
+            } else {
+                null
             }
         } catch (e: Exception) {
-            Timber.e("error pay: $e")
+            Timber.e("error create pay $e")
+            null
         }
-        return emptyList()
-    }
-
-    suspend fun getPaymentStatus(orderId: String): Pair<Int, Int> {
-        try {
-            val answer = sberApi.getOrderStatus(UserNameSber, passwordSber, orderId)
-            return Pair(
-                answer["orderNumber"].toString().removePrefix("\"").removeSuffix("\"").toInt(),
-                answer["orderStatus"].toString().toInt()
-            )
-        }catch (e: Exception) {
-            Timber.e("error get status pay: $e")
-        }
-        return Pair(0, 0)
     }
 
     suspend fun setStatusPayment(orderId: Int, parameters: JsonObject): Boolean {
@@ -260,27 +238,21 @@ class ProductRepository @Inject constructor(
 
     suspend fun getOrder(orderId: Int): OrderFromCRM? {
        return try {
+           Timber.d("get ORDER, ${getAuthClient().clientId}")
             val listOrder = apiWater.getOrderClient(getAuthClient().clientId)
             return if (listOrder.isNullOrEmpty()) {
                 null
             } else {
-                listOrder.first { it.id == orderId }
+                listOrder.filter {
+                        orderFromCRM -> orderFromCRM.order_id == orderId
+                }
+                listOrder[0]
             }
         } catch (e: Exception) {
             Timber.e("error get order: $e")
             null
         }
     }
-
-//    suspend fun getOrdersList(): List<OrderCrmListItem> {
-//        return try {
-//            val order = apiWater.getOrderClient1(getAuthClient().clientId) ?: emptyList()
-//            order
-//        } catch (e: Exception) {
-//            Timber.e("error get ordersList: $e")
-//            emptyList()
-//        }
-//    }
 
     suspend fun getOrdersList(): List<OrderFromCRM> {
         return try {
@@ -368,5 +340,5 @@ class ProductRepository @Inject constructor(
         authClient.remove()
     }
 
-    private fun getAuthClient(): AuthClient = authClient.get()
+    fun getAuthClient(): AuthClient = authClient.get()
 }
