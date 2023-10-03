@@ -21,7 +21,7 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseActivity
-import ru.iwater.youwater.screen.navigation.MainStartScreen
+import ru.iwater.youwater.screen.navigation.StartScreen
 import ru.iwater.youwater.vm.AuthViewModel
 import timber.log.Timber
 import javax.inject.Inject
@@ -49,11 +49,10 @@ class StartActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         screenComponent.inject(this)
-        setContent {
-            MainStartScreen(viewModel, this)
-        }
-
         checkForAppUpdate()
+        setContent {
+            StartScreen(viewModel, this)
+        }
     }
 
     private fun checkForAppUpdate() {

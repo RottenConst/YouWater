@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:node="remove"
+        tools:ignore="QueryAllPackagesPermission"/>
+
 
     <application
         android:name=".base.App"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher_youwater"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/ym_network_security_config"
         android:roundIcon="@mipmap/ic_launcher_youwater_round"
         android:supportsRtl="true"
+        android:theme="@style/Theme.YouWater"
         android:usesCleartextTraffic="true"
-        android:hardwareAccelerated="true"
-        android:theme="@style/Theme.YouWater">
-        <service android:name=".utils.NotificationsMessagingService"
+        tools:targetApi="n">
+        <service
+            android:name=".utils.NotificationsMessagingService"
             android:exported="false">
             <intent-filter android:priority="1">
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
@@ -27,7 +35,15 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${GOOGLE_MAPS_API_KEY}" />
 
-        <activity android:name=".screen.StartActivity"
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_default_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/blue" />
+
+        <activity
+            android:name=".screen.StartActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,8 +52,12 @@
         </activity>
         <activity
             android:name=".screen.MainActivity"
-            android:exported="true"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true" />
+        <activity
+            android:name=".screen.PaymentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true" />
     </application>
 
 </manifest>
