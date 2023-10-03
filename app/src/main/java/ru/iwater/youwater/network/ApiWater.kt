@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import retrofit2.Response
 import retrofit2.http.*
 import ru.iwater.youwater.data.*
+import ru.iwater.youwater.data.payModule.MessagePay
 
 interface ApiWater {
 
@@ -17,7 +18,7 @@ interface ApiWater {
 
     @GET("favorites-list/{client_id}/")
     suspend fun getFavoriteProduct(
-        @Path("client_id") client_id: Int
+        @Path("client_id") clientId: Int
     ): Favorite?
 
     @FormUrlEncoded
@@ -30,7 +31,7 @@ interface ApiWater {
     @FormUrlEncoded
     @HTTP(method = "DELETE", path = "favorites-list/{client_id}/", hasBody = true)
     suspend fun deleteFavoriteProduct(
-        @Path("client_id") client_id: Int,
+        @Path("client_id") clientId: Int,
         @Field("product_id") productId: Int
     ): ResponseStatus?
 
@@ -59,15 +60,6 @@ interface ApiWater {
 
     @FormUrlEncoded
     @POST("sign-up/")
-    suspend fun singUp(
-        @Field("id") id: Int,
-        @Field("phone") phone: String,
-        @Field("name") name: String,
-        @Field("email") email: String
-    ): Response<JsonObject>
-
-    @FormUrlEncoded
-    @POST("sign-up/")
     suspend fun register(
         @Field("phone") phone: String,
         @Field("name") name: String,
@@ -80,25 +72,10 @@ interface ApiWater {
         @Body clientData: JsonObject
     ): Response<JsonObject>?
 
-//    @POST("OrderCreate/")
-//    suspend fun createOrder(
-//        @Body order: Order
-//    ): Response<JsonObject>
-
-    @POST("order-app/")
-    suspend fun createOrderApp(
-        @Body order: Order
-    ): Response<JsonObject>
-
     @POST("order-app/")
     suspend fun createOrder(
         @Body order: Order
     ): OrderApp?
-
-//    @GET("return_of_applications_client_id/{client_id}/")
-//    suspend fun getOrderClient(
-//        @Path("client_id") clientId: Int
-//    ): List<OrderFromCRM>?
 
     @GET("client-orders-app/{client_id}/")
     suspend fun getOrderClient(
@@ -116,11 +93,6 @@ interface ApiWater {
         @Path("client_id") clientId: Int
     ):List<RawAddress>
 
-    @GET("address_detail/{address_id}")
-    suspend fun getAddress(
-        @Path("address_id") addressId: Int
-    ): RawAddress?
-
     @POST("address/")
     suspend fun createNewAddress(
         @Body parameters: JsonObject
@@ -137,28 +109,22 @@ interface ApiWater {
         @Body parameters: JsonObject,
     ): Response<JsonObject>
 
-    @GET("status_order/{order_id}/")
-    suspend fun getStatusOrder(
-        @Path("order_id") orderId: Int
-    ): Response<List<JsonObject>>
-
     @GET("starter-eligible/{client_id}")
     suspend fun isStartPocket(
-        @Path("client_id") client_id: Int
+        @Path("client_id") clientId: Int
     ): StartPocket?
 
     @GET("promo/")
     suspend fun getPromo(): List<PromoBanner>?
 
-    @GET("last_users_order/{client_id}/")
-    suspend fun isLastOrder(
-        @Path("client_id") clientId: Int
-    ): Response<JsonObject>
-
-    @GET("OrdersInfo/{lastOrderId}/")
-    suspend fun getLastOrderInfo(
-        @Path("lastOrderId") lastOrderId: Int
-    ): OrderFromCRM?
+    @FormUrlEncoded
+    @POST("yookassa-order-mobile/")
+    suspend fun createPay(
+        @Field("amount") amount: String,
+        @Field("description") description: String,
+        @Field("payment_token") paymentToken: String,
+        @Field("capture") capture: Boolean
+    ): MessagePay?
 
     //Получить график доставки
     @POST("delivery-days/")
