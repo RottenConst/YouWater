@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 import kotlin.Exception
 
@@ -264,13 +265,21 @@ class WatterViewModel @Inject constructor(
                         popUpTo(MainNavRoute.UserDataScreen.path) { inclusive = true }
                     }
                 } else {
-                    Toast.makeText(navHostController.context, "Ошибка, данные не были отправлены", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        navHostController.context,
+                        "Ошибка, данные не были отправлены",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     navHostController.navigate(MainNavRoute.UserDataScreen.withArgs(false.toString())) {
                         popUpTo(MainNavRoute.UserDataScreen.path) { inclusive = true }
                     }
                 }
             } else {
-                Toast.makeText(navHostController.context, "Ошибка, данные не были отправлены", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    navHostController.context,
+                    "Ошибка, данные не были отправлены",
+                    Toast.LENGTH_SHORT
+                ).show()
                 navHostController.navigate(MainNavRoute.UserDataScreen.withArgs(false.toString())) {
                     popUpTo(MainNavRoute.UserDataScreen.path) { inclusive = true }
                 }
@@ -284,53 +293,41 @@ class WatterViewModel @Inject constructor(
         }
     }
 
-
-    fun getCalendar(calendar: Calendar, setDateOrder: (String) -> Unit): DatePickerDialog {
-        val thisYear = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
+    fun getStartDate(calendar: Calendar): Calendar {
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        _timesListOrder.clear()
-
-        val datePickerDialog = DatePickerDialog.newInstance({ _, year, monthOfYear, dayOfMonth ->
-            if (monthOfYear + 1 >= 10) "$dayOfMonth.${monthOfYear + 1}.$year".also {
-                setDateOrder(it)
-                _timesListOrder.addAll(getTimeList(year, monthOfYear, dayOfMonth))
-            } else "$dayOfMonth.0${monthOfYear + 1}.$year".also {
-                setDateOrder(it)
-                _timesListOrder.addAll(getTimeList(year, monthOfYear, dayOfMonth))
-            }
-        }, thisYear, month, day)
-
-        datePickerDialog.setTitle("Укажите время заказа")
-        datePickerDialog.firstDayOfWeek = Calendar.MONDAY
         val minDate = Calendar.getInstance()
-        datePickerDialog.minDate = minDate
 
-        if (hour >= 14) {
+        if (hour < 12) {
             val yearMin = minDate.get(Calendar.YEAR)
             val monthMin = minDate.get(Calendar.MONTH)
             val dayMin = minDate.get(Calendar.DAY_OF_MONTH)
-            minDate.set(yearMin, monthMin, dayMin + 1)
-            datePickerDialog.minDate = minDate
+            minDate.set(yearMin, monthMin, dayMin - 1)
+        } else if (hour in 12..15) {
+            val yearMin = minDate.get(Calendar.YEAR)
+            val monthMin = minDate.get(Calendar.MONTH)
+            val dayMin = minDate.get(Calendar.DAY_OF_MONTH)
+            minDate.set(yearMin, monthMin, dayMin, hour, 0)
+        } else {
+            val yearMin = minDate.get(Calendar.YEAR)
+            val monthMin = minDate.get(Calendar.MONTH)
+            val dayMin = minDate.get(Calendar.DAY_OF_MONTH)
+            minDate.set(yearMin, monthMin, dayMin)
         }
-
-        val maxDate = Calendar.getInstance()
-        maxDate.set(Calendar.DAY_OF_MONTH, day + 320)
-        datePickerDialog.maxDate = maxDate
-
-        disableOnDelivery(minDate, maxDate, disabledDays, exceptions, datePickerDialog)
-        return datePickerDialog
+        return minDate
     }
 
-    private fun getTimeList(year: Int, monthOfYear: Int, dayOfMonth: Int): List<String> {
+    fun getTimeList1(timeMillis: Long, minDate: Calendar) {
+        _timesListOrder.clear()
         val calendar = Calendar.getInstance()
         //дата заказа
-        calendar.set(year, monthOfYear, dayOfMonth)
+        calendar.timeInMillis = timeMillis
         val orderDate = calendar.get(Calendar.DAY_OF_WEEK) - 1
-        val date = SimpleDateFormat("yyyy-MM-dd", Locale("ru")).format(Date(calendar.timeInMillis))
+        val tomorrowDay = minDate.get(Calendar.DAY_OF_WEEK) + 1 //завтрашняя дата
+        val thisHour = minDate.get(Calendar.HOUR_OF_DAY) // который час
+        val selectDay = calendar.get(Calendar.DAY_OF_WEEK) // выбранная дата
+        val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale("ru")).format(Date(Calendar.getInstance().timeInMillis)) // сегодняшняя дата
+        val date = SimpleDateFormat("yyyy-MM-dd", Locale("ru")).format(Date(timeMillis)) // выбранная дата
         _order.value?.date = date
-
         val exception = exceptionTime.filter { it.date == date }
         val commons = deliveryTime.filter { it.day_num == orderDate }
         val times = if (commons.isNotEmpty() || exception.isNotEmpty()) {
@@ -341,96 +338,94 @@ class WatterViewModel @Inject constructor(
                 commons[0].part_types.forEach {
                     Timber.d("part_types = $it")
                 }
-                addTime(commons[0].part_types)
+                when {
+                    todayDate == date -> { //выбрана сегодняшняя дата
+                        addTime(listOf(1)) //только вечер
+                    }
+                    tomorrowDay == selectDay && thisHour < 16 -> { // если заказ на завтра и время меньше 16
+                        addTime(listOf(0, 1)) // любое время
+                    }
+                    tomorrowDay == selectDay && thisHour > 15 -> { // если заказ на завтра и время больше 16
+                        addTime(listOf(1)) // вечер
+                    }
+                    else -> {
+                        addTime(commons[0].part_types) // иначе как указано в графике
+                    }
+                }
             }
         } else emptyList()
-        return times
+        _timesListOrder.addAll(times)
     }
 
-    private fun disableOnDelivery(
-        minDate: Calendar,
-        maxDate: Calendar,
-        disabledDays: List<Common>,
-        exceptions: List<ru.iwater.youwater.data.Exception>,
-        datePickerDialog: DatePickerDialog
-    ) {
-        var loopDate = minDate
-        while (minDate.before(maxDate)) {
-            val dayOfWeek = loopDate[Calendar.DAY_OF_WEEK]
-            disabledDays.forEach { common ->
-                disableDay(common.day_num, dayOfWeek, loopDate, datePickerDialog)
-            }
-            minDate.add(Calendar.DATE, 1)
-            loopDate = minDate
-        }
-        datePickerDialog.disabledDays.forEach { calendar ->
-            val date = SimpleDateFormat("yyyy-MM-dd", Locale("ru")).format(calendar.time)
-            exceptions.forEach {
-                if (it.date == date && it.available) {
-                    calendar.clear()
+    fun disableDays(utcTimeMills: Long): Boolean {
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        calendar.timeInMillis = utcTimeMills
+        var monday = isAvailableDay(disabledDays.find { day -> day.day_num == 1 }, calendar)
+        var tuesday = isAvailableDay(disabledDays.find { day -> day.day_num == 2 }, calendar)
+        var wednesday = isAvailableDay(disabledDays.find { day -> day.day_num == 3 }, calendar)
+        var thursday = isAvailableDay(disabledDays.find { day -> day.day_num == 4 }, calendar)
+        var friday = isAvailableDay(disabledDays.find { day -> day.day_num == 5 }, calendar)
+        var saturday = isAvailableDay(disabledDays.find { day -> day.day_num == 6 }, calendar)
+        var sunday = isAvailableDay(disabledDays.find { day -> day.day_num == 7 }, calendar)
+        Timber.d("MONDAY = ${monday} TUESDAY = ${thursday} WEDNESDAY = ${wednesday} THURSDAY = ${thursday} FRIDAY = ${friday} SATURDAY = ${saturday} SUNDAY = ${sunday}")
+        exceptions.forEach { exceptionDay ->
+            if (exceptionDay.available) {
+                val date = SimpleDateFormat("yyyy-MM-dd", Locale("ru")).format(calendar.time)
+                if (date == exceptionDay.date) {
+                    val dates = date.split("-")
+                    val year = dates[0].toInt()
+                    val month = dates[1].toInt()
+                    val day = dates[2].toInt()
+                    val exceptionsDate = Calendar.getInstance()
+                    exceptionsDate.set(year, month, day)
+                    Timber.d("YEAR = $year, month = $month, day = $day")
+                    Timber.d("Exception date = ${exceptionsDate.time}")
+                    when (exceptionDay.day_num) {
+                        1 -> monday = calendar[Calendar.DAY_OF_WEEK] == Calendar.MONDAY
+                        2 -> tuesday = calendar[Calendar.DAY_OF_WEEK] == Calendar.TUESDAY
+                        3 -> wednesday = calendar[Calendar.DAY_OF_WEEK] == Calendar.WEDNESDAY
+                        4 -> thursday = calendar[Calendar.DAY_OF_WEEK] == Calendar.THURSDAY
+                        5 -> friday = calendar[Calendar.DAY_OF_WEEK] == Calendar.FRIDAY
+                        6 -> saturday = calendar[Calendar.DAY_OF_WEEK] == Calendar.SATURDAY
+                        7 -> sunday = calendar[Calendar.DAY_OF_WEEK] == Calendar.SUNDAY
+                    }
                 }
             }
         }
+
+        return monday && tuesday && wednesday && thursday && friday && saturday && sunday
     }
 
-    private fun disableDay(
-        day: Int,
-        dayOfWeek: Int,
-        loopDate: Calendar,
-        datePickerDialog: DatePickerDialog
-    ) {
-        when (day) {
-            1 -> if (dayOfWeek == Calendar.MONDAY) {
-                val disables = arrayOfNulls<Calendar>(1)
-                disables[0] = loopDate
-                datePickerDialog.disabledDays = disables
+    private fun isAvailableDay(common: Common?, calendar: Calendar): Boolean {
+        return if (common != null) {
+            if (common.available) {
+                true
+            } else {
+                when (common.day_num) {
+                    1 -> calendar[Calendar.DAY_OF_WEEK] != Calendar.MONDAY
+                    2 -> calendar[Calendar.DAY_OF_WEEK] != Calendar.TUESDAY
+                    3 -> calendar[Calendar.DAY_OF_WEEK] != Calendar.WEDNESDAY
+                    4 -> calendar[Calendar.DAY_OF_WEEK] != Calendar.THURSDAY
+                    5 -> calendar[Calendar.DAY_OF_WEEK] != Calendar.FRIDAY
+                    6 -> calendar[Calendar.DAY_OF_WEEK] != Calendar.SATURDAY
+                    7 -> calendar[Calendar.DAY_OF_WEEK] != Calendar.SUNDAY
+                    else -> {
+                        true
+                    }
+                }
             }
-
-            2 -> if (dayOfWeek == Calendar.TUESDAY) {
-                val disables = arrayOfNulls<Calendar>(1)
-                disables[0] = loopDate
-                datePickerDialog.disabledDays = disables
-            }
-
-            3 -> if (dayOfWeek == Calendar.WEDNESDAY) {
-                val disables = arrayOfNulls<Calendar>(1)
-                disables[0] = loopDate
-                datePickerDialog.disabledDays = disables
-            }
-
-            4 -> if (dayOfWeek == Calendar.THURSDAY) {
-                val disables = arrayOfNulls<Calendar>(1)
-                disables[0] = loopDate
-                datePickerDialog.disabledDays = disables
-            }
-
-            5 -> if (dayOfWeek == Calendar.FRIDAY) {
-                val disables = arrayOfNulls<Calendar>(1)
-                disables[0] = loopDate
-                datePickerDialog.disabledDays = disables
-            }
-
-            6 -> if (dayOfWeek == Calendar.SATURDAY) {
-                val disables = arrayOfNulls<Calendar>(1)
-                disables[0] = loopDate
-                datePickerDialog.disabledDays = disables
-            }
-
-            7 -> if (dayOfWeek == Calendar.SUNDAY) {
-                val disables = arrayOfNulls<Calendar>(1)
-                disables[0] = loopDate
-                datePickerDialog.disabledDays = disables
-            }
+        } else {
+            false
         }
     }
 
-    private fun addTime(part_types: List<Int>): MutableList<String> {
+    private fun addTime(partTypes: List<Int>): MutableList<String> {
         return when {
-            part_types.size == 2 -> {
+            partTypes.size == 2 -> {
                 arrayListOf("09:00-16:00", "17:00-22:00", "19:00-22:00")
             }
 
-            part_types[0] == 0 -> {
+            partTypes[0] == 0 -> {
                 arrayListOf("09:00-16:00")
             }
 
@@ -449,7 +444,7 @@ class WatterViewModel @Inject constructor(
             order.value?.addressId = address.id
             val delivery = repository.getDelivery(address)
             if (delivery != null) {
-                disabledDays.addAll(delivery.common.filter { !it.available })
+                disabledDays.addAll(delivery.common)
                 exceptions.addAll(delivery.exceptions)
                 deliveryTime.addAll(
                     delivery.common.filter { it.available }
@@ -517,7 +512,10 @@ class WatterViewModel @Inject constructor(
                 val orderId = repository.createOrderApp(order)
                 if (order.paymentType != "2") {
                     navController.navigate(
-                        MainNavRoute.CompleteOrderScreen.withArgs(orderId.toString(), false.toString())
+                        MainNavRoute.CompleteOrderScreen.withArgs(
+                            orderId.toString(),
+                            false.toString()
+                        )
                     ) {
                         popUpTo(navController.graph.startDestinationId) {
                             inclusive = false
@@ -530,13 +528,24 @@ class WatterViewModel @Inject constructor(
                     getTelNumber()
                     refreshOrder()
                     navController.clearBackStack(MainNavRoute.CreateOrderScreen.path)
-                    PaymentActivity.startGenerateToken(navController.context, orderId, orderCost, telNumber)
+                    PaymentActivity.startGenerateToken(
+                        navController.context,
+                        orderId,
+                        orderCost,
+                        telNumber
+                    )
                 }
             }
         }
     }
 
-    fun createPay(orderId: Int, amount: String, description: String, paymentToken: String, capture: Boolean) {
+    fun createPay(
+        orderId: Int,
+        amount: String,
+        description: String,
+        paymentToken: String,
+        capture: Boolean
+    ) {
         viewModelScope.launch {
             val dataPayment = repository.createPay(
                 amount, description, paymentToken, capture
@@ -546,6 +555,7 @@ class WatterViewModel @Inject constructor(
                     Timber.d("succeeded")
                     _paymentStatus.value = StatusPayment.DONE
                 }
+
                 dataPayment != null && dataPayment.data.status == "pending" -> {
                     Timber.d("Check pay")
                     _paymentStatus.value = StatusPayment.PANDING
@@ -555,6 +565,7 @@ class WatterViewModel @Inject constructor(
                     repository.setStatusPayment(orderId = orderId, parameters)
                     checkUrl = dataPayment.data.confirmation.confirmation_url
                 }
+
                 else -> {
                     errorPay()
                 }
@@ -732,9 +743,27 @@ class WatterViewModel @Inject constructor(
         viewModelScope.launch {
             val client = repository.getClientInfo()
             val newAddressParameters = JsonObject()
-            val factAddress = getFactAddress(city = city, street = street, house = house, building = building, entrance = entrance, floor = floor, flat = flat)
-            val addressJson = getJsonAddress(region = region, city = city, street = street, house = house, building = building, entrance = entrance, floor = floor, flat = flat)
-            val fullAddress = getFullAddress(region =  region, street = street, house = house, building = building)
+            val factAddress = getFactAddress(
+                city = city,
+                street = street,
+                house = house,
+                building = building,
+                entrance = entrance,
+                floor = floor,
+                flat = flat
+            )
+            val addressJson = getJsonAddress(
+                region = region,
+                city = city,
+                street = street,
+                house = house,
+                building = building,
+                entrance = entrance,
+                floor = floor,
+                flat = flat
+            )
+            val fullAddress =
+                getFullAddress(region = region, street = street, house = house, building = building)
             val address = getAddress(street = street, house = house, building = building)
             if (client != null) {
                 newAddressParameters.apply {
@@ -752,7 +781,7 @@ class WatterViewModel @Inject constructor(
                     this.add("address_json", addressJson)
                 }
                 val newAddress =
-                    if (contact.isEmpty()){
+                    if (contact.isEmpty()) {
                         newAddressParameters.addProperty("contact", client.contact)
                         repository.createAddress(
                             newAddressParameters
@@ -769,10 +798,18 @@ class WatterViewModel @Inject constructor(
                         MainNavRoute.CreateOrderScreen.withArgs(false.toString(), "0")
                     ) else navController.navigate(MainNavRoute.AddressesScreen.path)
                 } else {
-                    Toast.makeText(navController.context, "Ошибка, данные не были отправлены, возможно проблемы с интернетом", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        navController.context,
+                        "Ошибка, данные не были отправлены, возможно проблемы с интернетом",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
-                Toast.makeText(navController.context, "Не был указан корректный адрес", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    navController.context,
+                    "Не был указан корректный адрес",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -888,7 +925,7 @@ class WatterViewModel @Inject constructor(
             favoriteList?.forEach { favoriteId ->
                 products.find { it.id == favoriteId }?.let { _productsList.add(it) }
             }
-            _productsList.forEach {product ->
+            _productsList.forEach { product ->
                 product.onFavoriteClick = true
             }
             _statusData.value = StatusData.DONE
@@ -945,7 +982,7 @@ class WatterViewModel @Inject constructor(
     fun onChangeFavorite(productId: Int, onFavorite: Boolean) {
         viewModelScope.launch {
             if (onFavorite) repository.deleteFavorite(productId)
-                else repository.addToFavoriteProduct(productId)
+            else repository.addToFavoriteProduct(productId)
             _productsList.find { product -> product.id == productId }?.onFavoriteClick = !onFavorite
         }
 

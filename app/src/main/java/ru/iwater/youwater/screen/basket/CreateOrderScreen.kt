@@ -1,6 +1,8 @@
 package ru.iwater.youwater.screen.basket
 
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,10 +13,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material3.DatePicker
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -28,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
@@ -41,14 +44,21 @@ import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.WatterViewModel
 import timber.log.Timber
 import java.util.Calendar
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.rememberDatePickerState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 @Composable
 fun CreateOrderScreen(
     watterViewModel: WatterViewModel = viewModel(),
     repeatOrder: Int,
     isShowMessage: Boolean,
-    navController: NavHostController,
-    fragmentManager: FragmentManager
+    navController: NavHostController
 ) {
     watterViewModel.getClient()
     watterViewModel.getAddressList()
@@ -57,7 +67,7 @@ fun CreateOrderScreen(
     val priceNoDiscount by watterViewModel.priceNoDiscount.observeAsState()
     val generalCost by watterViewModel.generalCost.observeAsState()
     var highSize by remember {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
     val addressList by watterViewModel.addressList.observeAsState()
 
@@ -98,7 +108,7 @@ fun CreateOrderScreen(
     val order by watterViewModel.order.observeAsState()
 
     var selectedAddress by rememberSaveable {
-        mutableStateOf(-1)
+        mutableIntStateOf(-1)
     }
 
     if (isShowMessage) {
@@ -127,6 +137,10 @@ fun CreateOrderScreen(
         modifier = Modifier.fillMaxSize(),
     ) {
         val scrollState = rememberScrollState()
+        var showDatePicker by remember {
+            mutableStateOf(false)
+        }
+        val calendar = Calendar.getInstance()
         Column(
             modifier = Modifier
                 .padding(bottom = 120.dp)
@@ -152,11 +166,11 @@ fun CreateOrderScreen(
                     dateOrder = ""
                     watterViewModel.getDeliveryOnAddress(it)
                     selectedAddress = addressList?.indexOf(it) ?: -1 }},
-                showDatePickerDialog = { watterViewModel.getCalendar(
-                    calendar = Calendar.getInstance(),
-                    setDateOrder = {dateOrder = it}
-                ).show(fragmentManager, "SetDateDialog") }
+                showDatePickerDialog = {
+                    showDatePicker = true
+                }
             )
+            ShowDatePickerDialog(showDatePicker = showDatePicker, watterViewModel = watterViewModel, setShowDatePicker = {showDatePicker = it}, calendar = calendar, setDateOrder = {dateOrder = it})
             if (dateOrder.isNotEmpty()) {
                 Timber.d("Date Order = $order")
                 SetTimeOrderCard(
@@ -277,36 +291,12 @@ fun AddressAndTimeOrder(
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "",
                     tint = Color.LightGray,
                 )
             }
             if (selectedAddress != -1) {
-//                if (!addressList[selectedAddress].notice.isNullOrEmpty()) {
-//                    Divider(color = Color.LightGray, thickness = 1.dp)
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(8.dp),
-//                        horizontalArrangement = Arrangement.SpaceBetween,
-//                        verticalAlignment = Alignment.CenterVertically
-//                    ) {
-//                        Icon(
-//                            modifier = Modifier.padding(end = 8.dp),
-//                            imageVector = Icons.Outlined.Edit,
-//                            tint = Blue500,
-//                            contentDescription = stringResource(id = R.string.info_product)
-//                        )
-//                        Text(
-//                            text = "Комментарий к адресу: ${addressList[selectedAddress].notice}",
-//                            style = YouWaterTypography.body1,
-//                            textAlign = TextAlign.Center,
-//                            color = Blue500,
-//                            modifier = Modifier.weight(1f)
-//                        )
-//                    }
-//                }
                 Divider(color = Color.LightGray, thickness = 1.dp)
                 Row(
                     modifier = Modifier
@@ -329,7 +319,7 @@ fun AddressAndTimeOrder(
                         color = Blue500
                     )
                     Icon(
-                        imageVector = Icons.Rounded.KeyboardArrowRight,
+                        imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                         contentDescription = "",
                         tint = Color.LightGray
                     )
@@ -493,7 +483,7 @@ fun DetailsOrder(highSize: Int, products: List<Product>, minusCount: (Product) -
             items(products.size) {index ->
                 val product = products[index]
                 var count by remember {
-                    mutableStateOf(product.count)
+                    mutableIntStateOf(product.count)
                 }
                 ItemProductInOrder(
                     productName = product.name,
@@ -539,7 +529,9 @@ fun ItemProductInOrder(
                     text = productName,
                     style = YouWaterTypography.caption,
                     textAlign = TextAlign.Start,
-                    modifier = Modifier.width(156.dp).weight(1f)
+                    modifier = Modifier
+                        .width(156.dp)
+                        .weight(1f)
                 )
                 IconButton(onClick = { minusCount() }) {
                     Icon(
@@ -640,6 +632,65 @@ fun TypePayCard(typesPayOrder: List<String>, selectedPay: String, expandedPay: B
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShowDatePickerDialog(showDatePicker: Boolean, watterViewModel: WatterViewModel, setShowDatePicker: (Boolean) -> Unit, calendar: Calendar, setDateOrder: (String) -> Unit) {
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = calendar.timeInMillis,
+        selectableDates = object : SelectableDates {
+            @RequiresApi(Build.VERSION_CODES.N)
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val calendar1 = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                calendar1.timeInMillis = utcTimeMillis
+                return watterViewModel.disableDays(utcTimeMillis) &&
+                        (utcTimeMillis >= watterViewModel.getStartDate(calendar).timeInMillis)
+            }
+        }
+    )
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = {
+                  setShowDatePicker(false)
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    setShowDatePicker(false)
+                    val formatter = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+                    watterViewModel.getTimeList1(datePickerState.selectedDateMillis ?: 0, watterViewModel.getStartDate(
+                        Calendar.getInstance()))
+                    setDateOrder(formatter.format(Date(datePickerState.selectedDateMillis ?: 0)))
+                }) {
+                    Text(text = "Выбрать")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    setShowDatePicker(false)
+                }) {
+                    Text(text = "Отмена")
+                }
+            }
+        ) {
+            DatePicker(
+                state = datePickerState,
+                title =  {
+                         Text(
+                             text = "Выберете дату доставки",
+                             modifier = Modifier.padding(
+                                 PaddingValues(
+                                     start = 24.dp,
+                                     end = 12.dp,
+                                     top = 16.dp
+                                 )
+                             )
+                         )
+                },
+                showModeToggle = false
+            )
+        }
+    }
+}
+
 @Composable
 fun GetCommentCard(commentOrder: String, setComment: (String) -> Unit) {
     Surface(
@@ -682,11 +733,11 @@ fun CreateOrderScreenPreview() {
         )
     }.toMutableStateList()
     var generalPrice by remember {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
 
     val highSize by rememberSaveable {
-        mutableStateOf(72*productsList.size)
+        mutableIntStateOf(72*productsList.size)
     }
     productsList.forEach {product ->
         generalPrice += product.getPriceOnCount(product.count)

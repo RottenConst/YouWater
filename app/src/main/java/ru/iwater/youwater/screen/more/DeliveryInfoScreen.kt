@@ -45,7 +45,7 @@ fun DeliveryInfoScreen() {
         "На следующий день",
         "В пригороды"
     )
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(pageCount = {3})
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabLayout(tabData = tabData, pagerState = pagerState)
@@ -339,7 +339,7 @@ fun TabLayout(tabData: List<String>, pagerState: PagerState){
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TabContent(tabData: List<String>, pagerState: PagerState){
-    HorizontalPager(state = pagerState, pageCount = tabData.size) { index ->
+    HorizontalPager(state = pagerState) { index ->
         when(index) {
             0 -> {
                 DeliveryInfoTwoHour(modifier = Modifier)

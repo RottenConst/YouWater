@@ -2,7 +2,6 @@ package ru.iwater.youwater.screen.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -45,7 +44,7 @@ fun MainNavGraph(modifier: Modifier = Modifier, navController: NavHostController
         addProductByCategoryScreen(watterViewModel, navController, this)
 
         addBasketScreen(watterViewModel, navController, this)
-        addCreateOrderScreen(watterViewModel, mainActivity.supportFragmentManager, navController, this)
+        addCreateOrderScreen(watterViewModel, navController, this)
         addCompleteOrderScreen(watterViewModel = watterViewModel, navController = navController, navGraphBuilder = this)
 
         addProfileScreen(watterViewModel, navController, this)
@@ -144,7 +143,6 @@ private fun addBasketScreen(
 
 private fun addCreateOrderScreen(
     watterViewModel: WatterViewModel,
-    fragmentManager: FragmentManager,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
@@ -167,7 +165,6 @@ private fun addCreateOrderScreen(
             repeatOrder = args?.getInt(MainNavRoute.CreateOrderScreen.lastOrderId)!!,
             isShowMessage = args.getBoolean(MainNavRoute.CreateOrderScreen.isShowMessage),
             navController = navController,
-            fragmentManager = fragmentManager
         )
     }
 }
