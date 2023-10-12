@@ -53,11 +53,11 @@ fun HomeScreen(
     var bannerName by remember {
         mutableStateOf("")
     }
-    var bannerDiscription by remember {
+    var bannerDescription by remember {
         mutableStateOf("")
     }
     val promoListState = rememberLazyListState()
-    val productsList = watterViewModel.productList
+    val productsList by watterViewModel.productList.observeAsState()
     var itemBanner = 0
 
     val sheetState = rememberModalBottomSheetState(
@@ -72,7 +72,7 @@ fun HomeScreen(
     ModalBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
-            BannerInfoScreen(namePromo = bannerName, promoDescription = bannerDiscription)
+            BannerInfoScreen(namePromo = bannerName, promoDescription = bannerDescription)
         }
     ) {
 
@@ -96,14 +96,14 @@ fun HomeScreen(
             Column(modifier = Modifier.padding(paddingValues)) {
                 PromoAction(promo = promoBanner, promoListState) {
                     bannerName = it?.name ?: ""
-                    bannerDiscription = it?.description ?: ""
+                    bannerDescription = it?.description ?: ""
                     showModalSheet.value = !showModalSheet.value
                     scope.launch {
                         sheetState.show()
                     }
 
                 }
-                if (productsList.isEmpty()) {
+                if (productsList?.isEmpty() == true) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -113,7 +113,7 @@ fun HomeScreen(
                 } else {
                     ProductContent(
                         catalogList = watterViewModel.catalogList,
-                        productsList = productsList,
+                        productsList = productsList ?: emptyList(),
                         getAboutProduct = {
                             navController.navigate(MainNavRoute.AboutProductScreen.withArgs(it.toString()))
                         },
@@ -443,7 +443,9 @@ fun ProductCost(id: Int, minPrice: Int, nameProduct: String, prices: List<String
                     items(prices.size) { itemIndex ->
                         val price = prices[itemIndex].split(":")
                         Row(
-                            modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             if (price.first() == "1") {

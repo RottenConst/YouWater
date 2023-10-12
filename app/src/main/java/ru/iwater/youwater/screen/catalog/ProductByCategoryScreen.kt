@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,29 +25,32 @@ fun ProductByCategory(
     catalogId: Int,
     navController: NavHostController
 ) {
+    val productsList by watterViewModel.productList.observeAsState()
     val modifier = Modifier
     Column {
         CatalogName(
             name = watterViewModel.catalogList.find { typeProduct -> typeProduct.id == catalogId }?.category ?: "",
             modifier = modifier.padding(start = 16.dp, top = 16.dp)
         )
-        ProductGrid(
-            modifier = modifier,
-            productsList = watterViewModel.productList.filter { product -> product.category == catalogId },
-            countGrid = 2,
-            getAboutProduct = {
-                navController.navigate(
-                    MainNavRoute.AboutProductScreen.withArgs(it.toString())
-                )
-            },
-            addProductInBasket = { watterViewModel.addProductToBasket(it) },
-            onCheckedFavorite = { product, isFavorite ->
-                watterViewModel.onChangeFavorite(
-                    productId = product.id,
-                    isFavorite
-                )
-            }
-        )
+        productsList?.filter { product -> product.category == catalogId }?.let {
+            ProductGrid(
+                modifier = modifier,
+                productsList = it,
+                countGrid = 2,
+                getAboutProduct = {
+                    navController.navigate(
+                        MainNavRoute.AboutProductScreen.withArgs(it.toString())
+                    )
+                },
+                addProductInBasket = { watterViewModel.addProductToBasket(it) },
+                onCheckedFavorite = { product, isFavorite ->
+                    watterViewModel.onChangeFavorite(
+                        productId = product.id,
+                        isFavorite
+                    )
+                }
+            )
+        }
     }
 }
 

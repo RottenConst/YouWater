@@ -37,7 +37,7 @@ fun FavoriteScreen(
     LaunchedEffect(Unit) {
         watterViewModel.getFavoriteProductList()
     }
-
+    val favoriteProductList by watterViewModel.favoriteProductList.observeAsState()
     val modifier = Modifier
     val statusData by watterViewModel.statusData.observeAsState()
     when (statusData) {
@@ -49,14 +49,14 @@ fun FavoriteScreen(
             }
         }
         StatusData.DONE -> {
-            if (watterViewModel.productList.isNotEmpty()) {
+            if (favoriteProductList?.isNotEmpty() == true) {
                 Column(modifier = modifier
                     .fillMaxSize()
                     .padding(16.dp)) {
                     CatalogName(name = stringResource(id = R.string.general_favorite), modifier = modifier)
                     ProductGrid(
                         modifier = modifier,
-                        productsList = watterViewModel.productList,
+                        productsList = favoriteProductList ?: emptyList(),
                         countGrid = 2,
                         getAboutProduct = {
                             navController.navigate(

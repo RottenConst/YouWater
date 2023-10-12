@@ -103,10 +103,8 @@ class ProductRepository @Inject constructor(
      */
     suspend fun getProductList(): List<Product> {
         return try {
-            val productList = apiWater.getProductList()
-            if (productList.isNotEmpty()) {
-                productList.filter { it.app == 1 }
-            } else emptyList()
+            val productList = apiWater.getProductList().filter { it.app == 1 }
+            productList.ifEmpty { emptyList() }
         } catch (e: Exception) {
             Timber.e("Error get product list: $e")
             emptyList()

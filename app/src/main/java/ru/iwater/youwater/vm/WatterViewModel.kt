@@ -6,7 +6,6 @@ import androidx.lifecycle.*
 import androidx.navigation.NavHostController
 import com.google.gson.JsonObject
 import com.pusher.pushnotifications.PushNotifications
-import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.di.components.OnScreen
@@ -41,13 +40,16 @@ class WatterViewModel @Inject constructor(
     private val _statusData: MutableLiveData<StatusData> = MutableLiveData()
     val statusData: LiveData<StatusData> get() = _statusData
 
-    private val _productsList = listOf<Product>().toMutableStateList()
-    val productList: List<Product>
+    private var _productsList: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
+    val productList: LiveData<List<Product>>
         get() = _productsList
 
     private val _catalogList = listOf<TypeProduct>().toMutableStateList()
     val catalogList: List<TypeProduct>
         get() = _catalogList
+
+    private val _favoriteProductList: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
+    val favoriteProductList: LiveData<List<Product>> get() = _favoriteProductList
 
     //продукт
     private val _product: MutableLiveData<Product?> = MutableLiveData()
@@ -147,12 +149,12 @@ class WatterViewModel @Inject constructor(
 
     fun getProductsList() {
         viewModelScope.launch {
-            _productsList.clear()
             val favoriteList = repository.getFavorite()?.favorites_list?.map { it.toInt() }
-            _productsList.addAll(repository.getProductList())
-            _productsList.forEach{ product ->
+            val productsList = repository.getProductList()
+            productsList.forEach{ product ->
                 product.onFavoriteClick = favoriteList?.contains(product.id) == true
             }
+            _productsList.value = productsList
         }
     }
 
@@ -918,16 +920,17 @@ class WatterViewModel @Inject constructor(
 
     fun getFavoriteProductList() {
         viewModelScope.launch {
-            _productsList.clear()
+            val favoriteProductList = _favoriteProductList.value?.toMutableStateList()
             _statusData.value = StatusData.LOAD
             val favoriteList = repository.getFavorite()?.favorites_list?.map { it.toInt() }
             val products = repository.getProductList()
             favoriteList?.forEach { favoriteId ->
-                products.find { it.id == favoriteId }?.let { _productsList.add(it) }
+                products.find { it.id == favoriteId }?.let { favoriteProductList?.add(it) }
             }
-            _productsList.forEach { product ->
+            favoriteProductList?.forEach { product ->
                 product.onFavoriteClick = true
             }
+            _favoriteProductList.value = favoriteProductList ?: emptyList()
             _statusData.value = StatusData.DONE
         }
     }
@@ -981,9 +984,11 @@ class WatterViewModel @Inject constructor(
 
     fun onChangeFavorite(productId: Int, onFavorite: Boolean) {
         viewModelScope.launch {
+            val productsList = _productsList.value
             if (onFavorite) repository.deleteFavorite(productId)
             else repository.addToFavoriteProduct(productId)
-            _productsList.find { product -> product.id == productId }?.onFavoriteClick = !onFavorite
+            productsList?.find { product -> product.id == productId }?.onFavoriteClick = !onFavorite
+            _productsList.value = productsList ?: emptyList()
         }
 
     }
