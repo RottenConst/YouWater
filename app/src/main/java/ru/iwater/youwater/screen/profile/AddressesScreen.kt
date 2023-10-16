@@ -8,16 +8,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.sharp.Close
 import androidx.compose.material.icons.sharp.LocationOn
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -79,14 +86,20 @@ fun AddressesScreen(
 
 @Composable
 fun AddressCard(modifier: Modifier, address: String, notice: String?, deleteAddress: () -> Unit) {
+    var isVisibleDialog by remember {
+        mutableStateOf(false)
+    }
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
-       Column(modifier = modifier.fillMaxWidth()) {
+        DeleteAddressDialog(isVisible = isVisibleDialog, setVisible = {isVisibleDialog = !isVisibleDialog}) {
+            deleteAddress()
+        }
+        Column(modifier = modifier.fillMaxWidth()) {
            Row(modifier = modifier
                .padding(8.dp)
                .fillMaxWidth(),
@@ -108,7 +121,7 @@ fun AddressCard(modifier: Modifier, address: String, notice: String?, deleteAddr
                        .weight(1f)
                        .padding(4.dp)
                )
-               IconButton(onClick = { deleteAddress() }) {
+               IconButton(onClick = { isVisibleDialog = true }) {
                    Icon(
                        imageVector = Icons.Sharp.Close,
                        contentDescription = "",
@@ -118,7 +131,7 @@ fun AddressCard(modifier: Modifier, address: String, notice: String?, deleteAddr
                }
            }
            if (!notice.isNullOrEmpty()) {
-               Divider(modifier = modifier, color = Color.LightGray, 1.dp)
+               HorizontalDivider(modifier = modifier, color = Color.LightGray, thickness = 1.dp)
                Text(
                    text = notice,
                    textAlign = TextAlign.Start,
@@ -132,13 +145,47 @@ fun AddressCard(modifier: Modifier, address: String, notice: String?, deleteAddr
     }
 }
 
+@Composable
+fun DeleteAddressDialog(isVisible: Boolean, setVisible: (Boolean) -> Unit, deleteDialog: () -> Unit) {
+    if (isVisible) {
+        AlertDialog(
+            icon = {
+                Icon(imageVector = Icons.Filled.Delete, contentDescription = "Удалить адрес", tint = Blue500 )
+            },
+            title = {
+                Text(text = "Удалить адрес?")
+            },
+            onDismissRequest = { setVisible(false) },
+            dismissButton = {
+                TextButton(onClick = { setVisible(false) }) {
+                    Text(text = "Нет", color = Blue500)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    setVisible(false)
+                    deleteDialog()
+                }) {
+                    Text(text = "Да", color = Blue500)
+                }
+            }
+        )
+    }
+}
+
 @Preview
 @Composable
 fun AddressesScreenPreview() {
     val modifier = Modifier
     YourWaterTheme {
         Column(modifier = modifier.fillMaxSize()) {
-            MenuButton(modifier = modifier, painter = painterResource(id = R.drawable.ic_black_place), tint = Color.Black, fontWeight = FontWeight.Bold, nameButton = stringResource(id = R.string.fragment_add_address_label), description = "") {
+            MenuButton(
+                modifier = modifier,
+                painter = painterResource(id = R.drawable.ic_black_place),
+                tint = Color.Black,
+                fontWeight = FontWeight.Bold,
+                nameButton = stringResource(id = R.string.fragment_add_address_label), description = ""
+            ) {
                 
             }
             AddressCard(modifier = modifier, "Питер , Некрасова , д. 1, корп. 2, подъезд 3, этаж 4, кв. 5", notice = "Примичание"){}
