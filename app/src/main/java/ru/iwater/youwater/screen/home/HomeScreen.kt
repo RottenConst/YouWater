@@ -8,7 +8,26 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,7 +60,7 @@ import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.WatterViewModel
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     watterViewModel: WatterViewModel = viewModel(),
@@ -57,39 +76,66 @@ fun HomeScreen(
         mutableStateOf("")
     }
     val promoListState = rememberLazyListState()
+    val productsListState = rememberLazyListState()
     val productsList by watterViewModel.productList.observeAsState()
     var itemBanner = 0
 
-    val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden
+    var skipPartiallyExpanded by remember { mutableStateOf(false) }
+    val bottomSheet = rememberModalBottomSheetState(
+        skipPartiallyExpanded = skipPartiallyExpanded
     )
     val showModalSheet = rememberSaveable {
         mutableStateOf(false)
     }
-    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+    val expandedFab by remember {
+        derivedStateOf {
+            productsListState.firstVisibleItemIndex == 0
+        }
+    }
     val scope = rememberCoroutineScope()
 
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
-        sheetContent = {
-            BannerInfoScreen(namePromo = bannerName, promoDescription = bannerDescription)
-        }
-    ) {
+    if (skipPartiallyExpanded) {
+        ModalBottomSheet(
+            sheetState = bottomSheet,
+            onDismissRequest = {
+                skipPartiallyExpanded = false
+            },
+            windowInsets = BottomSheetDefaults.windowInsets,
+            content = {
+                BannerInfoScreen(namePromo = bannerName, promoDescription = bannerDescription)
+            }
+        )
+    }
 
         Scaffold(
-            scaffoldState = scaffoldState,
+            snackbarHost = {
+                SnackbarHost(snackbarHostState) { snackbarData ->
+                    Snackbar(snackbarData = snackbarData, actionColor = Blue500)
+                }
+            },
             floatingActionButton = {
                 if (lastOrder != null) {
-                    FloatingActionButton(onClick = {
-                        navController.navigate(
-                            MainNavRoute.CreateOrderScreen.withArgs(false.toString(), lastOrder.toString())
-                        )
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_basket_icon),
-                            contentDescription = "Повторить последний заказ"
-                        )
-                    }
+                    ExtendedFloatingActionButton(
+                        onClick = {
+                            navController.navigate(
+                                MainNavRoute.CreateOrderScreen.withArgs(false.toString(), lastOrder.toString())
+                            )
+                        },
+                        expanded = expandedFab,
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Outlined.ShoppingCart,
+                                contentDescription =  "Повторить последний заказ"
+                            ) },
+                        text = {
+                               Text(text = "Повторить последний заказ")
+                        },
+                        contentColor = Color.White,
+                        containerColor = Blue500
+                    )
                 }
             })
         {paddingValues ->
@@ -99,7 +145,7 @@ fun HomeScreen(
                     bannerDescription = it?.description ?: ""
                     showModalSheet.value = !showModalSheet.value
                     scope.launch {
-                        sheetState.show()
+                        skipPartiallyExpanded = !skipPartiallyExpanded
                     }
 
                 }
@@ -108,23 +154,25 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = Blue500)
                     }
                 } else {
                     ProductContent(
                         catalogList = watterViewModel.catalogList,
                         productsList = productsList ?: emptyList(),
+                        productsListState = productsListState,
                         getAboutProduct = {
                             navController.navigate(MainNavRoute.AboutProductScreen.withArgs(it.toString()))
                         },
-                        addProductInBasket = {
-                            watterViewModel.addProductToBasket(it)
+                        addProductInBasket = { product ->
+                            watterViewModel.addProductToBasket(product)
                             scope.launch {
-                                val result = scaffoldState.snackbarHostState.showSnackbar(
-                                    message = "${it.app_name} добавлен в корзину",
-                                    actionLabel = "Корзина"
+                                val messageAddProduct = snackbarHostState.showSnackbar(
+                                    message = "${product.name} добавлен в корзину",
+                                    actionLabel = "Корзина",
+                                    duration = SnackbarDuration.Short
                                 )
-                                when (result) {
+                                when (messageAddProduct) {
                                     SnackbarResult.ActionPerformed -> {
                                         navController.navigate(MainNavRoute.BasketScreen.path)
                                     }
@@ -142,7 +190,6 @@ fun HomeScreen(
                 }
             }
         }
-    }
 
     LaunchedEffect(Unit) {
         watterViewModel.viewModelScope.launch {
@@ -170,7 +217,7 @@ fun CatalogName(name: String, modifier: Modifier) {
         modifier = modifier,
         text = name,
         style = YouWaterTypography.h6,
-        fontWeight = FontWeight.Bold
+        fontWeight = FontWeight.Bold,
     )
 }
 
@@ -178,11 +225,12 @@ fun CatalogName(name: String, modifier: Modifier) {
 fun ProductContent(
     catalogList: List<TypeProduct>,
     productsList: List<Product>,
+    productsListState: LazyListState,
     addProductInBasket: (Product) -> Unit,
     getAboutProduct: (Int) -> Unit,
     onCheckedFavorite: (Product, Boolean) -> Unit
 ) {
-    LazyColumn {
+    LazyColumn (state = productsListState) {
         items(catalogList.size) { catalogIndex ->
             ProductsByCategoryRow(
                 categoryName = catalogList[catalogIndex].category,
@@ -287,14 +335,20 @@ fun PromoAction(
             .height(182.dp),
         color = Blue500,
         shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            CatalogName(name = "Акции", Modifier.padding(8.dp))
+            Text(
+                modifier = Modifier.padding(8.dp),
+                text = "Акции",
+                style = YouWaterTypography.h6,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
             PromoImage(banners = promo, listState, getInfoBanner)
         }
     }
@@ -313,7 +367,7 @@ fun ProductCard(
             .height(200.dp)
             .padding(8.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         Box(
             modifier = Modifier
@@ -433,8 +487,7 @@ fun ProductCost(id: Int, minPrice: Int, nameProduct: String, prices: List<String
         AlertDialog(
             onDismissRequest = { openDialog = false },
             title = {
-                Text(
-                    text = nameProduct,
+                Text(text = nameProduct,
                     textAlign = TextAlign.Center
                 )
                     },
@@ -467,14 +520,8 @@ fun ProductCost(id: Int, minPrice: Int, nameProduct: String, prices: List<String
                     }
                 }
             },
-            buttons = {
-                Button(
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp)
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    onClick = { openDialog = false }
-                ) {
+            confirmButton = {
+                TextButton(onClick = { openDialog = false }) {
                     Text(text = stringResource(id = R.string.general_ok))
                 }
             }
@@ -500,8 +547,8 @@ fun ProductCost(id: Int, minPrice: Int, nameProduct: String, prices: List<String
             ) {
                 Text(
                     text = when (id) {
-                        81 -> "от ${minPrice - 30}₽"
-                        84 -> "от ${minPrice - 30}₽"
+                        81 -> "от ${minPrice - 15}₽"
+                        84 -> "от ${minPrice - 15}₽"
                         else -> "от ${minPrice}₽"
                     },
                     color = Blue500,
