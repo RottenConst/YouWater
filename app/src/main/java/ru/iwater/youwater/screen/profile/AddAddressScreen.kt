@@ -34,7 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PlatformImeOptions
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -159,7 +161,7 @@ fun AddAddressScreen(
                         SetNotice(notice = notice, setNotice = {notice = it})
                         isEnabledButton = selectRegion != "Выберете регион" && city.isNotEmpty() && street.isNotEmpty() && house.isNotEmpty()
                         ButtonEnter(text = stringResource(id = R.string.fragment_create_order_add_address_to_order), isEnabledButton = isEnabledButton) {
-
+                            isVisibleDialog = true
                         }
                     }
                 }
@@ -235,7 +237,6 @@ fun SetRegion(
                         },
                         text = {
                             Text(
-//                            modifier = Modifier.fillMaxWidth(),
                                 text = region,
                                 style = YouWaterTypography.body1
                             )
@@ -274,8 +275,10 @@ fun SetCity(city: String, setCity: (String) -> Unit) {
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
             focusedLabelColor = Blue500,
-            focusedTextColor = Blue500
-        )
+            focusedTextColor = Blue500,
+            cursorColor = Blue500
+        ),
+        maxLines = 1
     )
 }
 
@@ -296,8 +299,10 @@ fun SetStreet(street: String, setStreet: (String) -> Unit) {
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
-            focusedLabelColor = Blue500
-        )
+            focusedLabelColor = Blue500,
+            cursorColor = Blue500
+        ),
+        maxLines = 1
     )
 }
 
@@ -319,8 +324,10 @@ fun SetHome(home: String, setHome: (String) -> Unit) {
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
-            focusedLabelColor = Blue500
-        )
+            focusedLabelColor = Blue500,
+            cursorColor = Blue500
+        ),
+        maxLines = 1
     )
 }
 
@@ -341,8 +348,10 @@ fun SetStructure(structure: String, setStructure: (String) -> Unit) {
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
-            focusedLabelColor = Blue500
-        )
+            focusedLabelColor = Blue500,
+            cursorColor = Blue500
+        ),
+        maxLines = 1
     )
 }
 
@@ -364,8 +373,10 @@ fun SetEntrance(entrance: String, setEntrance: (String) -> Unit) {
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
-            focusedLabelColor = Blue500
-        )
+            focusedLabelColor = Blue500,
+            cursorColor = Blue500
+        ),
+        maxLines = 1
     )
 }
 
@@ -387,8 +398,10 @@ fun SetApartment(apartment: String, setApartment: (String) -> Unit) {
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
-            focusedLabelColor = Blue500
-        )
+            focusedLabelColor = Blue500,
+            cursorColor = Blue500
+        ),
+        maxLines = 1
     )
 }
 
@@ -410,8 +423,10 @@ fun SetFloor(floor: String, setFloor: (String) -> Unit) {
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
-            focusedLabelColor = Blue500
-        )
+            focusedLabelColor = Blue500,
+            cursorColor = Blue500
+        ),
+        maxLines = 1
     )
 }
 
@@ -433,7 +448,8 @@ fun SetNotice(notice: String, setNotice: (String) -> Unit) {
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
-            focusedLabelColor = Blue500
+            focusedLabelColor = Blue500,
+            cursorColor = Blue500
         )
     )
 }
