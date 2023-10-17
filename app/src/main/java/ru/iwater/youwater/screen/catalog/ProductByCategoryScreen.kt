@@ -5,6 +5,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -12,10 +18,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.screen.home.CatalogName
 import ru.iwater.youwater.screen.home.ProductCard
 import ru.iwater.youwater.screen.navigation.MainNavRoute
+import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.WatterViewModel
 
@@ -27,31 +35,59 @@ fun ProductByCategory(
 ) {
     val productsList by watterViewModel.productList.observeAsState()
     val modifier = Modifier
-    Column {
-        CatalogName(
-            name = watterViewModel.catalogList.find { typeProduct -> typeProduct.id == catalogId }?.category ?: "",
-            modifier = modifier.padding(start = 16.dp, top = 16.dp)
-        )
-        productsList?.filter { product -> product.category == catalogId }?.let {
-            ProductGrid(
-                modifier = modifier,
-                productsList = it,
-                countGrid = 2,
-                getAboutProduct = {
-                    navController.navigate(
-                        MainNavRoute.AboutProductScreen.withArgs(it.toString())
-                    )
-                },
-                addProductInBasket = { watterViewModel.addProductToBasket(it) },
-                onCheckedFavorite = { product, isFavorite ->
-                    watterViewModel.onChangeFavorite(
-                        productId = product.id,
-                        isFavorite
-                    )
-                }
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+    val scope = rememberCoroutineScope()
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) {
+                snackbarData ->
+                Snackbar(snackbarData = snackbarData, actionColor = Blue500)
+            }
+        }
+    ) { paddingValues ->
+        Column(modifier = modifier.padding(paddingValues)) {
+            CatalogName(
+                name = watterViewModel.catalogList.find { typeProduct -> typeProduct.id == catalogId }?.category ?: "",
+                modifier = modifier.padding(start = 16.dp, top = 16.dp)
             )
+            productsList?.filter { product -> product.category == catalogId }?.let {
+                ProductGrid(
+                    modifier = modifier,
+                    productsList = it,
+                    countGrid = 2,
+                    getAboutProduct = {
+                        navController.navigate(
+                            MainNavRoute.AboutProductScreen.withArgs(it.toString())
+                        )
+                    },
+                    addProductInBasket = { product ->
+                        watterViewModel.addProductToBasket(product = product)
+                        scope.launch {
+                            val messageAddProduct = snackbarHostState.showSnackbar(
+                                message = "${product.name} добавлен в корзину",
+                                actionLabel = "Корзина",
+                                duration = SnackbarDuration.Short
+                            )
+                            when (messageAddProduct) {
+                                SnackbarResult.ActionPerformed -> {
+                                    navController.navigate(MainNavRoute.BasketScreen.path)
+                                }
+                                else -> {}
+                            }
+                        } },
+                    onCheckedFavorite = { product, isFavorite ->
+                        watterViewModel.onChangeFavorite(
+                            productId = product.id,
+                            isFavorite
+                        )
+                    }
+                )
+            }
         }
     }
+
 }
 
 @Composable
