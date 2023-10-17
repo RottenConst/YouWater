@@ -920,17 +920,17 @@ class WatterViewModel @Inject constructor(
 
     fun getFavoriteProductList() {
         viewModelScope.launch {
-            val favoriteProductList = _favoriteProductList.value?.toMutableStateList()
+            val favoriteProductList = mutableListOf<Product>()
             _statusData.value = StatusData.LOAD
             val favoriteList = repository.getFavorite()?.favorites_list?.map { it.toInt() }
             val products = repository.getProductList()
             favoriteList?.forEach { favoriteId ->
-                products.find { it.id == favoriteId }?.let { favoriteProductList?.add(it) }
+                products.find { it.id == favoriteId }?.let { favoriteProductList.add(it) }
             }
-            favoriteProductList?.forEach { product ->
+            favoriteProductList.forEach { product ->
                 product.onFavoriteClick = true
             }
-            _favoriteProductList.value = favoriteProductList ?: emptyList()
+            _favoriteProductList.value = favoriteProductList
             _statusData.value = StatusData.DONE
         }
     }

@@ -4,12 +4,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -19,11 +20,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.Product
 import ru.iwater.youwater.screen.catalog.ProductGrid
 import ru.iwater.youwater.screen.home.CatalogName
 import ru.iwater.youwater.screen.navigation.MainNavRoute
+import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.utils.StatusData
 import ru.iwater.youwater.vm.WatterViewModel
@@ -37,6 +40,7 @@ fun FavoriteScreen(
     LaunchedEffect(Unit) {
         watterViewModel.getFavoriteProductList()
     }
+    val scope = rememberCoroutineScope()
     val favoriteProductList by watterViewModel.favoriteProductList.observeAsState()
     val modifier = Modifier
     val statusData by watterViewModel.statusData.observeAsState()
@@ -45,7 +49,7 @@ fun FavoriteScreen(
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = Blue500)
             }
         }
         StatusData.DONE -> {
@@ -66,6 +70,9 @@ fun FavoriteScreen(
                         addProductInBasket = {watterViewModel.addProductToBasket(it)},
                         onCheckedFavorite = { product, isFavorite ->
                             watterViewModel.onChangeFavorite(productId = product.id, isFavorite)
+                            scope.launch {
+                                watterViewModel.getFavoriteProductList()
+                            }
                         }
                     )
                 }
