@@ -127,6 +127,7 @@ class WatterViewModel @Inject constructor(
 
     private var telNumber = ""
     private var checkUrl = ""
+    private var idOrderPay = ""
 
     init {
         getCatalogList()
@@ -318,7 +319,7 @@ class WatterViewModel @Inject constructor(
         return minDate
     }
 
-    fun getTimeList1(timeMillis: Long, minDate: Calendar) {
+    fun getTimeList(timeMillis: Long, minDate: Calendar) {
         _timesListOrder.clear()
         val calendar = Calendar.getInstance()
         //дата заказа
@@ -566,6 +567,7 @@ class WatterViewModel @Inject constructor(
                     parameters.addProperty("updated_acq", dataPayment.data.id)
                     repository.setStatusPayment(orderId = orderId, parameters)
                     checkUrl = dataPayment.data.confirmation.confirmation_url
+                    idOrderPay = dataPayment.data.payment_method.id
                 }
 
                 else -> {
@@ -576,10 +578,23 @@ class WatterViewModel @Inject constructor(
     }
 
     fun setPaymentStatus(navController: NavHostController) {
-        _paymentStatus.value = StatusPayment.DONE
-        navController.navigate(
-            PaymentNavRoute.CompleteOrderScreen.path
-        )
+        viewModelScope.launch {
+            Timber.d("start Get order pay $idOrderPay")
+            val resultPay = repository.getOrderPayStatus(idOrderPay)
+            if (resultPay) {
+                _paymentStatus.value = StatusPayment.DONE
+                navController.navigate(
+                    PaymentNavRoute.CompleteOrderScreen.path
+                )
+            }
+            else {
+                _paymentStatus.value = StatusPayment.ERROR
+                navController.navigate(
+                    PaymentNavRoute.CompleteOrderScreen.path
+                )
+            }
+
+        }
     }
 
     fun getCheckUrl() = checkUrl

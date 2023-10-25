@@ -11,14 +11,15 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,8 +46,21 @@ import ru.iwater.youwater.vm.WatterViewModel
 import timber.log.Timber
 import java.util.Calendar
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -222,7 +236,7 @@ fun ClientInfoCard(name: String, telNumber: String) {
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         Column(
             modifier = Modifier
@@ -257,7 +271,7 @@ fun AddressAndTimeOrder(
             .padding(horizontal = 16.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         Column {
             Row(
@@ -282,7 +296,9 @@ fun AddressAndTimeOrder(
                     } else {
                         when (selectedAddress) {
                             -1 -> "Выбрать адрес"
-                            else -> addressList[selectedAddress].factAddress
+                            else -> {
+                                addressList[selectedAddress].factAddress
+                            }
                         }
                     },
                     style = YouWaterTypography.body1,
@@ -297,7 +313,7 @@ fun AddressAndTimeOrder(
                 )
             }
             if (selectedAddress != -1) {
-                Divider(color = Color.LightGray, thickness = 1.dp)
+                HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -343,35 +359,34 @@ private fun SetAddressDialog(
     onShowDialog: () -> Unit,
     setAddressOrder: (RawAddress) -> Unit
 ) {
+    var addressSelected by remember {
+        mutableStateOf(addressList[0])
+    }
     AlertDialog(
+        modifier = Modifier.padding(top = 32.dp, bottom = 32.dp),
+        containerColor = Color.White,
         onDismissRequest = { onShowDialog() },
+        icon = {Icon(
+//            modifier = Modifier.padding(8.dp),
+            imageVector = Icons.Rounded.LocationOn,
+            contentDescription = "",
+            tint = Blue500
+        )},
         title = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.LocationOn,
-                    contentDescription = "",
-                    tint = Blue500
-                )
-                Text(
-                    text = "Bыберете адрес",
-                    color = Blue500,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-            }
+            Text(
+                text = "Bыберете адрес",
+                color = Blue500,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
         },
-        shape = RoundedCornerShape(8.dp),
-        buttons = {
-            var addressSelected by remember {
-                mutableStateOf(addressList[0])
-            }
+        text = {
+            val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
                     .selectableGroup()
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
             ) {
                 addressList.forEach { address ->
                     Row(
@@ -380,41 +395,39 @@ private fun SetAddressDialog(
                                 selected = (address == addressSelected),
                                 onClick = { addressSelected = address }
                             )
-                            .padding(16.dp),
+                            .padding(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start
                     ) {
                         RadioButton(
                             selected = (address == addressSelected),
-                            onClick = null
+                            onClick = null,
+                            colors = RadioButtonDefaults.colors(selectedColor = Blue500)
                         )
                         Text(text = address.factAddress)
                     }
                 }
-                Row(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = { onShowDialog() }) {
-                        Text(text = "Отмена")
-                    }
-                    TextButton(onClick = {
-                        onShowDialog()
-                        setAddressOrder(addressSelected)
-                    }
-                    ) {
-                        Text(text = "Выбрать")
-                    }
-                }
-
             }
-
-        })
+        },
+        shape = RoundedCornerShape(8.dp),
+        dismissButton = {
+            TextButton(onClick = { onShowDialog() }) {
+                Text(text = "Отмена", color = Blue500)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onShowDialog()
+                setAddressOrder(addressSelected)
+            }
+            ) {
+                Text(text = "Выбрать", color = Blue500)
+            }
+        },
+    )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetTimeOrderCard(timeListOrder: List<String>, selectedTime: String, expandedTime: Boolean, setTimeOrder: (String) -> Unit) {
     Surface(
@@ -422,7 +435,7 @@ fun SetTimeOrderCard(timeListOrder: List<String>, selectedTime: String, expanded
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         ExposedDropdownMenuBox(
             modifier = Modifier.fillMaxWidth(),
@@ -432,7 +445,9 @@ fun SetTimeOrderCard(timeListOrder: List<String>, selectedTime: String, expanded
             }
         ) {
             TextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
                 value = selectedTime,
                 onValueChange = {},
                 readOnly = true,
@@ -440,6 +455,12 @@ fun SetTimeOrderCard(timeListOrder: List<String>, selectedTime: String, expanded
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTime)
                 },
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedLabelColor = Blue500,
+                    focusedIndicatorColor = Blue500
+                )
             )
             ExposedDropdownMenu(
                 modifier = Modifier.fillMaxWidth(),
@@ -451,10 +472,14 @@ fun SetTimeOrderCard(timeListOrder: List<String>, selectedTime: String, expanded
                         onClick = {
                             setTimeOrder(timeOrder)
 //                            setExpanded()
-                        }
-                    ) {
-                        Text(text = timeOrder)
-                    }
+                        },
+                        text = {
+                            Text(
+                                text = timeOrder,
+                                style = YouWaterTypography.body1
+                            )
+                        },
+                    )
                 }
 
 
@@ -477,7 +502,7 @@ fun DetailsOrder(highSize: Int, products: List<Product>, minusCount: (Product) -
             .padding(horizontal = 16.dp)
             .height(highSize.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         LazyColumn {
             items(products.size) {index ->
@@ -549,7 +574,7 @@ fun ItemProductInOrder(
                     )
                 }
             }
-            Divider(color = Color.LightGray, thickness = 1.dp)
+            HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
     }
 }
 
@@ -583,7 +608,7 @@ fun PriceAndCount(productCount: Int, productsPrise: (Int) -> Int, priceNoDiscoun
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TypePayCard(typesPayOrder: List<String>, selectedPay: String, expandedPay: Boolean, setPaymentType: (String) -> Unit) {
     Surface(
@@ -591,7 +616,7 @@ fun TypePayCard(typesPayOrder: List<String>, selectedPay: String, expandedPay: B
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         ExposedDropdownMenuBox(
             modifier = Modifier.fillMaxWidth(),
@@ -602,7 +627,9 @@ fun TypePayCard(typesPayOrder: List<String>, selectedPay: String, expandedPay: B
             }
         ) {
             TextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
                 value = selectedPay,
                 onValueChange = {},
                 readOnly = true,
@@ -610,6 +637,12 @@ fun TypePayCard(typesPayOrder: List<String>, selectedPay: String, expandedPay: B
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedPay)
                 },
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedLabelColor = Blue500,
+                    focusedIndicatorColor = Blue500
+                )
             )
             ExposedDropdownMenu(
                 modifier = Modifier.fillMaxWidth(),
@@ -620,13 +653,16 @@ fun TypePayCard(typesPayOrder: List<String>, selectedPay: String, expandedPay: B
                     DropdownMenuItem(
                         onClick = {
                             setPaymentType(typePey)
-                        }
-                    ) {
-                        Text(text = typePey)
-                    }
+                        },
+                        text = {
+                            Text(
+                                text = typePey,
+                                style = YouWaterTypography.body1
+                            )
+                        })
                 }
 
-                
+
             }
         }
     }
@@ -636,7 +672,7 @@ fun TypePayCard(typesPayOrder: List<String>, selectedPay: String, expandedPay: B
 @Composable
 fun ShowDatePickerDialog(showDatePicker: Boolean, watterViewModel: WatterViewModel, setShowDatePicker: (Boolean) -> Unit, calendar: Calendar, setDateOrder: (String) -> Unit) {
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = calendar.timeInMillis,
+        initialSelectedDateMillis = null,
         selectableDates = object : SelectableDates {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
@@ -655,21 +691,32 @@ fun ShowDatePickerDialog(showDatePicker: Boolean, watterViewModel: WatterViewMod
             confirmButton = {
                 TextButton(onClick = {
                     setShowDatePicker(false)
-                    val formatter = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
-                    watterViewModel.getTimeList1(datePickerState.selectedDateMillis ?: 0, watterViewModel.getStartDate(
-                        Calendar.getInstance()))
-                    setDateOrder(formatter.format(Date(datePickerState.selectedDateMillis ?: 0)))
+                    if (datePickerState.selectedDateMillis != null) {
+                        val formatter = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+                        watterViewModel.getTimeList(
+                            datePickerState.selectedDateMillis ?: 0, watterViewModel.getStartDate(
+                                Calendar.getInstance()
+                            )
+                        )
+                        setDateOrder(
+                            formatter.format(
+                                Date(
+                                    datePickerState.selectedDateMillis ?: 0
+                                )
+                            )
+                        )
+                    }
                 }) {
-                    Text(text = "Выбрать")
+                    Text(text = "Выбрать", color = Blue500)
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     setShowDatePicker(false)
                 }) {
-                    Text(text = "Отмена")
+                    Text(text = "Отмена", color = Blue500)
                 }
-            }
+            },
         ) {
             DatePicker(
                 state = datePickerState,
@@ -685,7 +732,14 @@ fun ShowDatePickerDialog(showDatePicker: Boolean, watterViewModel: WatterViewMod
                              )
                          )
                 },
-                showModeToggle = false
+                showModeToggle = false,
+                colors = DatePickerDefaults.colors(
+                    containerColor = Color.White,
+                    selectedDayContainerColor = Blue500,
+                    selectedDayContentColor = Color.White,
+                    todayDateBorderColor = Blue500,
+                    todayContentColor = Blue500
+                )
             )
         }
     }
@@ -696,15 +750,22 @@ fun GetCommentCard(commentOrder: String, setComment: (String) -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = commentOrder,
             onValueChange = {setComment(it)},
             label = { Text(text = "Коментарий для курьера")},
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                focusedLabelColor = Blue500,
+                cursorColor = Blue500,
+                focusedIndicatorColor = Blue500
+            )
 
         )
     }

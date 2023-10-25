@@ -95,6 +95,7 @@ fun BasketScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     text = "Ни одного товара не добавлено в корзину",
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
@@ -323,11 +324,11 @@ fun GeneralInfoOrder(generalPrice: Int, titleButton: String, isEnable: () -> Boo
             modifier = Modifier
                 .padding(vertical = 8.dp)
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.Top,
+            verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Box {
-                Row(modifier = Modifier
+                Row(modifier = Modifier.padding(bottom = 8.dp)
                     .fillMaxHeight(),
                     verticalAlignment = Alignment.Bottom) {
                     Text(

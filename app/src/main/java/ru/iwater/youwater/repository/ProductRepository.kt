@@ -8,6 +8,7 @@ import ru.iwater.youwater.data.payModule.MessagePay
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.network.ApiWater
+import ru.iwater.youwater.network.ApiYookassa
 import ru.iwater.youwater.network.RetrofitFactory
 import timber.log.Timber
 import javax.inject.Inject
@@ -21,6 +22,7 @@ class ProductRepository @Inject constructor(
 
     private val productDao: ProductDao = youWaterDB.productDao()
     private val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
+    private val yookassa: ApiYookassa = RetrofitFactory.makeYookassaApi()
 
     /**
      * получить список продуктов добавленых в корзину
@@ -221,6 +223,16 @@ class ProductRepository @Inject constructor(
         } catch (e: Exception) {
             Timber.e("error create pay $e")
             null
+        }
+    }
+
+    suspend fun getOrderPayStatus(idOrderPay: String): Boolean {
+        return try {
+            val messagePay = yookassa.getPayment(paymentId = idOrderPay)
+            messagePay?.paid ?: false
+        } catch (e: Exception) {
+            Timber.d("error get pay order $e")
+            false
         }
     }
 
