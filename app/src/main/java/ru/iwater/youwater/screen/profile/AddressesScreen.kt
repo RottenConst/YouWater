@@ -150,15 +150,15 @@ fun DeleteAddressDialog(isVisible: Boolean, setVisible: (Boolean) -> Unit, delet
     if (isVisible) {
         AlertDialog(
             icon = {
-                Icon(imageVector = Icons.Filled.Delete, contentDescription = "Удалить адрес", tint = Blue500 )
+                Icon(imageVector = Icons.Filled.Delete, contentDescription = stringResource(id = R.string.delete_address_text), tint = Blue500 )
             },
             title = {
-                Text(text = "Удалить адрес?")
+                Text(text = stringResource(id = R.string.delete_address_quest_text))
             },
             onDismissRequest = { setVisible(false) },
             dismissButton = {
                 TextButton(onClick = { setVisible(false) }) {
-                    Text(text = "Нет", color = Blue500)
+                    Text(text = stringResource(id = R.string.general_no), color = Blue500)
                 }
             },
             confirmButton = {
@@ -166,7 +166,7 @@ fun DeleteAddressDialog(isVisible: Boolean, setVisible: (Boolean) -> Unit, delet
                     setVisible(false)
                     deleteDialog()
                 }) {
-                    Text(text = "Да", color = Blue500)
+                    Text(text = stringResource(id = R.string.general_yes), color = Blue500)
                 }
             }
         )

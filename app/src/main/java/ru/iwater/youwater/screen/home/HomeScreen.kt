@@ -128,10 +128,10 @@ fun HomeScreen(
                         icon = {
                             Icon(
                                 imageVector = Icons.Outlined.ShoppingCart,
-                                contentDescription =  "Повторить последний заказ"
+                                contentDescription = stringResource(id = R.string.repeat_last_order)
                             ) },
                         text = {
-                               Text(text = "Повторить последний заказ")
+                               Text(text = stringResource(id = R.string.repeat_last_order))
                         },
                         contentColor = Color.White,
                         containerColor = Blue500
@@ -344,7 +344,7 @@ fun PromoAction(
         ) {
             Text(
                 modifier = Modifier.padding(8.dp),
-                text = "Акции",
+                text = stringResource(id = R.string.stocks),
                 style = YouWaterTypography.h6,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -547,8 +547,8 @@ fun ProductCost(id: Int, minPrice: Int, nameProduct: String, prices: List<String
             ) {
                 Text(
                     text = when (id) {
-                        81 -> "от ${minPrice - 15}₽"
-                        84 -> "от ${minPrice - 15}₽"
+                        81 -> "от ${minPrice - 30}₽"
+                        84 -> "от ${minPrice - 30}₽"
                         else -> "от ${minPrice}₽"
                     },
                     color = Blue500,

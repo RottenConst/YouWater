@@ -103,10 +103,8 @@ fun InfoStatusCreate(modifier: Modifier, isPayment: Boolean, isPay: StatusPaymen
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (isPayment) {
-            Timber.d("is Payment true")
             when (isPay) {
                 StatusPayment.DONE -> {
-                    Timber.d("Status DONE")
                     Icon(
                         modifier = modifier.size(42.dp, 42.dp),
                         imageVector = Icons.Sharp.CheckCircle,
@@ -126,7 +124,6 @@ fun InfoStatusCreate(modifier: Modifier, isPayment: Boolean, isPay: StatusPaymen
                 }
 
                 StatusPayment.ERROR -> {
-                    Timber.d("Status ERROR")
                     Icon(
                         modifier = modifier.size(42.dp, 42.dp),
                         imageVector = Icons.Rounded.Close,
@@ -134,7 +131,7 @@ fun InfoStatusCreate(modifier: Modifier, isPayment: Boolean, isPay: StatusPaymen
                         tint = Color.Red
                     )
                     Text(
-                        text = "Ошибка, не удалось оплатить заказ",
+                        text = stringResource(id = R.string.error_pay_order_text),
                         style = YouWaterTypography.h6,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -153,10 +150,7 @@ fun InfoStatusCreate(modifier: Modifier, isPayment: Boolean, isPay: StatusPaymen
                 }
 
                 StatusPayment.PANDING -> {
-                    Timber.d("Check Pay2")
-
                     if (pay == 0) {
-                        Timber.d("Check Pay3")
                         payPlus()
                         navController.navigate(
                             PaymentNavRoute.CheckPaymentScreen.path
@@ -166,28 +160,12 @@ fun InfoStatusCreate(modifier: Modifier, isPayment: Boolean, isPay: StatusPaymen
                             }
                         }
                     }
-
                 }
 
                 else -> {
-                    Timber.d("Status NONE")
-//                    Icon(
-//                        modifier = modifier.size(42.dp, 42.dp),
-//                        imageVector = Icons.Rounded.Close,
-//                        contentDescription = "",
-//                        tint = Color.Red
-//                    )
-//                    Text(
-//                        text = "Ошибка, оплата была прервана",
-//                        style = YouWaterTypography.h6,
-//                        fontWeight = FontWeight.Bold,
-//                        textAlign = TextAlign.Center,
-//                        color = Blue500
-//                    )
                 }
             }
         } else {
-            Timber.d("is Payment false")
             Icon(
                 modifier = modifier.size(42.dp, 42.dp),
                 imageVector = Icons.Sharp.CheckCircle,
@@ -212,7 +190,7 @@ fun InfoStatusCreate(modifier: Modifier, isPayment: Boolean, isPay: StatusPaymen
 fun NumberOrderText(numberOrder: Int) {
     Row {
         Text(
-            text = "Заказ №",
+            text = stringResource(id = R.string.order_number_text),
             style = YouWaterTypography.body1,
             fontWeight = FontWeight.Black
         )
@@ -278,7 +256,7 @@ fun PriceOrder(modifier: Modifier, priceOder: String) {
     ) {
         Text(
             modifier = modifier.padding(8.dp),
-            text = "Итого:",
+            text = stringResource(id = R.string.item_order_total_sum),
             style = YouWaterTypography.subtitle2,
             fontWeight = FontWeight.Black
         )
@@ -303,7 +281,7 @@ fun TypePayOrder(modifier: Modifier, typePay: String) {
     ) {
         Text(
             modifier = modifier.padding(8.dp),
-            text = "Оформление заявки:",
+            text = stringResource(id = R.string.item_order_description_complete_order),
             style = YouWaterTypography.subtitle2,
             fontWeight = FontWeight.Black
         )
@@ -389,7 +367,7 @@ fun ProductsOrderList(modifier: Modifier, products: List<Product>) {
             item {
                 Text(
                     modifier = modifier.padding(8.dp),
-                    text = "Детали заказа:",
+                    text = stringResource(id = R.string.item_order_info_order),
                     style = YouWaterTypography.body2,
                     fontWeight = FontWeight.Bold
                 )
@@ -455,7 +433,7 @@ fun HomeButton(modifier: Modifier, toHomeScreen: () -> Unit){
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
         onClick = { toHomeScreen() }) {
-        Text(text = "Перейти на главную")
+        Text(text = stringResource(id = R.string.to_home_text))
     }
 }
 
@@ -465,7 +443,6 @@ fun CompleteOrderPreview() {
     YourWaterTheme {
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(modifier = Modifier.padding(bottom = 80.dp)) {
-//                item { InfoStatusCreate(modifier = Modifier.fillMaxWidth(), isPayment = false, StatusPayment.LOAD) }
                 items(1) {
                 }
         }

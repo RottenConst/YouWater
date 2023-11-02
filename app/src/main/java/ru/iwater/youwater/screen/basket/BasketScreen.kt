@@ -210,7 +210,7 @@ fun CostProducts(id: Int, priceNoDiscount: (Int) -> Int, costProducts: (Int) -> 
             }
         } else {
             Text(
-                text = "${costProducts(count)}",
+                text = "${costProducts(count)}₽",
                 style = YouWaterTypography.subtitle1,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Start,

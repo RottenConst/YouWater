@@ -154,7 +154,7 @@ private fun CardOrderInfoWithButton(modifier: Modifier, order: MyOrder, repeatOr
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 onClick = { repeatOrder() }) {
-                Text(text = "Повторить заказ")
+                Text(text = stringResource(id = R.string.item_order_replay_order))
             }
         }
     }

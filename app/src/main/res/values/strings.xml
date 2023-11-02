@@ -58,7 +58,6 @@
 
     <string name="MailingNotification">Получать уведомления о новых предложениях и акциях</string>
 
-
     <string name="default_notification_channel_name" translatable="true">hello</string>
     <string name="default_notification_channel_id" translatable="false">hello</string>
     <string name="msg_subscribed">Subscribed to weather topic</string>
@@ -77,16 +76,22 @@
 
     <!-- item order -->
     <string name="item_order_number_order">Заказ #</string>
+    <string name="order_number_text">Заказ №</string>
     <string name="item_order_info_order">Детали заказа:</string>
     <string name="item_order_total_sum">Итого:</string>
-    <string name="item_order_description_complete_order">Оформление заявки</string>
+    <string name="item_order_description_complete_order">Оформление заявки:</string>
     <string name="item_order_description_complete_order_logo">Оформление заявки завершено</string>
     <string name="item_order_replay_order">Повторить заказ</string>
-
+    <string name="to_home_text">Перейти на главную</string>
 
     <!-- item category product -->
     <string name="item_category_product_name_category">Название категории</string>
-
+    <string name="promo_banner_image_error">Не удалось загрузить картинку</string>
+    <string name="repeat_last_order">Повторить последний заказ</string>
+    <string name="stocks">Акции</string>
+    <string name="net_error_text">Ошибка соединения</string>
+    <string name="error_pin_code_text">Неверный пин код</string>
+    <string name="error_pay_order_text">Ошибка, не удалось оплатить заказ</string>
     <!-- item card product -->
     <string name="item_card_product_name_product">Название товара</string>
     <string name="item_card_product_description_product">Описание товара</string>
@@ -116,7 +121,6 @@
     <string name="fragment_user_data_phone">Телефон</string>
     <string name="fragment_user_data_email">Электронная почта</string>
     <string name="edit_user_data">Изменить данные</string>
-
     <!-- fragment register -->
     <string name="fragment_register_register_text">Регистрация</string>
     <string name="fragment_register_finish">Завершить</string>
@@ -230,6 +234,7 @@
     <string name="fragment_create_order_info_order">Детали заказа:</string>
     <string name="fragment_create_order_total_cost_order">Итого с учётом скидок:</string>
     <string name="fragment_create_order_time_order">Время доставки:</string>
+    <string name="get_date_order_text">Выберете дату доставки</string>
 
     <string name="faq_label">Часто задаваемые вопросы </string>
     <string name="one_quest_answer_2">Plesca Натуральная – это вода из артезианской скважины из Псковской области Печерского района. Этот вид воды отлично подходит для питья в сыром виде. В воде Plesca Натуральная много природных минералов полезных для здоровья, она обладает хорошими вкусовые качествами и безопасна для употребления взрослыми и детьми.</string>
@@ -290,6 +295,7 @@
     <!-- fragment add address-->
     <string name="fragment_add_address_label">Добавить адрес</string>
     <string name="fragment_add_address_city">Город/посёлок</string>
+    <string name="region">Регион</string>
     <string name="fragment_add_address_street">Улица</string>
     <string name="fragment_add_address_home">Дом</string>
     <string name="fragment_add_address_structure">Строение</string>
@@ -298,7 +304,9 @@
     <string name="fragment_add_address_apartment">Квартира</string>
     <string name="fragment_add_address_notice">Примечание к адресу</string>
     <string name="fragment_add_address_contact">Дополнительный контакт</string>
-
+    <string name="save_address_quest_text">Сохранить адрес?</string>
+    <string name="delete_address_quest_text">Удалить адрес?</string>
+    <string name="delete_address_text">Удалить адрес</string>
     <!-- fragment about product-->
     <string name="fragment_about_product_name_product">Название товара</string>
     <string name="fragment_about_product_description_product">Описание товара</string>

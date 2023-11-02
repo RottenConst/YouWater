@@ -59,11 +59,11 @@ fun EnterPinCodeScreen(
             }
             ERROR -> {
                 Timber.d("Error")
-                Toast.makeText(context, "Неверный пин код", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, stringResource(id = R.string.error_pin_code_text), Toast.LENGTH_LONG).show()
             }
             NET_ERROR -> {
                 Timber.d("Net Error")
-                Toast.makeText(context, "Ошибка соединения", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, stringResource(id = R.string.net_error_text), Toast.LENGTH_LONG).show()
             }
             else -> {}
         }

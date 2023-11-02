@@ -208,7 +208,7 @@ fun SetRegion(
                 readOnly = true,
                 label = {
                     Text(
-                        text = "Регион",
+                        text = stringResource(id = R.string.region),
                         style = YouWaterTypography.body1
                     )},
                 trailingIcon = {
@@ -482,14 +482,14 @@ fun SaveAddressDialog(isVisibleDialog: Boolean, setVisible: (Boolean) -> Unit, s
                 Icon(imageVector = Icons.Filled.Info, contentDescription = "", tint = Blue500)
             },
             title = {
-                Text(text = "Сохранить адрес?")
+                Text(text = stringResource(id = R.string.save_address_quest_text))
             },
             onDismissRequest = { setVisible(false) },
             dismissButton = {
                  TextButton(onClick = {
                      setVisible(false)
                  }) {
-                     Text(text = "Нет", color = Blue500)
+                     Text(text = stringResource(id = R.string.general_no), color = Blue500)
                  }
             },
             confirmButton = {
@@ -498,7 +498,7 @@ fun SaveAddressDialog(isVisibleDialog: Boolean, setVisible: (Boolean) -> Unit, s
                         setVisible(false)
                         saveAddress()
                     }) {
-                    Text(text = "Да", color = Blue500)
+                    Text(text = stringResource(id = R.string.general_yes), color = Blue500)
                 }
             }
         )

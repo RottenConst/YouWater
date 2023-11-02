@@ -722,7 +722,7 @@ fun ShowDatePickerDialog(showDatePicker: Boolean, watterViewModel: WatterViewMod
                 state = datePickerState,
                 title =  {
                          Text(
-                             text = "Выберете дату доставки",
+                             text = stringResource(id = R.string.get_date_order_text),
                              modifier = Modifier.padding(
                                  PaddingValues(
                                      start = 24.dp,
@@ -758,7 +758,7 @@ fun GetCommentCard(commentOrder: String, setComment: (String) -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             value = commentOrder,
             onValueChange = {setComment(it)},
-            label = { Text(text = "Коментарий для курьера")},
+            label = { Text(text = stringResource(id = R.string.add_notice_dialog_comment_for_driver))},
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color.White,
