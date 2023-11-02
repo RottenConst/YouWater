@@ -1,12 +1,18 @@
 package ru.iwater.youwater.screen.home
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -60,7 +66,7 @@ import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.WatterViewModel
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     watterViewModel: WatterViewModel = viewModel(),
@@ -75,7 +81,9 @@ fun HomeScreen(
     var bannerDescription by remember {
         mutableStateOf("")
     }
-    val promoListState = rememberLazyListState()
+    val promoPagerState = rememberPagerState {
+        promoBanner?.size ?: 0
+    }
     val productsListState = rememberLazyListState()
     val productsList by watterViewModel.productList.observeAsState()
     var itemBanner = 0
@@ -140,15 +148,6 @@ fun HomeScreen(
             })
         {paddingValues ->
             Column(modifier = Modifier.padding(paddingValues)) {
-                PromoAction(promo = promoBanner, promoListState) {
-                    bannerName = it?.name ?: ""
-                    bannerDescription = it?.description ?: ""
-                    showModalSheet.value = !showModalSheet.value
-                    scope.launch {
-                        skipPartiallyExpanded = !skipPartiallyExpanded
-                    }
-
-                }
                 if (productsList?.isEmpty() == true) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -158,6 +157,16 @@ fun HomeScreen(
                     }
                 } else {
                     ProductContent(
+                        promoBanner = promoBanner,
+                        promoPagerState = promoPagerState,
+                        getInfoBanner = {
+                            bannerName = it?.name ?: ""
+                            bannerDescription = it?.description ?: ""
+                            showModalSheet.value = !showModalSheet.value
+                            scope.launch {
+                                skipPartiallyExpanded = !skipPartiallyExpanded
+                            }
+                        },
                         catalogList = watterViewModel.catalogList,
                         productsList = productsList ?: emptyList(),
                         productsListState = productsListState,
@@ -197,10 +206,10 @@ fun HomeScreen(
                 delay(5000)
                 if (itemBanner != promoBanner?.size) {
                     itemBanner++
-                    promoListState.scrollToItem(itemBanner)
+                    promoPagerState.scrollToPage(itemBanner)
                 } else {
                     itemBanner = 0
-                    promoListState.scrollToItem(itemBanner)
+                    promoPagerState.scrollToPage(itemBanner)
                 }
             }
         }
@@ -221,8 +230,12 @@ fun CatalogName(name: String, modifier: Modifier) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProductContent(
+    promoBanner: List<PromoBanner>?,
+    promoPagerState: PagerState,
+    getInfoBanner: (PromoBanner?) -> Unit,
     catalogList: List<TypeProduct>,
     productsList: List<Product>,
     productsListState: LazyListState,
@@ -231,6 +244,10 @@ fun ProductContent(
     onCheckedFavorite: (Product, Boolean) -> Unit
 ) {
     LazyColumn (state = productsListState) {
+        item {
+            PromoAction(promo = promoBanner, pagerState = promoPagerState, getInfoBanner = getInfoBanner)
+        }
+
         items(catalogList.size) { catalogIndex ->
             ProductsByCategoryRow(
                 categoryName = catalogList[catalogIndex].category,
@@ -279,54 +296,68 @@ fun ProductsByCategoryRow(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PromoImage(
-    banners: List<PromoBanner>?,
-    listState: LazyListState,
+    banners: List<PromoBanner>,
+    pagerState: PagerState,
     getInfoBanner: (PromoBanner?) -> Unit
 ) {
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        state = listState
+    HorizontalPager(state = pagerState) { page ->
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+
+        ) {
+            GlideImage(
+                imageModel = { "$ImageUrl/${banners[page].picture}" },
+                imageOptions = ImageOptions(
+                    alignment = Alignment.Center,
+                    contentDescription = stringResource(id = R.string.description_image_logo),
+                    contentScale = ContentScale.FillWidth,
+                ),
+                loading = {
+                    CircularProgressIndicator(
+                        modifier = Modifier.matchParentSize()
+                    )
+                },
+                failure = {
+                    Text(text = stringResource(id = R.string.promo_banner_image_error))
+                },
+                previewPlaceholder = R.drawable.ic_your_water_logo,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .height(96.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { getInfoBanner(banners[page]) }
+            )
+        }
+    }
+    Row(
+        Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .padding(bottom = 4.dp),
+        horizontalArrangement = Arrangement.Center
     ) {
-        items(banners?.size ?: 0) {
+        repeat(pagerState.pageCount) { iteration ->
+            val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
             Box(
                 modifier = Modifier
-                    .fillParentMaxWidth(),
-            ) {
-                GlideImage(
-                    imageModel = { "$ImageUrl/${banners?.get(it)?.picture}" },
-                    imageOptions = ImageOptions(
-                        alignment = Alignment.Center,
-                        contentDescription = stringResource(id = R.string.description_image_logo),
-                        contentScale = ContentScale.FillWidth,
-                    ),
-                    loading = {
-                        CircularProgressIndicator(
-                            modifier = Modifier.matchParentSize()
-                        )
-                    },
-                    failure = {
-                        Text(text = "Не удалось загрузить картинку")
-                    },
-                    previewPlaceholder = R.drawable.ic_your_water_logo,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { getInfoBanner(banners?.get(it)) }
-                )
-            }
+                    .padding(2.dp)
+                    .clip(CircleShape)
+                    .background(color)
+                    .size(4.dp)
+            )
         }
-
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PromoAction(
     promo: List<PromoBanner>?,
-    listState: LazyListState,
+    pagerState: PagerState,
     getInfoBanner: (PromoBanner?) -> Unit
 ) {
     Surface(
@@ -349,7 +380,7 @@ fun PromoAction(
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-            PromoImage(banners = promo, listState, getInfoBanner)
+            PromoImage(banners = promo ?: emptyList(), pagerState, getInfoBanner)
         }
     }
 }
@@ -591,6 +622,7 @@ fun ProductPlusButton(addProductInBasket: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
 fun HomeScreenPreview() {
@@ -633,7 +665,9 @@ fun HomeScreenPreview() {
             )
         }
         Column {
-            PromoAction(promoTest, rememberLazyListState()) {}
+            PromoAction(promoTest, rememberPagerState {
+                promoTest.size
+            }) {}
             LazyColumn {
                 items(catalogNames.size) { catalog ->
                     ProductsByCategoryRow(
