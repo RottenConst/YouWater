@@ -4,12 +4,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -17,7 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.iwater.youwater.R
+import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.theme.Blue500
+import ru.iwater.youwater.theme.Red800
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.vm.WatterViewModel
@@ -25,6 +36,7 @@ import ru.iwater.youwater.vm.WatterViewModel
 @Composable
 fun UserDataScreen(
     watterViewModel: WatterViewModel = viewModel(),
+    mainActivity: MainActivity,
     sendUserData: Boolean
 ) {
     LaunchedEffect(Unit) {
@@ -33,6 +45,10 @@ fun UserDataScreen(
 
     val client by watterViewModel.client.observeAsState()
     val modifier = Modifier
+
+    var isVisibleDialog by remember {
+        mutableStateOf(false)
+    }
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(horizontal = 16.dp)) {
@@ -50,6 +66,18 @@ fun UserDataScreen(
                     .fillMaxWidth()
             )
         }
+        DeleteAccountDialog(isVisible = isVisibleDialog, setVisible = {isVisibleDialog = !isVisibleDialog}) {
+            watterViewModel.deleteAccount(
+                clientId = client?.client_id ?: 0,
+                phone = client?.contact ?: "",
+                mainActivity = mainActivity
+            )
+        }
+        DeleteAccountButton(
+            onDelete = {
+                isVisibleDialog = true
+            }
+        )
     }
 }
 
@@ -121,6 +149,48 @@ fun EmailInfoClient(modifier: Modifier, email: String) {
     }
 }
 
+@Composable
+fun DeleteAccountButton(onDelete: () -> Unit) {
+    TextButton(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp, start = 52.dp, end = 52.dp),
+        onClick = { onDelete() }) {
+        Text(
+            text = "Удалить Аккаунт",
+            style = YouWaterTypography.body1,
+            color = Color.Red
+        )
+    }
+}
+
+@Composable
+fun DeleteAccountDialog(isVisible: Boolean, setVisible: (Boolean) -> Unit, deleteAccount: () -> Unit) {
+    if (isVisible) {
+        AlertDialog(
+            icon = {
+                Icon(imageVector = Icons.Filled.Delete, contentDescription = "", tint = Red800)
+            },
+            title = {Text(text = stringResource(id = R.string.delete_account_quest), textAlign = TextAlign.Center)},
+            onDismissRequest = { setVisible(false) },
+            dismissButton = {
+                TextButton(onClick = {
+                    setVisible(false)
+                }) {
+                    Text(text = stringResource(id = R.string.general_no), color = Blue500)
+                }
+            },confirmButton = {
+                TextButton(
+                    onClick = {
+                        setVisible(false)
+                        deleteAccount()
+                    }) {
+                    Text(text = stringResource(id = R.string.general_yes), color = Blue500)
+                }
+            })
+    }
+}
+
 @Preview
 @Composable
 fun UserDataPreview() {
@@ -133,6 +203,7 @@ fun UserDataPreview() {
             LastNameInfoClient(modifier = modifier, lastName = "Lastname")
             PhoneInfoClient(modifier = modifier, phone = "+123123123")
             EmailInfoClient(modifier = modifier, email = "mail@mail.com")
+            DeleteAccountButton({})
         }
 
     }
