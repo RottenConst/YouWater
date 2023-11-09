@@ -6,7 +6,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -58,7 +67,7 @@ fun BasketScreen(
                 items(productsListInOrder.size) { productIndex ->
                     val product = productsListInOrder[productIndex]
                     var count by remember {
-                        mutableStateOf(product.count)
+                        mutableIntStateOf(product.count)
                     }
                     CardProductInBasket(
                         id = product.id,
@@ -67,6 +76,9 @@ fun BasketScreen(
                         priceNoDiscount = {product.getPriceNoDiscount(count)},
                         costProducts = { product.getPriceOnCount(count) },
                         count = count,
+                        getAboutProduct = {
+                           navController.navigate(MainNavRoute.AboutProductScreen.withArgs(product.id.toString()))
+                        },
                         deleteProduct = {
                             watterViewModel.deleteProductFromBasket(product.id)
                         },
@@ -126,6 +138,7 @@ fun CardProductInBasket(
     priceNoDiscount: (Int) -> Int,
     costProducts: (Int) -> Int,
     count: Int,
+    getAboutProduct: (Int) -> Unit,
     deleteProduct: () -> Unit,
     plusCount: (Int) -> Unit,
     minusCount: (Int) -> Unit
@@ -135,10 +148,10 @@ fun CardProductInBasket(
             .fillMaxWidth()
             .height(102.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         Box(
-            modifier = Modifier.padding(4.dp)
+            modifier = Modifier.padding(4.dp).clickable { getAboutProduct(id) }
         ) {
             Row {
                 ImageProduct(image = urlImage)
@@ -160,6 +173,18 @@ fun CardProductInBasket(
 
 @Composable
 fun TitleProduct(productName: String, deleteProduct: () -> Unit) {
+    var isVisible by remember {
+        mutableStateOf(false)
+    }
+
+    DeleteProductDialog(
+        productName = productName,
+        isVisible = isVisible,
+        setVisible = {isVisible = !isVisible},
+        deleteProduct = {
+            deleteProduct()
+        }
+    )
     Row(
         modifier = Modifier
             .padding(4.dp)
@@ -175,7 +200,7 @@ fun TitleProduct(productName: String, deleteProduct: () -> Unit) {
             modifier = Modifier.width(200.dp)
         )
         Icon(
-            modifier = Modifier.clickable { deleteProduct() },
+            modifier = Modifier.clickable { isVisible = true },
             painter = painterResource(id = R.drawable.ic_cancel),
             contentDescription = stringResource(id = R.string.description_ic_delete),
             tint = Color.LightGray
@@ -195,13 +220,13 @@ fun CostProducts(id: Int, priceNoDiscount: (Int) -> Int, costProducts: (Int) -> 
         if (id == 81 || id == 84) {
             Column {
                 Text(
-                    text = "${priceNoDiscount(count)}",
+                    text = "${priceNoDiscount(count)}₽",
                     style = YouWaterTypography.subtitle2,
                     textDecoration = TextDecoration.LineThrough,
                     color = Color.Gray
                 )
                 Text(
-                    text = "${costProducts(count)}",
+                    text = "${costProducts(count)}₽",
                     style = YouWaterTypography.subtitle1,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Start,
@@ -231,7 +256,7 @@ fun CostProducts(id: Int, priceNoDiscount: (Int) -> Int, costProducts: (Int) -> 
                     color = Color.Gray,
                     style = YouWaterTypography.body1,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
                 PlusProductButton {
                     plusCount(count)
@@ -239,6 +264,34 @@ fun CostProducts(id: Int, priceNoDiscount: (Int) -> Int, costProducts: (Int) -> 
             }
         }
 
+    }
+}
+
+@Composable
+fun DeleteProductDialog(productName: String, isVisible: Boolean, setVisible: (Boolean) -> Unit, deleteProduct: () -> Unit) {
+    if (isVisible) {
+        AlertDialog(
+            icon = {
+                Icon(imageVector = Icons.Filled.Delete, contentDescription = stringResource(id = R.string.delete_product_text), tint = Blue500)
+            },
+            title = {
+                Text(text = "Удалить $productName из корзины?", textAlign = TextAlign.Center)
+            },
+            onDismissRequest = { setVisible(false) },
+            dismissButton = {
+                TextButton(onClick = { setVisible(false) }) {
+                    Text(text = stringResource(id = R.string.general_no), color = Blue500)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    setVisible(false)
+                    deleteProduct()
+                }) {
+                    Text(text = stringResource(id = R.string.general_yes), color = Blue500)
+                }
+            }
+        )
     }
 }
 
@@ -328,7 +381,8 @@ fun GeneralInfoOrder(generalPrice: Int, titleButton: String, isEnable: () -> Boo
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Box {
-                Row(modifier = Modifier.padding(bottom = 8.dp)
+                Row(modifier = Modifier
+                    .padding(bottom = 8.dp)
                     .fillMaxHeight(),
                     verticalAlignment = Alignment.Bottom) {
                     Text(
@@ -348,7 +402,8 @@ fun GeneralInfoOrder(generalPrice: Int, titleButton: String, isEnable: () -> Boo
             Button(
                 onClick = { toCreateOrder() },
                 enabled = isEnable(),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Blue500)
             ) {
                 Text(text = titleButton)
             }
@@ -362,7 +417,7 @@ fun GeneralInfo(modifier: Modifier = Modifier, priceNoDiscount: Int, generalCost
             modifier = modifier
                 .fillMaxWidth()
                 .height(120.dp),
-            elevation = 8.dp,
+            shadowElevation = 8.dp,
             border = BorderStroke(width = 1.dp, Color.LightGray)
         ) {
             Column(
@@ -415,7 +470,7 @@ fun GeneralInfoPreview() {
                         {productsList1[productIndex].getPriceNoDiscount(1)},
                         {productsList1[productIndex].getPriceOnCount(1)},
                         productsList1[productIndex].count,
-                        {}, {}, {})
+                        {}, {}, {}, {})
                 }
             }
             GeneralInfo(
