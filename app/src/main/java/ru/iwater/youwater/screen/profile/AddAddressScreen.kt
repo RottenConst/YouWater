@@ -91,6 +91,28 @@ fun AddAddressScreen(
     var isEnabledButton by rememberSaveable {
         mutableStateOf(false)
     }
+    var isValidateCity by rememberSaveable {
+        mutableStateOf(true)
+    }
+    var isValidateStreet by rememberSaveable {
+        mutableStateOf(true)
+    }
+    var isValidateHouse by rememberSaveable {
+        mutableStateOf(true)
+    }
+    var isValidateStructure by rememberSaveable {
+        mutableStateOf(true)
+    }
+    var isValidateEntrance by rememberSaveable {
+        mutableStateOf(true)
+    }
+    var isValidateApartment by rememberSaveable {
+        mutableStateOf(true)
+    }
+    var isValidateFloor by rememberSaveable {
+        mutableStateOf(true)
+    }
+
     var isVisibleDialog by remember {
         mutableStateOf(false)
     }
@@ -126,29 +148,29 @@ fun AddAddressScreen(
                 SetRegion(regionList = listRegion, selectRegion = selectRegion, expandedRegion = expandedRegion, setExpandedRegion = {expandedRegion = !expandedRegion}, setRegion = {
                     selectRegion = it
                 })
-                SetCity(city = city, setCity = {city = it})
-                SetStreet(street = street, setStreet = {street = it})
+                SetCity(city = city, setCity = {city = it}, isValidateText = isValidateCity, setValidation = {isValidateCity = it})
+                SetStreet(street = street, setStreet = {street = it}, isValidateText = isValidateStreet, setValidation = {isValidateStreet = it})
             }
         }
         Box {
             Column {
                 Row (modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     Box(modifier = modifier.weight(1f)) {
-                        SetHome(home = house, setHome = {house = it})
+                        SetHome(home = house, setHome = {house = it}, isValidateText = isValidateHouse, setValidation = {isValidateHouse = it})
                     }
                     Box(modifier = modifier.weight(1f)) {
-                        SetStructure(structure = structure, setStructure = {structure = it})
+                        SetStructure(structure = structure, setStructure = {structure = it}, isValidateText = isValidateStructure, setValidation = {isValidateStructure = it})
                     }
                 }
                 Row (modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     Box(modifier = modifier.weight(1f)) {
-                        SetEntrance(entrance = entrance, setEntrance = {entrance = it})
+                        SetEntrance(entrance = entrance, setEntrance = {entrance = it}, isValidateText = isValidateEntrance, setValidation = {isValidateEntrance = it})
                     }
                     Box(modifier = modifier.weight(1f)) {
-                        SetApartment(apartment = apartment, setApartment = {apartment = it})
+                        SetApartment(apartment = apartment, setApartment = {apartment = it}, isValidateText = isValidateApartment, setValidation = {isValidateApartment = it})
                     }
                     Box(modifier = modifier.weight(1f)) {
-                        SetFloor(floor = floor, setFloor = {floor = it})
+                        SetFloor(floor = floor, setFloor = {floor = it}, isValidateText = isValidateFloor, setValidation = {isValidateFloor = it})
                     }
                 }
                 Box {
@@ -158,6 +180,7 @@ fun AddAddressScreen(
                     Column {
                         SetNotice(notice = notice, setNotice = {notice = it})
                         isEnabledButton = selectRegion != "Выберете регион" && city.isNotEmpty() && street.isNotEmpty() && house.isNotEmpty()
+                                && isValidateCity && isValidateStreet && isValidateHouse && isValidateStructure && isValidateEntrance && isValidateApartment && isValidateFloor
                         ButtonEnter(text = stringResource(id = R.string.fragment_create_order_add_address_to_order), isEnabledButton = isEnabledButton) {
                             isVisibleDialog = true
                         }
@@ -256,24 +279,30 @@ fun SetRegion(
 }
 
 @Composable
-fun SetCity(city: String, setCity: (String) -> Unit) {
+fun SetCity(city: String, setCity: (String) -> Unit, isValidateText: Boolean = true, setValidation: (Boolean) -> Unit) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
         value = city,
-        onValueChange = {setCity(it)},
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        onValueChange = {
+            setCity(it)
+            setValidation(!it.contains(Regex("""[^А-я\s]""")))
+                        },
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_city),
                 style = YouWaterTypography.body1
             )},
+        isError = !isValidateText,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
             focusedLabelColor = Blue500,
             focusedTextColor = Blue500,
+            errorContainerColor = Color.White,
             cursorColor = Blue500
         ),
         maxLines = 1
@@ -281,22 +310,27 @@ fun SetCity(city: String, setCity: (String) -> Unit) {
 }
 
 @Composable
-fun SetStreet(street: String, setStreet: (String) -> Unit) {
+fun SetStreet(street: String, setStreet: (String) -> Unit, isValidateText: Boolean = true, setValidation: (Boolean) -> Unit) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
         value = street,
-        onValueChange = {setStreet(it)},
+        onValueChange = {
+            setStreet(it)
+            setValidation(!it.contains(Regex("""[^А-я\s]""")))
+                        },
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_street),
                 style = YouWaterTypography.body1
             )},
+        isError = !isValidateText,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
+            errorContainerColor = Color.White,
             focusedLabelColor = Blue500,
             cursorColor = Blue500
         ),
@@ -305,23 +339,28 @@ fun SetStreet(street: String, setStreet: (String) -> Unit) {
 }
 
 @Composable
-fun SetHome(home: String, setHome: (String) -> Unit) {
+fun SetHome(home: String, setHome: (String) -> Unit, isValidateText: Boolean = true, setValidation: (Boolean) -> Unit) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
         value = home,
-        onValueChange = {setHome(it)},
+        onValueChange = {
+            setHome(it)
+            setValidation(!it.contains(Regex("""[^0-9]""")))
+                        },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_home),
                 style = YouWaterTypography.body1
             )},
+        isError = !isValidateText,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
+            errorContainerColor = Color.White,
             focusedLabelColor = Blue500,
             cursorColor = Blue500
         ),
@@ -330,22 +369,27 @@ fun SetHome(home: String, setHome: (String) -> Unit) {
 }
 
 @Composable
-fun SetStructure(structure: String, setStructure: (String) -> Unit) {
+fun SetStructure(structure: String, setStructure: (String) -> Unit, isValidateText: Boolean = true, setValidation: (Boolean) -> Unit) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
         value = structure,
-        onValueChange = {setStructure(it)},
+        onValueChange = {
+            setStructure(it)
+            setValidation(!it.contains(Regex("""[^А-я0-9]""")))
+                        },
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_structure),
                 style = YouWaterTypography.body1
             )},
+        isError = !isValidateText,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
+            errorContainerColor = Color.White,
             focusedLabelColor = Blue500,
             cursorColor = Blue500
         ),
@@ -354,23 +398,28 @@ fun SetStructure(structure: String, setStructure: (String) -> Unit) {
 }
 
 @Composable
-fun SetEntrance(entrance: String, setEntrance: (String) -> Unit) {
+fun SetEntrance(entrance: String, setEntrance: (String) -> Unit, isValidateText: Boolean = true, setValidation: (Boolean) -> Unit) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
         value = entrance,
-        onValueChange = {setEntrance(it)},
+        onValueChange = {
+            setEntrance(it)
+            setValidation(!it.contains(Regex("""[^0-9]""")))
+                        },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_entrance),
                 style = YouWaterTypography.body1
             )},
+        isError = !isValidateText,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
+            errorContainerColor = Color.White,
             focusedLabelColor = Blue500,
             cursorColor = Blue500
         ),
@@ -379,23 +428,28 @@ fun SetEntrance(entrance: String, setEntrance: (String) -> Unit) {
 }
 
 @Composable
-fun SetApartment(apartment: String, setApartment: (String) -> Unit) {
+fun SetApartment(apartment: String, setApartment: (String) -> Unit, isValidateText: Boolean = true, setValidation: (Boolean) -> Unit) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
         value = apartment,
-        onValueChange = {setApartment(it)},
+        onValueChange = {
+            setApartment(it)
+            setValidation(!it.contains(Regex("""[^0-9]""")))
+                        },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_apartment),
                 style = YouWaterTypography.body1
             )},
+        isError = !isValidateText,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
+            errorContainerColor = Color.White,
             focusedLabelColor = Blue500,
             cursorColor = Blue500
         ),
@@ -404,23 +458,28 @@ fun SetApartment(apartment: String, setApartment: (String) -> Unit) {
 }
 
 @Composable
-fun SetFloor(floor: String, setFloor: (String) -> Unit) {
+fun SetFloor(floor: String, setFloor: (String) -> Unit, isValidateText: Boolean = true, setValidation: (Boolean) -> Unit) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
         value = floor,
-        onValueChange = {setFloor(it)},
+        onValueChange = {
+            setFloor(it)
+            setValidation(!it.contains(Regex("""[^0-9]""")))
+                        },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_floor),
                 style = YouWaterTypography.body1
             )},
+        isError = !isValidateText,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Blue500,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
+            errorContainerColor = Color.White,
             focusedLabelColor = Blue500,
             cursorColor = Blue500
         ),
@@ -544,7 +603,10 @@ fun AddAddressScreenPreview() {
         mutableStateOf("")
     }
     var isVisibleDialog by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
+    }
+    var isValidate by rememberSaveable {
+        mutableStateOf(false)
     }
     val scrollState = rememberScrollState()
     YourWaterTheme {
@@ -559,29 +621,29 @@ fun AddAddressScreenPreview() {
                     SetRegion(regionList = listRegion, selectRegion = selectRegion, expandedRegion = expandedRegion, setExpandedRegion = {expandedRegion = !expandedRegion}, setRegion = {
                         selectRegion = it
                     })
-                    SetCity(city = city, setCity = {city = it})
-                    SetStreet(street = street, setStreet = {street = it})
+                    SetCity(city = city, setCity = {city = it}, setValidation = {isValidate = it})
+                    SetStreet(street = street, setStreet = {street = it}, setValidation = {isValidate = it})
                 }
             }
             Box {
                 Column {
                     Row (modifier = modifier.fillMaxWidth()) {
                         Box(modifier.weight(1f)) {
-                            SetHome(home = home, setHome = {home = it})
+                            SetHome(home = home, setHome = {home = it}, setValidation = {isValidate = it})
                         }
                         Box(modifier.weight(1f)) {
-                            SetStructure(structure = structure, setStructure = {structure = it})
+                            SetStructure(structure = structure, setStructure = {structure = it}, setValidation = {})
                         }
                     }
                     Row (modifier = modifier.fillMaxWidth()) {
                         Box(modifier.weight(1f)) {
-                            SetEntrance(entrance = entrance, setEntrance = {entrance = it})
+                            SetEntrance(entrance = entrance, setEntrance = {entrance = it}, setValidation = {})
                         }
                         Box(modifier.weight(1f)) {
-                            SetApartment(apartment = apartment, setApartment = {apartment = it})
+                            SetApartment(apartment = apartment, setApartment = {apartment = it}, setValidation = {})
                         }
                         Box(modifier.weight(1f)) {
-                            SetFloor(floor = floor, setFloor = {floor = it})
+                            SetFloor(floor = floor, setFloor = {floor = it}, setValidation = {})
                         }
                     }
                     Box {
