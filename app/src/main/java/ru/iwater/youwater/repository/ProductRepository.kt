@@ -289,6 +289,15 @@ class ProductRepository @Inject constructor(
         return null
     }
 
+    suspend fun deleteAccount(clientId: Int, parameter: JsonObject): DeleteMessage? {
+        return try {
+            apiWater.deleteAccount(clientId, parameter)
+        } catch (e: Exception) {
+            Timber.e("Error delete account: $e")
+            null
+        }
+    }
+
     suspend fun editUserData(clientId: Int, clientUserData: JsonObject): Boolean {
         try {
             val answer = apiWater.editUserData(clientId, clientUserData)

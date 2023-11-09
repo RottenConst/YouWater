@@ -83,7 +83,8 @@
     <string name="item_order_description_complete_order_logo">Оформление заявки завершено</string>
     <string name="item_order_replay_order">Повторить заказ</string>
     <string name="to_home_text">Перейти на главную</string>
-
+    <string name="delete_product_text">Удалить товар из корзины</string>
+    <string name="delete_product_quest_text">Удалить данный товар из корзины</string>
     <!-- item category product -->
     <string name="item_category_product_name_category">Название категории</string>
     <string name="promo_banner_image_error">Не удалось загрузить картинку</string>
@@ -135,7 +136,9 @@
     <string name="fragment_profile_balls">У вас </string>
     <string name="fragment_profile_tanks">Бутелей к возврату:</string>
     <string name="fragment_profile_name_client">Имя клиента</string>
-
+    <string name="support_text_edit_name">Используйте символы русского или латинского алфавита</string>
+    <string name="support_text_edit_phone">Просьба ввести валидный номер телефона из 11 цифр, начинающийся на +7</string>
+    <string name="support_text_edit_email">Просьба ввести валидный адрес содержащий имя почтового адреса, доменное имя раззделенные @. Пример: test@gmail.com</string>
     <!-- fragment notification -->
     <string name="fragment_notification_set_sms_notification">Получать SMS-уведомления</string>
     <string name="fragment_notification_set_PUSH_notification">Получать Push-уведомления</string>
@@ -154,7 +157,7 @@
 
     <!-- fragment faq -->
     <string name="fragment_faq_one_quest">В чем отличие воды?</string>
-    <string name="fragment_faq_one_quest_answer_1_1">Обе воды добываются в сердце Карельского перешейка. Около посёлка Стеклянный расположены скважины глубиной 185 метров — там же, прямо на месте добычы, происходит розлив. Вода доставляется в Санкт-Петербург и область, сохранив свежесть, чистоту и пользу.</string>
+    <string name="fragment_faq_one_quest_answer_1_1">Обе воды добываются в сердце Карельского перешейка. Около посёлка Стеклянный расположены скважины глубиной 185 метров — там же, прямо на месте добычи, происходит розлив. Вода доставляется в Санкт-Петербург и область, сохранив свежесть, чистоту и пользу.</string>
     <string name="fragment_faq_one_quest_answer_1_2">Вода «Plesca Натуральная» — подходит для повседневного употребления в любом виде. Содержит комплекс веществ, необходимых для здоровья городских жителей.</string>
     <string name="fragment_faq_one_quest_answer_1_3">• Глубина источника гарантирует неизменный состав воды.\n• Содержит природный комплекс полезных веществ: кальций, магний, калий, натрий.\n• Подходит для готовки, ежедневного употребления без ограничений. \n• Соответствует нормативам качества.</string>
     <string name="fragment_faq_one_quest_answer_1_4">Вода «Plesca Классическая» — смягченная артезианская вода, оптимальный выбор для офисов и предприятий. Подходит для использования в кулерах, чайниках и кофе-машинах.</string>
@@ -170,7 +173,7 @@
     <string name="fragment_delivery_two_hour_time_interval_delivery">17:00–22:00\n в тот же день</string>
     <string name="fragment_delivery_two_hour_delivery_sat_two_hour">19:00–22:00\nв тот же день</string>
     <string name="fragment_delivery_two_hour_logo">Доставка в тот же день:</string>
-    <string name="fragment_delivery_two_hour_description_text">Доставляем воду в тот же день Санкт-Петербургу для заказов, сделанных до 12:00 этого дня.</string>
+    <string name="fragment_delivery_two_hour_description_text">Доставляем воду в тот же день по Санкт-Петербургу для заказов, сделанных до 12:00 этого дня.</string>
 
     <!-- fragment delivery suburbs -->
     <string name="fragment_delivery_suburbs_text_logo">Доставка воды в пригороды  Санкт-Петербурга</string>
@@ -353,6 +356,7 @@
     <string name="description_add_product">Добавить продукт</string>
     <string name="description_image_background">Изображение фона</string>
     <string name="title_activity_pey_test">PaymentActivity</string>
+    <string name="delete_account_quest">Вы действительно хотите удалить свой аккаунт?</string>
 
     <string name='tokenization_canceled'>Токенизация отменена</string>
     <string name='tokenization_success'>Токен: %1$s</string>

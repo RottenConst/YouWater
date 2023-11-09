@@ -1,16 +1,22 @@
 package ru.iwater.youwater.vm
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.*
 import androidx.navigation.NavHostController
 import com.google.gson.JsonObject
 import com.pusher.pushnotifications.PushNotifications
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.repository.ProductRepository
+import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.screen.PaymentActivity
+import ru.iwater.youwater.screen.StartActivity
 import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.screen.navigation.PaymentNavRoute
 import ru.iwater.youwater.utils.StatusData
@@ -246,12 +252,78 @@ class WatterViewModel @Inject constructor(
         }
     }
 
+    fun deleteAccount(clientId: Int, phone: String, mainActivity: MainActivity) {
+        viewModelScope.launch {
+            val parametersForDelete = JsonObject()
+            parametersForDelete.addProperty("phone", phone)
+            val deleteMessage = repository.deleteAccount(clientId, parametersForDelete)
+            if (deleteMessage != null && deleteMessage.status) {
+                PushNotifications.clearAllState()
+                val intent = Intent(mainActivity.applicationContext, StartActivity::class.java)
+                intent.flags =
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                CoroutineScope(Dispatchers.Default).launch {
+                    YouWaterDB.getYouWaterDB(mainActivity.applicationContext)?.clearAllTables()
+                }
+                exitClient()
+                Toast.makeText(
+                    mainActivity.applicationContext,
+                    deleteMessage.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+                mainActivity.startActivity(intent)
+            } else {
+                Toast.makeText(
+                    mainActivity.applicationContext,
+                    "Ошибка соединения",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     fun getAuthClient(): AuthClient = repository.getAuthClient()
 
-    fun setEditClientData(clientName: String, clientPhone: String, clientEmail: String) {
-        editClientName = clientName
-        editClientPhone = clientPhone
-        editClientEmail = clientEmail
+    fun setEditClientName(clientName: String, clientPhone: String, clientEmail: String): Boolean {
+        return if (!clientName.contains(Regex("""[^A-zА-я\s]"""))) {
+            editClientName = clientName
+            editClientPhone = clientPhone
+            editClientEmail = clientEmail
+            true
+        } else {
+            false
+        }
+    }
+
+    fun setEditClientPhone(clientPhone: String, clientName: String, clientEmail: String): Boolean {
+        return if (clientPhone.contains(Regex("""7\d{10}"""))) {
+            editClientPhone = "+${clientPhone[0]}(${clientPhone[1]}${clientPhone[2]}${clientPhone[3]}) ${clientPhone[4]}${clientPhone[5]}${clientPhone[6]}-${clientPhone[7]}${clientPhone[8]}${clientPhone[9]}${clientPhone[10]}"
+            editClientName = clientName
+            editClientEmail = clientEmail
+            true
+        } else {
+            false
+        }
+    }
+
+    fun setEditClientEmail(clientEmail: String, clientName: String, clientPhone: String): Boolean {
+        return if (clientEmail.contains(Regex("""(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})"""))) {
+            editClientEmail = clientEmail
+            editClientName = clientName
+            editClientPhone = clientPhone
+            true
+        } else false
+    }
+
+    fun getNumberFromPhone(clientPhone: String): String {
+        val listNumber = mutableListOf<Char>()
+        val integerChars = '0'..'9'
+        clientPhone.forEach { char ->
+            if (char in integerChars) listNumber.add(char)
+        }
+        return listNumber.joinToString(
+            ""
+        )
     }
 
     fun editUserData(navHostController: NavHostController) {

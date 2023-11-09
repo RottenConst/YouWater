@@ -49,7 +49,7 @@ fun MainNavGraph(modifier: Modifier = Modifier, navController: NavHostController
 
         addProfileScreen(watterViewModel, navController, this)
         addMyOrdersScreen(watterViewModel = watterViewModel, navController = navController, this)
-        addUserDataScreen(watterViewModel = watterViewModel, this)
+        addUserDataScreen(watterViewModel = watterViewModel, mainActivity = mainActivity, this)
         addEditUserData(watterViewModel = watterViewModel, this)
         addFavoriteScreen(watterViewModel = watterViewModel, navController = navController, this)
         addAddressesScreen(watterViewModel = watterViewModel, navController = navController, this)
@@ -208,6 +208,7 @@ private fun addEditUserData(
 
 private fun addUserDataScreen(
     watterViewModel: WatterViewModel,
+    mainActivity: MainActivity,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
@@ -221,7 +222,7 @@ private fun addUserDataScreen(
 
         val args = navBackStackEntry.arguments
 
-        UserDataScreen(sendUserData = args?.getBoolean(MainNavRoute.UserDataScreen.sendUserData)!!, watterViewModel = watterViewModel)
+        UserDataScreen(sendUserData = args?.getBoolean(MainNavRoute.UserDataScreen.sendUserData)!!, mainActivity = mainActivity, watterViewModel = watterViewModel)
     }
 }
 

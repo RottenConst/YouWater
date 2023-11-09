@@ -131,4 +131,10 @@ interface ApiWater {
     suspend fun getDeliverySchedule(
         @Body addressJson: JsonObject
     ): DeliverySchedule?
+
+    @POST("delete-account/{client_id}/")
+    suspend fun deleteAccount(
+        @Path("client_id") client_id: Int,
+        @Body parameters: JsonObject
+    ): DeleteMessage?
 }
