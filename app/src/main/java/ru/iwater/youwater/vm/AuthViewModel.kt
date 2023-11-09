@@ -63,23 +63,33 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    fun isValidatePhone(phone: String): Boolean {
+        return phone.contains(Regex("""\d{10}"""))
+    }
+
     /*
         проверка пин кода
      */
-    fun checkPin(pinCode: String, clientId: Int) {
+    fun checkPin(pinCode: String, clientId: Int, isCheck: Boolean) {
         viewModelScope.launch {
-            val clientFullAuth = authorisationRepository.checkCode(clientId, pinCode)
-            when {
-                clientFullAuth == null -> {
-                    _statusPinCode.value = StatusPinCode.NET_ERROR
+            if (isCheck) {
+                val clientFullAuth = authorisationRepository.checkCode(clientId, pinCode)
+                when {
+                    clientFullAuth == null -> {
+                        _statusPinCode.value = StatusPinCode.NET_ERROR
+                    }
+
+                    clientFullAuth.session.isNotEmpty() -> {
+                        _statusPinCode.value = StatusPinCode.DONE
+                        saveClient(clientFullAuth)
+                    }
+
+                    clientFullAuth.session.isEmpty() -> {
+                        _statusPinCode.value = StatusPinCode.ERROR
+                    }
                 }
-                clientFullAuth.session.isNotEmpty() -> {
-                    _statusPinCode.value = StatusPinCode.DONE
-                    saveClient(clientFullAuth)
-                }
-                clientFullAuth.session.isEmpty() -> {
-                    _statusPinCode.value = StatusPinCode.ERROR
-                }
+            } else {
+                _statusPinCode.value = StatusPinCode.EDIT_PIN
             }
         }
     }
@@ -95,6 +105,14 @@ class AuthViewModel @Inject constructor(
                 else -> _statusSession.value = StatusSession.ERROR
             }
         }
+    }
+
+    fun isValidName(name: String): Boolean {
+        return !name.contains(Regex("""[^A-zА-я\s]"""))
+    }
+
+    fun isValidEmail(email: String): Boolean {
+        return email.contains(Regex("""(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})"""))
     }
 
     /*
