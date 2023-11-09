@@ -5,7 +5,7 @@ enum class StatusData {
     DONE
 }
 
-enum class StatusPinCode { ERROR, DONE, NET_ERROR }
+enum class StatusPinCode { ERROR, EDIT_PIN, DONE, NET_ERROR }
 
 enum class StatusSession { TRY, FALSE, ERROR }
 
