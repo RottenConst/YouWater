@@ -9,7 +9,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -51,21 +54,39 @@ fun EnterPinCodeScreen(
         var isCheckPinCode by rememberSaveable { mutableStateOf(false) }
         var pinCode by rememberSaveable{ mutableStateOf("") }
         val statusPinCode by authViewModel.statusPinCode.observeAsState()
+        authViewModel.checkPin(pinCode, clientId, isCheck = isCheckPinCode)
         when (statusPinCode) {
             DONE -> {
+                isCheckPinCode = false
                 Timber.d("DONE")
                 startActivity.finish()
                 MainActivity.start(context)
             }
+
             ERROR -> {
                 Timber.d("Error")
-                Toast.makeText(context, stringResource(id = R.string.error_pin_code_text), Toast.LENGTH_LONG).show()
+                pinCode = ""
+                isCheckPinCode = false
+                Toast.makeText(
+                    context,
+                    stringResource(id = R.string.error_pin_code_text),
+                    Toast.LENGTH_LONG
+                ).show()
             }
+
             NET_ERROR -> {
                 Timber.d("Net Error")
-                Toast.makeText(context, stringResource(id = R.string.net_error_text), Toast.LENGTH_LONG).show()
+                pinCode = ""
+                isCheckPinCode = false
+                Toast.makeText(
+                    context,
+                    stringResource(id = R.string.net_error_text),
+                    Toast.LENGTH_LONG
+                ).show()
             }
-            else -> {}
+            else -> {
+            }
+
         }
 
         LoginTitle(title = stringResource(id = R.string.fragment_enter_pin_code_enter_text))
@@ -77,10 +98,6 @@ fun EnterPinCodeScreen(
             maxLength = 4,
             isFullPinCode = {isCheckPinCode = it}
         )
-        if (isCheckPinCode) {
-            authViewModel.checkPin(pinCode, clientId)
-            isCheckPinCode = false
-        }
         DescriptionText(text = "$infoPinCode $phone")
     }
 }
@@ -103,6 +120,7 @@ fun ButtonEnter(text: String, isEnabledButton: Boolean, onEvent: () -> Unit) {
             .padding(top = 24.dp, start = 52.dp, end = 52.dp),
         shape = RoundedCornerShape(8.dp),
         enabled = isEnabledButton,
+        colors = ButtonDefaults.buttonColors(containerColor = Blue500),
         onClick = {
             onEvent()
         }) {
