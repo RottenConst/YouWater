@@ -478,7 +478,8 @@ fun ProductInfo(modifier: Modifier, product: Product) {
         loading = {
             Box(modifier = modifier.matchParentSize()) {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Blue500
                 )
             }
         },

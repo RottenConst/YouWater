@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -13,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
@@ -22,9 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.R
+import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.vm.AuthViewModel
 import ru.iwater.youwater.theme.YouWaterTypography
-import kotlin.math.absoluteValue
+import ru.iwater.youwater.utils.MaskVisualTransformation
+import ru.iwater.youwater.utils.NumberDefaults
 
 @Composable
 fun LoginScreen(
@@ -44,7 +47,13 @@ fun LoginScreen(
             mutableStateOf(false)
         }
         LoginTitle(stringResource(id = R.string.login_fragment_enter_text))
-        InputTelNumberField(phone = phone, setPhone = {phone = it}, isFullPhoneNumber = {isEnabledButton = it})
+        InputTelNumberField(
+            phone = phone,
+            setPhone = {
+                phone = it
+                authViewModel.isValidatePhone(it) },
+            isFullPhoneNumber = {isEnabledButton = it}
+        )
         ButtonEnter(text = stringResource(id = R.string.login_fragment_sent_code), isEnabledButton = isEnabledButton) {
             authViewModel.authPhone(
                 phone = phone,
@@ -84,7 +93,10 @@ fun LoginTitle(title: String) {
 }
 
 @Composable
-fun InputTelNumberField(phone: String, setPhone: (String) -> Unit, isFullPhoneNumber: (Boolean) -> Unit) {
+fun InputTelNumberField(phone: String, setPhone: (String) -> Boolean, isFullPhoneNumber: (Boolean) -> Unit) {
+    var isValidatePhone by rememberSaveable {
+        mutableStateOf(true)
+    }
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
@@ -93,15 +105,24 @@ fun InputTelNumberField(phone: String, setPhone: (String) -> Unit, isFullPhoneNu
         value = phone,
         onValueChange = {number ->
             if (number.length <= NumberDefaults.INPUT_LENGTH) {
-                setPhone(number)
-                isFullPhoneNumber(number.length == NumberDefaults.INPUT_LENGTH)
+                isValidatePhone = setPhone(number)
+                isFullPhoneNumber(number.length == NumberDefaults.INPUT_LENGTH && isValidatePhone)
             }
         },
+        isError = !isValidatePhone,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
         label = { Text(text = stringResource(id = R.string.login_fragment_tel_number))},
         visualTransformation =
-        MaskVisualTransformation(NumberDefaults.MASK),
-        maxLines = 1
+        MaskVisualTransformation(NumberDefaults.MASK_LOGIN_PHONE),
+        maxLines = 1,
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = Blue500,
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            errorContainerColor = Color.White,
+            focusedLabelColor = Blue500,
+            cursorColor = Blue500
+        )
     )
 }
 @Composable
@@ -112,45 +133,6 @@ fun DescriptionText(text: String) {
         style = YouWaterTypography.body2,
         text = text
     )
-}
-
-object NumberDefaults {
-    const val MASK = "+7(###) ###-####"
-    const val INPUT_LENGTH = 10
-}
-
-class MaskVisualTransformation(private val mask: String) : VisualTransformation {
-
-    private val specialSymbolsIndices = mask.indices.filter { mask[it] != '#'}
-    override fun filter(text: AnnotatedString): TransformedText {
-        var out = ""
-        var maskIndex = 0
-        text.forEach { char ->
-            while (specialSymbolsIndices.contains(maskIndex)) {
-                out += mask[maskIndex]
-                maskIndex++
-            }
-            out += char
-            maskIndex++
-        }
-        return TransformedText(AnnotatedString(out), offsetTranslator())
-    }
-    private fun offsetTranslator() = object : OffsetMapping {
-        override fun originalToTransformed(offset: Int): Int {
-            val offsetValue = offset.absoluteValue
-            if (offsetValue == 0) return 0
-            var numberOfHashtags = 0
-            val masked = mask.takeWhile {
-                if (it == '#') numberOfHashtags++
-                numberOfHashtags < offsetValue
-            }
-            return masked.length + 1
-        }
-
-        override fun transformedToOriginal(offset: Int): Int {
-            return mask.take(offset.absoluteValue).count { it == '#' }
-        }
-    }
 }
 
 @Preview
@@ -172,7 +154,10 @@ fun InputTelNumPreview() {
             LoginTitle(title = stringResource(id = R.string.login_fragment_enter_text))
             InputTelNumberField(
                 phone = phone,
-                setPhone = {phone = it},
+                setPhone = {
+                    phone = it
+                    it.contains(Regex("""7\d{10}"""))
+                           },
                 isFullPhoneNumber = {
                     isEnabledButton = it
                 })
