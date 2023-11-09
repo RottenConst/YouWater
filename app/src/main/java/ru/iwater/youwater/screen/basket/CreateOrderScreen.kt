@@ -169,17 +169,17 @@ fun CreateOrderScreen(
                 selectedAddress = selectedAddress,
                 checkAddressDialog = checkAddressDialog,
                 dateOrder = dateOrder,
-                onShowDialog = {checkAddressDialog = !checkAddressDialog},
-                setAddressOrder = {
+                onShowDialog = {
                     if (addressList.isNullOrEmpty()) {
                         navController.navigate(
                             MainNavRoute.AddAddressScreen.withArgs(true.toString())
                         )
-                    } else {
+                    } else checkAddressDialog = !checkAddressDialog },
+                setAddressOrder = {
                     selectedTime = "**:**-**:**"
                     dateOrder = ""
                     watterViewModel.getDeliveryOnAddress(it)
-                    selectedAddress = addressList?.indexOf(it) ?: -1 }},
+                    selectedAddress = addressList?.indexOf(it) ?: -1 },
                 showDatePickerDialog = {
                     showDatePicker = true
                 }
@@ -348,7 +348,8 @@ fun AddressAndTimeOrder(
         SetAddressDialog(
             addressList = addressList,
             onShowDialog = { onShowDialog() },
-            setAddressOrder = setAddressOrder)
+            setAddressOrder = setAddressOrder
+        )
     }
 
 }
@@ -367,7 +368,6 @@ private fun SetAddressDialog(
         containerColor = Color.White,
         onDismissRequest = { onShowDialog() },
         icon = {Icon(
-//            modifier = Modifier.padding(8.dp),
             imageVector = Icons.Rounded.LocationOn,
             contentDescription = "",
             tint = Blue500
@@ -812,12 +812,10 @@ fun CreateOrderScreenPreview() {
                 .padding(bottom = 120.dp)
                 .verticalScroll(state = scrollState, enabled = true)) {
                 ClientInfoCard(name = "Екатерина Иванова", telNumber = "+7 (999) 210-48-94")
-//                AddressAndTimeOrder(context = LocalContext.current)
                 DetailsOrder(
                     highSize = highSize,
                     products = productsList,
                     minusCount = {
-//                        it.count--
                         generalPrice = 0
                         productsList.find { product -> it.id == product.id }?.count = it.count--
                     },
@@ -826,8 +824,6 @@ fun CreateOrderScreenPreview() {
                         productsList.find { product -> it.id == product.id }?.count = it.count++
                     }
                 )
-//                TypePayCard()
-//                GetCommentCard()
             }
             GeneralInfo(
                 modifier = Modifier.align(Alignment.BottomCenter),
