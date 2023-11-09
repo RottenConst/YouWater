@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +30,8 @@ import ru.iwater.youwater.R
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
+import ru.iwater.youwater.utils.MaskVisualTransformation
+import ru.iwater.youwater.utils.NumberDefaults
 import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
@@ -49,7 +51,7 @@ fun EditUserDataScreen(
         mutableStateOf(client?.name)
     }
     var phoneClient by rememberSaveable {
-        mutableStateOf(client?.contact)
+        mutableStateOf(watterViewModel.getNumberFromPhone(client?.contact ?: ""))
     }
     var emailClient by rememberSaveable {
         mutableStateOf(client?.email)
@@ -60,9 +62,9 @@ fun EditUserDataScreen(
             name = clientName ?: "",
             editUserName = {
                 clientName = it
-                watterViewModel.setEditClientData(
-                    clientName = clientName ?: "",
-                    clientPhone = phoneClient ?: "",
+                watterViewModel.setEditClientName(
+                    clientName = it,
+                    clientPhone = phoneClient,
                     clientEmail = emailClient ?: ""
                 )
             },
@@ -72,12 +74,12 @@ fun EditUserDataScreen(
         )
         PhoneEditClient(
             modifier = modifier,
-            phone = phoneClient ?: "",
+            phone = phoneClient,
             editUserPhone = {
                 phoneClient = it
-                watterViewModel.setEditClientData(
-                    clientName = clientName ?: "",
+                watterViewModel.setEditClientPhone(
                     clientPhone = it,
+                    clientName = clientName ?: "",
                     clientEmail = emailClient ?: ""
                 )
             },
@@ -90,10 +92,10 @@ fun EditUserDataScreen(
             email = emailClient ?: "",
             editUserEmail = {
                 emailClient = it
-                watterViewModel.setEditClientData(
+                watterViewModel.setEditClientEmail(
+                    clientEmail = it,
                     clientName = clientName ?: "",
-                    clientPhone = phoneClient ?: "",
-                    clientEmail = it
+                    clientPhone = phoneClient
                 )
             },
             clearEmail = {
@@ -104,13 +106,16 @@ fun EditUserDataScreen(
 }
 
 @Composable
-fun NameEditClient(modifier: Modifier, name: String, editUserName: (String) -> Unit, clearName: () -> Unit) {
+fun NameEditClient(modifier: Modifier, name: String, editUserName: (String) -> Boolean, clearName: () -> Unit) {
+    var isValidateName by rememberSaveable {
+        mutableStateOf(true)
+    }
     Column(modifier = modifier
         .padding(16.dp)
         .fillMaxWidth()) {
         TextField(
             value = name,
-            onValueChange = { editUserName(it) },
+            onValueChange = { isValidateName = editUserName(it) },
             label = { Text(
                 text = stringResource(id = R.string.fragment_user_data_name_user),
                 style = YouWaterTypography.body2
@@ -121,21 +126,37 @@ fun NameEditClient(modifier: Modifier, name: String, editUserName: (String) -> U
             trailingIcon = {
                 Icon(painter = painterResource(id = R.drawable.ic_cancel_24), contentDescription = "", tint = Color.Gray, modifier = modifier.clickable { clearName() })
             },
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White, disabledTrailingIconColor = Color.Gray, trailingIconColor = Blue500)
+            isError = !isValidateName,
+            supportingText = { if (!isValidateName) Text(text = stringResource(id = R.string.support_text_edit_name)) },
+            colors = TextFieldDefaults.colors(
+                focusedTrailingIconColor = Blue500,
+                focusedIndicatorColor = Blue500,
+                disabledTrailingIconColor = Color.Gray,
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                errorContainerColor = Color.White,
+                focusedLabelColor = Blue500,
+                cursorColor = Blue500
+            )
         )
     }
 
 }
 
 @Composable
-fun PhoneEditClient(modifier: Modifier, phone: String, editUserPhone: (String) -> Unit, clearPhone: () -> Unit) {
+fun PhoneEditClient(modifier: Modifier, phone: String, editUserPhone: (String) -> Boolean, clearPhone: () -> Unit) {
+    var isValidatePhone by rememberSaveable {
+        mutableStateOf(true)
+    }
     Column(modifier = modifier
         .padding(16.dp)
         .fillMaxWidth()) {
         TextField(
             value = phone,
             onValueChange = {number ->
-                editUserPhone(number) },
+                if (number.length <= 11) {
+                    isValidatePhone = editUserPhone(number)
+                } },
             label = { Text(
                 text = stringResource(id = R.string.fragment_user_data_phone),
                 style = YouWaterTypography.body2
@@ -147,19 +168,36 @@ fun PhoneEditClient(modifier: Modifier, phone: String, editUserPhone: (String) -
             trailingIcon = {
                 Icon(painter = painterResource(id = R.drawable.ic_cancel_24), contentDescription = "", tint = Color.Gray, modifier = modifier.clickable { clearPhone() })
             },
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White, disabledTrailingIconColor = Color.Gray, trailingIconColor = Blue500)
+            isError = !isValidatePhone,
+            supportingText = { if (!isValidatePhone) Text(text = stringResource(id = R.string.support_text_edit_phone)) },
+            visualTransformation = MaskVisualTransformation(NumberDefaults.MASK_EDIT_PHONE),
+            colors = TextFieldDefaults.colors(
+                focusedTrailingIconColor = Blue500,
+                focusedIndicatorColor = Blue500,
+                disabledTrailingIconColor = Color.Gray,
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                errorContainerColor = Color.White,
+                focusedLabelColor = Blue500,
+                cursorColor = Blue500
+            )
         )
     }
 }
 
 @Composable
-fun EmailEditClient(modifier: Modifier, email: String, editUserEmail: (String) -> Unit, clearEmail: () -> Unit) {
+fun EmailEditClient(modifier: Modifier, email: String, editUserEmail: (String) -> Boolean, clearEmail: () -> Unit) {
+    var isValidateEmail by rememberSaveable {
+        mutableStateOf(true)
+    }
     Column(modifier = modifier
         .padding(16.dp)
         .fillMaxWidth()) {
         TextField(
             value = email,
-            onValueChange = { editUserEmail(it) },
+            onValueChange = {
+                isValidateEmail = editUserEmail(it)
+                            },
             label = { Text(
                 text = stringResource(id = R.string.fragment_user_data_email),
                 style = YouWaterTypography.body2
@@ -170,7 +208,19 @@ fun EmailEditClient(modifier: Modifier, email: String, editUserEmail: (String) -
             trailingIcon = {
                 Icon(painter = painterResource(id = R.drawable.ic_cancel_24), contentDescription = "", tint = Color.Gray, modifier = modifier.clickable { clearEmail() })
             },
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White, disabledTrailingIconColor = Color.Gray, trailingIconColor = Blue500)
+            isError = !isValidateEmail,
+            supportingText = {if (!isValidateEmail) Text(text = stringResource(id = R.string.support_text_edit_email))},
+            colors = TextFieldDefaults.colors(
+                focusedTrailingIconColor = Blue500,
+                focusedIndicatorColor = Blue500,
+                disabledTrailingIconColor = Color.Gray,
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                errorContainerColor = Color.White,
+                focusedLabelColor = Blue500,
+                cursorColor = Blue500
+            )
+//            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White, disabledTrailingIconColor = Color.Gray, trailingIconColor = Blue500)
         )
     }
 }
@@ -190,10 +240,10 @@ fun EditUserDataPreview() {
     }
     YourWaterTheme {
         Column(modifier = modifier.fillMaxSize()) {
-            NameEditClient(modifier = modifier, name = name, editUserName = {name = it}, clearName = {name = ""})
+//            NameEditClient(modifier = modifier, name = name, editUserName = {name = it}, clearName = {name = ""})
 
-            PhoneEditClient(modifier = modifier, phone = phone, editUserPhone = {phone = it}, clearPhone = {phone = ""})
-            EmailEditClient(modifier = modifier, email = email, editUserEmail = {email = it}, clearEmail = { email = ""})
+//            PhoneEditClient(modifier = modifier, phone = phone, editUserPhone = {phone = it}, clearPhone = {phone = ""})
+//            EmailEditClient(modifier = modifier, email = email, editUserEmail = {email = it}, clearEmail = { email = ""})
         }
 
     }
