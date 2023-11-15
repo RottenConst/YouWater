@@ -581,7 +581,7 @@ class WatterViewModel @Inject constructor(
                 order.orderCost = orderCost
                 _productsInBasket.forEach { product ->
                     val productJson =
-                        getJsonProduct(product, product.getPriceOnCount(product.count))
+                        getJsonProduct(product, product.getPriceOnCount(product.count)/product.count)
                     order.waterEquip.add(productJson)
                 }
                 val orderId = repository.createOrderApp(order)
