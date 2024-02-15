@@ -5,12 +5,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Text
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,14 +26,14 @@ fun BannerInfoScreen(namePromo: String, promoDescription: String){
     ) {
         Text(
             text = namePromo,
-            style = YouWaterTypography.body1,
+//            style = YouWaterTypography.body1,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
         Text(
             text = promoDescription,
-            style = YouWaterTypography.body2,
+//            style = YouWaterTypography.body2,
             modifier = Modifier.fillMaxWidth().padding(8.dp).verticalScroll(state = scrollState, enabled = true
             )
         )
@@ -56,14 +52,14 @@ fun BannerInfoScreenPreview() {
         ) {
             Text(
                 text = "Action",
-                style = YouWaterTypography.body1,
+//                style = YouWaterTypography.body1,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
                 text = "Info",
-                style = YouWaterTypography.body2,
+//                style = YouWaterTypography.body2,
                 modifier = Modifier.fillMaxWidth().padding(8.dp).verticalScroll(state = scrollState, enabled = true)
             )
         }

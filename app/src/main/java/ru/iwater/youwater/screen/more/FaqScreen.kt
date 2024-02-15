@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,32 +29,32 @@ fun QuestOne(modifier: Modifier) {
         .fillMaxSize().verticalScroll(state = scrollState, enabled = true)) {
         Text(
             text = stringResource(id = R.string.fragment_faq_one_quest),
-            style = YouWaterTypography.h6,
+//            style = YouWaterTypography.h6,
             fontWeight = FontWeight.Bold,
         )
         Text(
             text = stringResource(id = R.string.fragment_faq_one_quest_answer_1_1),
-            style = YouWaterTypography.body1,
+//            style = YouWaterTypography.body1,
             modifier = modifier.padding(8.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_faq_one_quest_answer_1_2),
-            style = YouWaterTypography.body1,
+//            style = YouWaterTypography.body1,
             modifier = modifier.padding(8.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_faq_one_quest_answer_1_3),
-            style = YouWaterTypography.body1,
+//            style = YouWaterTypography.body1,
             modifier = modifier.padding(8.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_faq_one_quest_answer_1_4),
-            style = YouWaterTypography.body1,
+//            style = YouWaterTypography.body1,
             modifier = modifier.padding(8.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_faq_one_quest_answer_1_5),
-            style = YouWaterTypography.body1,
+//            style = YouWaterTypography.body1,
             modifier = modifier.padding(8.dp)
         )
 

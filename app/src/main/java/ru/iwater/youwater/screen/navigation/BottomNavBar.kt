@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,13 +30,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 
 @Composable
-fun BottomNavBar(navController: NavController, onOpenDriverMenu: () -> Unit) {
+fun BottomNavBar(productInBasket: Int, navController: NavController, onOpenDriverMenu: () -> Unit) {
+    var navigationSelectedItem by remember {
+        mutableIntStateOf(0)
+    }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val items = listOf(
@@ -64,40 +71,70 @@ fun BottomNavBar(navController: NavController, onOpenDriverMenu: () -> Unit) {
     ) {
         return
     }
-
-
-    BottomNavigation(backgroundColor = Color.White){
-        items.forEach {item ->
-            val selectedItem = currentRoute == item.screenRoute
-            BottomNavigationItem(
-                icon = { Icon(painter = painterResource(id = item.icon), contentDescription = item.title)},
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.secondaryContainer
+    ) {
+        items.forEachIndexed { index, navigationItem ->
+            val selectedItem = currentRoute == navigationItem.screenRoute
+            NavigationBarItem(
+                selected = selectedItem,
                 label = {
                     Text(
-                        text = item.title,
+                        text = navigationItem.title,
                         textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodySmall,
                         fontSize = 9.sp,
                         maxLines = 1
                     )
-                        },
-                selectedContentColor = Blue500,
-                unselectedContentColor = Color.Gray,
+                },
+                icon = {
+                    if (productInBasket > 0 && index == 2) {
+                        BadgedBox(badge = { Badge {
+                            Text(
+                                text = "$productInBasket",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }}) {
+                            Icon(painter = painterResource(id = navigationItem.icon), contentDescription = navigationItem.title)
+                        }
+                    } else {
+                        Icon(painter = painterResource(id = navigationItem.icon), contentDescription = navigationItem.title)
+                    }
+
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedTextColor = MaterialTheme.colorScheme.primary,
+                    disabledTextColor = MaterialTheme.colorScheme.tertiary,
+                    selectedIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    unselectedIconColor = MaterialTheme.colorScheme.primary,
+                    disabledIconColor = MaterialTheme.colorScheme.tertiary,
+                    indicatorColor = MaterialTheme.colorScheme.primary,
+
+                ),
                 alwaysShowLabel = false,
-                selected = selectedItem,
                 onClick = {
-                    if (!selectedItem && item.screenRoute != "more_item") {
-                        navController.navigate(item.screenRoute) {
+                    if (!selectedItem && navigationItem.screenRoute != "more_item") {
+                        navigationSelectedItem = index
+                        navController.navigate(navigationItem.screenRoute) {
                             popUpTo(MainNavRoute.HomeScreen.path) { inclusive = true}
                         }
-                    } else  if (item.screenRoute == "more_item"){
+                    } else  if (navigationItem.screenRoute == "more_item"){
                         onOpenDriverMenu()
-                    }
-                })
+                    } },
+                )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController, onEditUserData: () -> Unit, onExitUser: () ->Unit) {
+fun TopBar(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    onEditUserData: () -> Unit,
+    onExitUser: () -> Unit
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -171,80 +208,112 @@ fun TopBar(navController: NavController, onEditUserData: () -> Unit, onExitUser:
                 currentRoute.contains(MainNavRoute.ProfileMenuScreen.path) ||
                 currentRoute.contains(MainNavRoute.CompleteOrderScreen.path) ||
                 currentRoute.contains(MainNavRoute.CardPaymentScreen.path) -> {
-            TopAppBar {
-                Text(
-                    modifier = Modifier.padding(4.dp),
-                    text = title,
-                    style = YouWaterTypography.h6,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.weight(1f, true))
-                IconButton(onClick = { onExitUser() }) {
-                    Icon(painter = painterResource(id = R.drawable.ic_exit), contentDescription = stringResource(
-                        id = R.string.Exit
-                    ), tint = Color.White)
+            TopAppBar(
+                colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                title = {
+                    Text(
+                        modifier = Modifier.padding(4.dp),
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                )},
+                actions = {
+                    IconButton(onClick = { onExitUser() }) {
+                        Icon(painter = painterResource(id = R.drawable.ic_exit), contentDescription = stringResource(
+                            id = R.string.Exit
+                        ), tint = MaterialTheme.colorScheme.primaryContainer)
+                    }
                 }
-            }
+            )
         }
         currentRoute.contains(MainNavRoute.UserDataScreen.path) -> {
-            TopAppBar{
-                IconButton(onClick = { navController.navigate(MainNavRoute.ProfileMenuScreen.path) }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "backIcon", tint = Color.White)
+            TopAppBar (
+                modifier = modifier,
+                colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                title = {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                },
+                actions = {
+                    IconButton(onClick = { navController.navigate(MainNavRoute.EditUserDataScreen.path) }) {
+                        Icon(painter = painterResource(id = R.drawable.ic_mode_edit_24), contentDescription = stringResource(
+                            id = R.string.Exit
+                        ), tint = MaterialTheme.colorScheme.primaryContainer)
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate(MainNavRoute.ProfileMenuScreen.path) }) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "backIcon", tint = MaterialTheme.colorScheme.primaryContainer)
+                    }
                 }
-                Text(
-                    text = title,
-                    style = YouWaterTypography.h6,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.weight(1f, true))
-                IconButton(onClick = { navController.navigate(MainNavRoute.EditUserDataScreen.path) }) {
-                    Icon(painter = painterResource(id = R.drawable.ic_mode_edit_24), contentDescription = stringResource(
-                        id = R.string.Exit
-                    ), tint = Color.White)
-                }
-            }
+            )
         }
         currentRoute.contains(MainNavRoute.EditUserDataScreen.path) -> {
-            TopAppBar{
-                IconButton(onClick = { navController.navigate(MainNavRoute.UserDataScreen.withArgs(false.toString())){
-                    popUpTo(MainNavRoute.UserDataScreen.path) {inclusive = true}
-                } }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "backIcon", tint = Color.White)
+            TopAppBar(
+                modifier = modifier,
+                colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                title = {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                },
+                actions = {
+                    IconButton(onClick = { onEditUserData() }) {
+                        Icon(painter = painterResource(id = R.drawable.ic_check_24), contentDescription = stringResource(
+                            id = R.string.Exit
+                        ), tint = MaterialTheme.colorScheme.primaryContainer)
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate(MainNavRoute.UserDataScreen.withArgs(false.toString())){
+                        popUpTo(MainNavRoute.UserDataScreen.path) {inclusive = true}
+                    } }) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "backIcon", tint = MaterialTheme.colorScheme.primaryContainer)
+                    }
                 }
-                Text(
-                    text = title,
-                    style = YouWaterTypography.h6,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.weight(1f, true))
-                IconButton(onClick = { onEditUserData() }) {
-                    Icon(painter = painterResource(id = R.drawable.ic_check_24), contentDescription = stringResource(
-                        id = R.string.Exit
-                    ), tint = Color.White)
-                }
-            }
+            )
         }
         else -> {
-            TopAppBar{
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "backIcon", tint = Color.White)
+            TopAppBar(
+                modifier = modifier,
+                colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                title = {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                },
+                actions = {
+                    IconButton(onClick = { onExitUser() }) {
+                        Icon(painter = painterResource(id = R.drawable.ic_exit), contentDescription = stringResource(
+                            id = R.string.Exit
+                        ), tint = MaterialTheme.colorScheme.primaryContainer)
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "backIcon", tint = MaterialTheme.colorScheme.primaryContainer)
+                    }
                 }
-                Text(
-                    text = title,
-                    style = YouWaterTypography.h6,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.weight(1f, true))
-                IconButton(onClick = { onExitUser() }) {
-                    Icon(painter = painterResource(id = R.drawable.ic_exit), contentDescription = stringResource(
-                        id = R.string.Exit
-                    ), tint = Color.White)
-                }
-            }
+            )
         }
     }
 }
@@ -326,15 +395,17 @@ fun DrawerBody(navController: NavHostController?, closeNavDrawer: () -> Unit) {
 @Preview
 @Composable
 fun BottomNavBarPreview() {
+    val navController = rememberNavController()
     YourWaterTheme {
-//        BottomNavBar()
+        BottomNavBar( 0 ,navController, {})
     }
 }
 
 @Preview
 @Composable
 fun TopAppBarPreview() {
+    val navController = rememberNavController()
     YourWaterTheme {
-//        TopBar("asd")
+        TopBar(navController = navController, onEditUserData = {}, onExitUser = {})
     }
 }

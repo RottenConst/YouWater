@@ -7,6 +7,10 @@ enum class StatusData {
 
 enum class StatusPinCode { ERROR, EDIT_PIN, DONE, NET_ERROR }
 
-enum class StatusSession { TRY, FALSE, ERROR }
+enum class StatusSession { CHECKED, TRY, FALSE, ERROR }
 
 enum class StatusPayment { LOAD, PANDING, ERROR, DONE }
+
+data class Status (
+    val status: Boolean
+)

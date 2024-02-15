@@ -16,13 +16,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -32,7 +31,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -41,38 +39,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
+import coil.ImageLoader
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.*
 import ru.iwater.youwater.network.ImageUrl
+import ru.iwater.youwater.screen.component.product.ProductCard
 import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.WatterViewModel
+import ru.iwater.youwater.vm.HomeViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
-    watterViewModel: WatterViewModel = viewModel(),
+    favorite: Favorite,
+    addProductInBasket: (NewProduct, Int, Boolean) -> Unit,
+    onCheckedFavorite: (NewProduct, Boolean) -> Unit,
+    watterViewModel: HomeViewModel = viewModel( factory = HomeViewModel.Factory),
     navController: NavHostController
 ) {
-    watterViewModel.getProductsList()
+    watterViewModel.getProductsList(favorite)
     val lastOrder by watterViewModel.lastOrder.observeAsState()
     val promoBanner by watterViewModel.promoBanners.observeAsState()
     var bannerName by remember {
@@ -85,6 +86,7 @@ fun HomeScreen(
         promoBanner?.size ?: 0
     }
     val productsListState = rememberLazyListState()
+    val startPocket by watterViewModel.startPocket.observeAsState()
     val productsList by watterViewModel.productList.observeAsState()
     var itemBanner = 0
 
@@ -117,64 +119,67 @@ fun HomeScreen(
             }
         )
     }
-
-        Scaffold(
-            snackbarHost = {
-                SnackbarHost(snackbarHostState) { snackbarData ->
-                    Snackbar(snackbarData = snackbarData, actionColor = Blue500)
-                }
-            },
-            floatingActionButton = {
-                if (lastOrder != null) {
-                    ExtendedFloatingActionButton(
-                        onClick = {
-                            navController.navigate(
-                                MainNavRoute.CreateOrderScreen.withArgs(false.toString(), lastOrder.toString())
-                            )
-                        },
-                        expanded = expandedFab,
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Outlined.ShoppingCart,
-                                contentDescription = stringResource(id = R.string.repeat_last_order)
-                            ) },
-                        text = {
-                               Text(text = stringResource(id = R.string.repeat_last_order))
-                        },
-                        contentColor = Color.White,
-                        containerColor = Blue500
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { snackbarData ->
+                Snackbar(snackbarData = snackbarData)
+            } },
+        floatingActionButton = {
+            if (lastOrder != null) {
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        navController.navigate(
+                            MainNavRoute.CreateOrderScreen.withArgs(false.toString(), lastOrder.toString())
+                        ) },
+                    expanded = expandedFab,
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.ShoppingCart,
+                            contentDescription = stringResource(id = R.string.repeat_last_order)
+                        ) },
+                    text = { Text(text = stringResource(id = R.string.repeat_last_order)) },
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    containerColor = MaterialTheme.colorScheme.primary
                     )
                 }
-            })
-        {paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
-                if (productsList?.isEmpty() == true) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Blue500)
-                    }
-                } else {
-                    ProductContent(
-                        promoBanner = promoBanner,
-                        promoPagerState = promoPagerState,
-                        getInfoBanner = {
-                            bannerName = it?.name ?: ""
-                            bannerDescription = it?.description ?: ""
-                            showModalSheet.value = !showModalSheet.value
+        }
+    ) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            if (productsList?.isEmpty() == true) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                ProductContent(
+                    promoBanner = promoBanner,
+                    promoPagerState = promoPagerState,
+                    getInfoBanner = {
+                        bannerName = it?.name ?: ""
+                        bannerDescription = it?.description ?: ""
+                        showModalSheet.value = !showModalSheet.value
+                        scope.launch {
+                            skipPartiallyExpanded = !skipPartiallyExpanded
+                        } },
+                    catalogList = watterViewModel.catalogList,
+                    productsList = productsList ?: emptyList(),
+                    productsListState = productsListState,
+                    getAboutProduct = {
+                        navController.navigate(MainNavRoute.AboutProductScreen.withArgs(it.toString()))
+                                      },
+                    addProductInBasket = { product ->
+                        if (product.price.isEmpty()) {
                             scope.launch {
-                                skipPartiallyExpanded = !skipPartiallyExpanded
+                                snackbarHostState.showSnackbar(
+                                    message = "${product.name} не доступен для заказа",
+                                    duration = SnackbarDuration.Short
+                                )
                             }
-                        },
-                        catalogList = watterViewModel.catalogList,
-                        productsList = productsList ?: emptyList(),
-                        productsListState = productsListState,
-                        getAboutProduct = {
-                            navController.navigate(MainNavRoute.AboutProductScreen.withArgs(it.toString()))
-                        },
-                        addProductInBasket = { product ->
-                            watterViewModel.addProductToBasket(product)
+                        } else {
+                            addProductInBasket(product, 1, startPocket?: false)
+//                            watterViewModel.addProductToBasket(product)
                             scope.launch {
                                 val messageAddProduct = snackbarHostState.showSnackbar(
                                     message = "${product.name} добавлен в корзину",
@@ -188,19 +193,16 @@ fun HomeScreen(
                                     else -> {}
                                 }
                             }
-                                             },
-                        onCheckedFavorite = { product, onFavorite ->
-                            watterViewModel.onChangeFavorite(
-                                productId = product.id,
-                                onFavorite = onFavorite
-                            )
-                        }
-                    )
-                }
+                        } },
+                    onCheckedFavorite = { product, onFavorite ->
+                        onCheckedFavorite(product, onFavorite)
+                    }
+                )
             }
         }
+    }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(itemBanner) {
         watterViewModel.viewModelScope.launch {
             while (itemBanner <= (promoBanner?.size ?: 0)) {
                 delay(5000)
@@ -214,10 +216,6 @@ fun HomeScreen(
             }
         }
     }
-
-
-
-
 }
 
 @Composable
@@ -225,7 +223,7 @@ fun CatalogName(name: String, modifier: Modifier) {
     Text(
         modifier = modifier,
         text = name,
-        style = YouWaterTypography.h6,
+        style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold,
     )
 }
@@ -233,24 +231,30 @@ fun CatalogName(name: String, modifier: Modifier) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProductContent(
-    promoBanner: List<PromoBanner>?,
+    promoBanner: List<Banner>?,
     promoPagerState: PagerState,
-    getInfoBanner: (PromoBanner?) -> Unit,
-    catalogList: List<TypeProduct>,
-    productsList: List<Product>,
+    getInfoBanner: (Banner?) -> Unit,
+    catalogList: List<Category>,
+    productsList: List<NewProduct>,
     productsListState: LazyListState,
-    addProductInBasket: (Product) -> Unit,
+    addProductInBasket: (NewProduct) -> Unit,
     getAboutProduct: (Int) -> Unit,
-    onCheckedFavorite: (Product, Boolean) -> Unit
+    onCheckedFavorite: (NewProduct, Boolean) -> Unit
 ) {
     LazyColumn (state = productsListState) {
-        item {
-            PromoAction(promo = promoBanner, pagerState = promoPagerState, getInfoBanner = getInfoBanner)
+        if (promoPagerState.pageCount != 0) {
+            item {
+                PromoAction(
+                    promo = promoBanner,
+                    pagerState = promoPagerState,
+                    getInfoBanner = getInfoBanner
+                )
+            }
         }
 
         items(catalogList.size) { catalogIndex ->
             ProductsByCategoryRow(
-                categoryName = catalogList[catalogIndex].category,
+                categoryName = catalogList[catalogIndex].name,
                 productsList = productsList.filter { it.category == catalogList[catalogIndex].id },
                 getAboutProduct = getAboutProduct,
                 addProductInBasket = addProductInBasket,
@@ -263,10 +267,10 @@ fun ProductContent(
 @Composable
 fun ProductsByCategoryRow(
     categoryName: String?,
-    productsList: List<Product>?,
+    productsList: List<NewProduct>?,
     getAboutProduct: (Int) -> Unit,
-    addProductInBasket: (Product) -> Unit,
-    onCheckedFavorite: (Product, Boolean) -> Unit
+    addProductInBasket: (NewProduct) -> Unit,
+    onCheckedFavorite: (NewProduct, Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier.padding(8.dp)
@@ -299,32 +303,39 @@ fun ProductsByCategoryRow(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PromoImage(
-    banners: List<PromoBanner>,
+    banners: List<Banner>,
     pagerState: PagerState,
-    getInfoBanner: (PromoBanner?) -> Unit
+    getInfoBanner: (Banner?) -> Unit
 ) {
     HorizontalPager(state = pagerState) { page ->
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
         ) {
-            GlideImage(
-                imageModel = { "$ImageUrl/${banners[page].picture}" },
-                imageOptions = ImageOptions(
-                    alignment = Alignment.Center,
-                    contentDescription = stringResource(id = R.string.description_image_logo),
-                    contentScale = ContentScale.FillWidth,
-                ),
-                loading = {
-                    CircularProgressIndicator(
-                        modifier = Modifier.matchParentSize()
-                    )
-                },
-                failure = {
-                    Text(text = stringResource(id = R.string.promo_banner_image_error))
-                },
-                previewPlaceholder = R.drawable.ic_your_water_logo,
+            val painter = rememberAsyncImagePainter(
+                model = "$ImageUrl/${banners[page].picture}/",
+                imageLoader = ImageLoader
+                    .Builder(LocalContext.current)
+                    .okHttpClient {
+                        OkHttpClient.Builder()
+                            .addInterceptor { chain -> val request = chain.request().newBuilder()
+                                .addHeader("Content-Type", "image/png")
+                                .addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiY29tcGFueV9pZCI6NywiZXhwIjoxNzAxNTI2NzI1MTQyLCJwZXJtaXNzaW9ucyI6eyJpbWFnZSI6NX19.JxLq6E9XGXltDK1iJMFS4K5j4eUzhs7XsWQ0krdYhjw")
+                                .build()
+                                return@addInterceptor chain.proceed(request)
+                            }.build()
+                    }
+                    .error(R.drawable.ic_your_water_logo)
+                    .build()
+            )
+            val painterState = painter.state
+            if (painterState is AsyncImagePainter.State.Loading) {
+                CircularProgressIndicator()
+            }
+            Image(
+                painter = painter,
+                contentDescription = stringResource(id = R.string.description_image_product),
                 modifier = Modifier
                     .padding(8.dp)
                     .height(96.dp)
@@ -356,15 +367,15 @@ fun PromoImage(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PromoAction(
-    promo: List<PromoBanner>?,
+    promo: List<Banner>?,
     pagerState: PagerState,
-    getInfoBanner: (PromoBanner?) -> Unit
+    getInfoBanner: (Banner?) -> Unit
 ) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .height(182.dp),
-        color = Blue500,
+        color = MaterialTheme.colorScheme.primary,
         shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
         shadowElevation = 8.dp
     ) {
@@ -376,250 +387,12 @@ fun PromoAction(
             Text(
                 modifier = Modifier.padding(8.dp),
                 text = stringResource(id = R.string.stocks),
-                style = YouWaterTypography.h6,
+//                style = YouWaterTypography.h6,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+//                color = Color.White
             )
             PromoImage(banners = promo ?: emptyList(), pagerState, getInfoBanner)
         }
-    }
-}
-
-@Composable
-fun ProductCard(
-    product: Product,
-    getAboutProduct: (Int) -> Unit,
-    addProductInBasket: (Product) -> Unit,
-    onCheckedFavorite: (Boolean) -> Unit
-) {
-    Surface(
-        modifier = Modifier
-            .width(152.dp)
-            .height(200.dp)
-            .padding(8.dp),
-        shape = RoundedCornerShape(8.dp),
-        shadowElevation = 8.dp
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable { getAboutProduct(product.id) }
-        ) {
-            Column(modifier = Modifier.padding(8.dp)) {
-                ProductInfo(Modifier.weight(1f), product)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    val priceProduct = product.price
-                    val prices = priceProduct.removeSuffix(";")
-                    val priceList = prices.split(";")
-                    ProductCost(id = product.id, minPrice = product.getMinPriceProduct(), nameProduct = product.name, prices = priceList)
-                    ProductPlusButton { addProductInBasket(product) }
-                }
-            }
-            StatefulFavoriteButton(
-                isFavorite = product.onFavoriteClick,
-                onCheckedFavorite = { onFavorite -> onCheckedFavorite(onFavorite) })
-        }
-    }
-}
-
-@Composable
-private fun IconLike(idIconLike: Int) {
-    Icon(
-        modifier = Modifier.padding(1.dp),
-        painter = painterResource(id = idIconLike),
-        contentDescription = stringResource(id = R.string.description_add_product),
-        tint = Blue500
-    )
-}
-
-@Composable
-private fun StatefulFavoriteButton(isFavorite: Boolean, onCheckedFavorite: (Boolean) -> Unit) {
-    var onFavorite by remember {
-        mutableStateOf(isFavorite)
-    }
-    StatelessFavoriteButton(
-        onFavorite = onFavorite,
-        onCheckedFavorite = { favorite ->
-            onFavorite = !favorite
-            onCheckedFavorite(favorite)
-        }
-    )
-}
-
-@Composable
-private fun StatelessFavoriteButton(onFavorite: Boolean, onCheckedFavorite: (Boolean) -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp, bottom = 8.dp),
-        contentAlignment = Alignment.TopEnd
-    ) {
-        IconButton(
-            onClick = {
-                onCheckedFavorite(onFavorite)
-            }
-        ) {
-            if (onFavorite) {
-                IconLike(idIconLike = R.drawable.ic_like_true)
-            } else
-                IconLike(idIconLike = R.drawable.ic_like)
-        }
-    }
-}
-
-@Composable
-fun ProductInfo(modifier: Modifier, product: Product) {
-    GlideImage(
-        imageModel = { "$ImageUrl/${product.gallery}" },
-        loading = {
-            Box(modifier = modifier.matchParentSize()) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Blue500
-                )
-            }
-        },
-        failure = {
-            Image(
-                modifier = modifier.matchParentSize(),
-                painter = painterResource(id = R.drawable.ic_your_water_logo),
-                contentDescription = stringResource(id = R.string.description_image_product),
-                alignment = Alignment.TopCenter
-            )
-        },
-        previewPlaceholder = R.drawable.ic_your_water_logo,
-        imageOptions = ImageOptions(
-            alignment = Alignment.TopCenter,
-            contentDescription = stringResource(id = R.string.description_image_product),
-            contentScale = ContentScale.Inside
-        ),
-        modifier = modifier
-            .fillMaxWidth()
-            .height(98.dp)
-    )
-    Text(
-        modifier = modifier
-            .fillMaxWidth(),
-        text = product.app_name ?: product.name,
-        style = YouWaterTypography.caption,
-        textAlign = TextAlign.Center,
-        fontWeight = FontWeight.Bold,
-        maxLines = 3
-    )
-}
-
-@Composable
-fun ProductCost(id: Int, minPrice: Int, nameProduct: String, prices: List<String>) {
-    var openDialog by remember { mutableStateOf(false) }
-    if (openDialog) {
-        AlertDialog(
-            onDismissRequest = { openDialog = false },
-            title = {
-                Text(text = nameProduct,
-                    textAlign = TextAlign.Center
-                )
-                    },
-            text = {
-                LazyColumn(modifier = Modifier.padding(8.dp)) {
-                    items(prices.size) { itemIndex ->
-                        val price = prices[itemIndex].split(":")
-                        Row(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            if (price.first() == "1") {
-                                Text(
-                                    text = "От одной шт.",
-                                    style = YouWaterTypography.subtitle1
-                                )
-                            } else {
-                                Text(
-                                    text = "От ${price.first()} шт.",
-                                    style = YouWaterTypography.subtitle1
-                                )
-                            }
-                            Text(
-                                text = "${price.last()}pyб./шт.",
-                                style = YouWaterTypography.subtitle1
-                            )
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { openDialog = false }) {
-                    Text(text = stringResource(id = R.string.general_ok))
-                }
-            }
-        )
-    }
-    Box(
-        contentAlignment = Alignment.BottomStart
-    ) {
-        Column {
-            if (id == 81 || id == 84) {
-                Text(
-                    text = "oт ${minPrice}₽",
-                    color = Color.Gray,
-                    fontWeight = FontWeight.Light,
-                    textAlign = TextAlign.Start,
-                    textDecoration = TextDecoration.LineThrough,
-                    style = YouWaterTypography.caption
-                )
-            }
-            Row(
-                modifier = Modifier.padding(0.dp),
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Text(
-                    text = when (id) {
-                        81 -> "от ${minPrice - 30}₽"
-                        84 -> "от ${minPrice - 30}₽"
-                        else -> "от ${minPrice}₽"
-                    },
-                    color = Blue500,
-                    style = YouWaterTypography.body2,
-                    fontWeight = FontWeight.Bold
-                )
-                IconButton(
-                    onClick = {
-                        openDialog = true
-                    },
-                    modifier = Modifier
-                        .size(24.dp)
-                ) {
-                    Icon(
-                        modifier = Modifier.padding(start = 4.dp),
-                        painter = painterResource(id = R.drawable.ic_help_24),
-                        contentDescription = stringResource(id = R.string.description_image_product),
-                        tint = Blue500
-                    )
-                }
-            }
-
-        }
-    }
-}
-
-@Composable
-fun ProductPlusButton(addProductInBasket: () -> Unit) {
-    IconButton(
-        onClick = { addProductInBasket() },
-        modifier = Modifier
-            .padding(0.dp)
-            .size(24.dp)
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_btn_plus),
-            contentDescription = stringResource(id = R.string.description_add_product),
-            tint = Blue500,
-        )
     }
 }
 
@@ -628,41 +401,32 @@ fun ProductPlusButton(addProductInBasket: () -> Unit) {
 @Composable
 fun HomeScreenPreview() {
     YourWaterTheme {
-        val productsList1: List<Product> = List(100) {
-            Product(
+        val productsList1: List<NewProduct> = List(100) {
+            NewProduct(
                 id = it,
-                name = "Plesca Натуральная 19л в оборотной таре",
-                shname = "PLN",
-                app_name = "Plesca Натуральная в оборотной таре",
-                price = "1:355;2:325;4:300;8:280;10:250;20:240;",
-                discount = 0,
+                name = "Plesca Классическая 19л в оборотной таре",
+                appName = "Plesca Классическая оборотной таре",
+                price = listOf(Price(1, 310)),
                 category = 1,
-                about = "",
-                gallery = "cat-1.png",
-                date_created = 1676121935,
-                date = "11/02/2023",
-                site = 1,
-                app = 1,
-                company_id = "0007"
+                image = "cat-1.png"
             )
         }
         val catalogNames: List<String> = List(100) { "$it" }
-        val promoTest: List<PromoBanner> = List(10) {
-            PromoBanner(
+        val promoTest: List<Banner> = List(10) {
+            Banner(
                 id = it,
                 name = "name $it",
-                promocode = "",
+                promoCode = "",
                 picture = "iwater_logistic.PNG",
-                discount = 10.0,
-                discount_type = false,
+                discountValue = 10.0,
+                discountType = 1,
                 description = "ПРОЦЕНТ",
-                is_active = true,
-                end_date = "",
-                start_date = "",
-                products = List(1) { product ->
-                    ProductXX(product, name = "name $product")
-                },
-                display_in_app = true
+                isActive = true,
+                endDate = "",
+                startDate = "",
+                productList = List(1) { product ->
+                    ProductX(product, name = "name $product")
+                }
             )
         }
         Column {

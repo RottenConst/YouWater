@@ -19,20 +19,26 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
-import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.data.Favorite
+import ru.iwater.youwater.data.NewProduct
+import ru.iwater.youwater.data.Price
+import ru.iwater.youwater.screen.component.product.ProductCard
 import ru.iwater.youwater.screen.home.CatalogName
-import ru.iwater.youwater.screen.home.ProductCard
 import ru.iwater.youwater.screen.navigation.MainNavRoute
-import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.WatterViewModel
+import ru.iwater.youwater.vm.HomeViewModel
 
 @Composable
 fun ProductByCategory(
-    watterViewModel: WatterViewModel = viewModel(),
+    favorite: Favorite,
+    addProductInBasket: (NewProduct, Int, Boolean) -> Unit,
+    onCheckedFavorite: (NewProduct, Boolean) -> Unit,
     catalogId: Int,
+    watterViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
     navController: NavHostController
 ) {
+    watterViewModel.getProductOfCategory(categoryId = catalogId, favorite = favorite)
+    val startPocket by watterViewModel.startPocket.observeAsState()
     val productsList by watterViewModel.productList.observeAsState()
     val modifier = Modifier
     val snackbarHostState = remember {
@@ -43,13 +49,13 @@ fun ProductByCategory(
         snackbarHost = {
             SnackbarHost(snackbarHostState) {
                 snackbarData ->
-                Snackbar(snackbarData = snackbarData, actionColor = Blue500)
+                Snackbar(snackbarData = snackbarData)
             }
         }
     ) { paddingValues ->
         Column(modifier = modifier.padding(paddingValues)) {
             CatalogName(
-                name = watterViewModel.catalogList.find { typeProduct -> typeProduct.id == catalogId }?.category ?: "",
+                name = watterViewModel.catalogList.find { typeProduct -> typeProduct.id == catalogId }?.name ?: "",
                 modifier = modifier.padding(start = 16.dp, top = 16.dp)
             )
             productsList?.filter { product -> product.category == catalogId }?.let {
@@ -57,13 +63,13 @@ fun ProductByCategory(
                     modifier = modifier,
                     productsList = it,
                     countGrid = 2,
-                    getAboutProduct = {
+                    getAboutProduct = { productId ->
                         navController.navigate(
-                            MainNavRoute.AboutProductScreen.withArgs(it.toString())
+                            MainNavRoute.AboutProductScreen.withArgs(productId.toString())
                         )
                     },
                     addProductInBasket = { product ->
-                        watterViewModel.addProductToBasket(product = product)
+                        addProductInBasket(product, 1, startPocket ?: false)
                         scope.launch {
                             val messageAddProduct = snackbarHostState.showSnackbar(
                                 message = "${product.name} добавлен в корзину",
@@ -78,10 +84,7 @@ fun ProductByCategory(
                             }
                         } },
                     onCheckedFavorite = { product, isFavorite ->
-                        watterViewModel.onChangeFavorite(
-                            productId = product.id,
-                            isFavorite
-                        )
+                        onCheckedFavorite(product, isFavorite)
                     }
                 )
             }
@@ -93,11 +96,11 @@ fun ProductByCategory(
 @Composable
 fun ProductGrid(
     modifier: Modifier,
-    productsList: List<Product>,
+    productsList: List<NewProduct>,
     countGrid: Int,
     getAboutProduct: (Int) -> Unit,
-    addProductInBasket: (Product) -> Unit,
-    onCheckedFavorite: (Product, Boolean) -> Unit
+    addProductInBasket: (NewProduct) -> Unit,
+    onCheckedFavorite: (NewProduct, Boolean) -> Unit
 ) {
     LazyVerticalGrid(
         modifier = modifier,
@@ -110,7 +113,8 @@ fun ProductGrid(
             ProductCard(
                 product = productsList[productIndex],
                 getAboutProduct = { getAboutProduct(productsList[productIndex].id) },
-                addProductInBasket = { addProductInBasket(productsList[productIndex]) },
+                addProductInBasket = {
+                    addProductInBasket(productsList[productIndex]) },
                 onCheckedFavorite = { isFavorite ->
                     onCheckedFavorite(
                         productsList[productIndex],
@@ -126,22 +130,14 @@ fun ProductGrid(
 @Composable
 fun ProductByCategoryPreview() {
     YourWaterTheme {
-        val productsList1: List<Product> = List(100) {
-            Product(
+        val productsList1: List<NewProduct> = List(100) {
+            NewProduct(
                 id = it,
-                name = "Plesca Натуральная 19л в оборотной таре",
-                shname = "PLN",
-                app_name = "Plesca Натуральная в оборотной таре",
-                price = "1:355;2:325;4:300;8:280;10:250;20:240;",
-                discount = 0,
+                name = "Plesca Классическая 19л в оборотной таре",
+                appName = "Plesca Классическая оборотной таре",
+                price = listOf(Price(1, 310)),
                 category = 1,
-                about = "",
-                gallery = "cat-1.png",
-                date_created = 1676121935,
-                date = "11/02/2023",
-                site = 1,
-                app = 1,
-                company_id = "0007"
+                image = "cat-1.png"
             )
         }
         Column {

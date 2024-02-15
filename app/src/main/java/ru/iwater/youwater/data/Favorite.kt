@@ -1,5 +1,9 @@
 package ru.iwater.youwater.data
 
+
+import com.google.gson.annotations.SerializedName
+
 data class Favorite(
-    val favorites_list: List<String>
+    @SerializedName("favorites_list")
+    val favoritesList: List<Int>
 )

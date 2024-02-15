@@ -2,57 +2,57 @@ package ru.iwater.youwater.screen.navigation
 
 sealed class MainNavRoute(val path: String) {
 
-    object HomeScreen: MainNavRoute("home")
+    data object HomeScreen: MainNavRoute("home")
 
-    object AboutProductScreen: MainNavRoute("about") {
+    data object AboutProductScreen: MainNavRoute("about") {
         const val productId = "productId"
     }
 
-    object CatalogScreen: MainNavRoute("catalog")
+    data object CatalogScreen: MainNavRoute("catalog")
 
-    object ProductsByCategoryScreen: MainNavRoute("category") {
+    data object ProductsByCategoryScreen: MainNavRoute("category") {
         const val catalogId = "categoryId"
     }
 
-    object BasketScreen: MainNavRoute("basket")
+    data object BasketScreen: MainNavRoute("basket")
 
-    object CreateOrderScreen: MainNavRoute("createOrder") {
+    data object CreateOrderScreen: MainNavRoute("createOrder") {
         const val isShowMessage = "isShowMessage"
         const val lastOrderId = "lastOrderId"
     }
 
-    object CardPaymentScreen: MainNavRoute("cardPayment") {
+    data object CardPaymentScreen: MainNavRoute("cardPayment") {
         const val orderId = "orderId"
     }
 
-    object CompleteOrderScreen: MainNavRoute("completeOrder") {
+    data object CompleteOrderScreen: MainNavRoute("completeOrder") {
         const val orderId = "orderId"
         const val isPayment = "isPayment"
     }
 
-    object ProfileMenuScreen: MainNavRoute("profile")
+    data object ProfileMenuScreen: MainNavRoute("profile")
 
-    object MyOrderScreen: MainNavRoute("myOrder")
+    data object MyOrderScreen: MainNavRoute("myOrder")
 
-    object UserDataScreen: MainNavRoute("user") {
+    data object UserDataScreen: MainNavRoute("user") {
         const val sendUserData = "sendUserData"
     }
 
-    object EditUserDataScreen: MainNavRoute("editUser")
+    data object EditUserDataScreen: MainNavRoute("editUser")
 
-    object FavoriteProductScreen: MainNavRoute("favorite")
+    data object FavoriteProductScreen: MainNavRoute("favorite")
 
-    object AddressesScreen: MainNavRoute("addresses")
+    data object AddressesScreen: MainNavRoute("addresses")
 
-    object AddAddressScreen: MainNavRoute("addAddress") {
+    data object AddAddressScreen: MainNavRoute("addAddress") {
         const val isFromOrder = "isFromOrder"
     }
 
-    object NotificationScreen: MainNavRoute("notification")
-    object AboutCompanyScreen: MainNavRoute("companyInfo")
-    object ContactScreen: MainNavRoute("contact")
-    object DeliveryInfoScreen: MainNavRoute("delivery")
-    object FaqScreen: MainNavRoute("faq")
+    data object NotificationScreen: MainNavRoute("notification")
+    data object AboutCompanyScreen: MainNavRoute("companyInfo")
+    data object ContactScreen: MainNavRoute("contact")
+    data object DeliveryInfoScreen: MainNavRoute("delivery")
+    data object FaqScreen: MainNavRoute("faq")
 
 
     fun withArgs(vararg args: String): String {

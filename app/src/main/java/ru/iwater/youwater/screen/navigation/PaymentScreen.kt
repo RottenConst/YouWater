@@ -5,17 +5,23 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import ru.iwater.youwater.vm.PaymentViewModel
+import ru.iwater.youwater.vm.PaymentViewModelFactory
 import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
-fun PaymentScreen(modifier: Modifier = Modifier, watterViewModel: WatterViewModel, orderId: Int) {
+fun PaymentScreen(
+    modifier: Modifier = Modifier,
+    orderId: Int,
+    watterViewModel: PaymentViewModel,
+) {
     val navController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
-    watterViewModel.startPay()
     Scaffold(
         scaffoldState = scaffoldState
     ) { paddingValues ->
-        PaymentNavGraph(navController = navController, watterViewModel = watterViewModel, modifier = modifier.padding(paddingValues = paddingValues), orderId = orderId)
+        PaymentNavGraph(navController = navController, modifier = modifier.padding(paddingValues = paddingValues), orderId = orderId, viewModel = watterViewModel)
     }
 }

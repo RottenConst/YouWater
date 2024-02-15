@@ -4,9 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,8 +22,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
-import ru.iwater.youwater.theme.Blue500
-import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.vm.AuthViewModel
 import ru.iwater.youwater.theme.YourWaterTheme
 import timber.log.Timber
@@ -38,7 +35,7 @@ fun RegisterScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(MaterialTheme.colorScheme.onPrimary),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         var nameClient by rememberSaveable {
@@ -80,8 +77,7 @@ fun RegisterScreen(
             message = stringResource(id = R.string.distributionAnswer),
             check = checkMessage,
             setChecked = {
-                checkMessage = it
-
+                checkMessage = !it
             }
         )
     }
@@ -102,12 +98,12 @@ fun RegisterNameField(nameClient: String, isValidateName: Boolean, setNameClient
         isError = !isValidateName,
         supportingText = { if (!isValidateName) Text(text = stringResource(id = R.string.support_text_edit_name)) },
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            errorContainerColor = MaterialTheme.colorScheme.onPrimary,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         )
     )
 }
@@ -127,12 +123,12 @@ fun RegisterEmailClient(emailClient: String, isValidateEmail: Boolean, setEmailC
         isError = !isValidateEmail,
         supportingText = { if (!isValidateEmail) Text(text = stringResource(id = R.string.support_text_edit_email)) },
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+            unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+            errorContainerColor = MaterialTheme.colorScheme.onPrimary,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         )
     )
 }
@@ -149,7 +145,7 @@ fun ButtonRegisterClient(isEnabledButton: Boolean, registerClient: () -> Unit) {
             ),
         shape = RoundedCornerShape(8.dp),
         enabled = isEnabledButton,
-        colors = ButtonDefaults.buttonColors(containerColor = Blue500),
+//        colors = ButtonDefaults.buttonColors(containerColor = ),
         onClick = {
             registerClient()
         }) {
@@ -168,13 +164,13 @@ fun CheckMessage(message: String, check: Boolean, setChecked: (Boolean) -> Unit)
             checked = !check,
             onCheckedChange = {setChecked(it)},
             colors = CheckboxDefaults.colors(
-                checkedColor = Blue500,
-                uncheckedColor = Color.Gray
+                checkedColor = MaterialTheme.colorScheme.primary,
+                uncheckedColor = MaterialTheme.colorScheme.outline
             )
         )
         Text(
             text = message,
-            style = YouWaterTypography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Start
         )
     }
@@ -203,7 +199,7 @@ private fun InputRegisterDataPreview() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(MaterialTheme.colorScheme.onPrimary),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoginTitle(title = stringResource(id = R.string.fragment_register_register_text))

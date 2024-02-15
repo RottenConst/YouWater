@@ -1,5 +1,6 @@
 package ru.iwater.youwater.screen.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,20 +8,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.sharp.Close
 import androidx.compose.material.icons.sharp.LocationOn
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,32 +36,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
+import ru.iwater.youwater.data.NewAddress
 import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
 fun AddressesScreen(
-    watterViewModel: WatterViewModel = viewModel(),
+    addressList1: List<NewAddress>,
+    deleteAddress: (Int) -> Unit,
     navController: NavHostController
 ) {
 
-    LaunchedEffect(Unit){
-        watterViewModel.getAddressesList()
-    }
-
     val modifier = Modifier
-    val addressList = watterViewModel.addressesList
     Column(modifier = modifier.fillMaxSize()) {
         MenuButton(
-            modifier = modifier,
+            modifier = modifier.background(color = MaterialTheme.colorScheme.onPrimary),
             painter = painterResource(id = R.drawable.ic_black_place),
-            tint = Color.Black,
+            tint = MaterialTheme.colorScheme.primary,
             nameButton = stringResource(id = R.string.fragment_add_address_label),
             description = ""
         ) {
@@ -69,13 +65,13 @@ fun AddressesScreen(
             )
         }
         LazyColumn(modifier = modifier.fillMaxWidth()) {
-            items(count = addressList.size) {addressIndex ->
+            items(count = addressList1.size) {addressIndex ->
                 AddressCard(
                     modifier = modifier,
-                    address = addressList[addressIndex].factAddress,
-                    notice = addressList[addressIndex].notice,
+                    address = addressList1[addressIndex].address,//address,//addressList[addressIndex].address,
+                    notice = addressList1[addressIndex].notice,
                     deleteAddress = {
-                        watterViewModel.inActiveAddress(addressList[addressIndex].id)
+                        deleteAddress(addressList1[addressIndex].id)
                     }
                 )
             }
@@ -89,12 +85,13 @@ fun AddressCard(modifier: Modifier, address: String, notice: String?, deleteAddr
     var isVisibleDialog by remember {
         mutableStateOf(false)
     }
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(8.dp),
-        shadowElevation = 8.dp
+    Card(modifier = modifier
+        .fillMaxWidth()
+        .padding(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.onPrimary
+        )
     ) {
         DeleteAddressDialog(isVisible = isVisibleDialog, setVisible = {isVisibleDialog = !isVisibleDialog}) {
             deleteAddress()
@@ -109,14 +106,14 @@ fun AddressCard(modifier: Modifier, address: String, notice: String?, deleteAddr
                Icon(
                    imageVector = Icons.Sharp.LocationOn,
                    contentDescription = "",
-                   tint = Blue500,
+                   tint = MaterialTheme.colorScheme.primary,
                    modifier = modifier.padding(4.dp)
                )
                Text(
                    text = address,
                    textAlign = TextAlign.Start,
-                   style = YouWaterTypography.body2,
-                   color = Blue500,
+                   style = MaterialTheme.typography.bodyMedium,
+                   color = MaterialTheme.colorScheme.primary,
                    modifier = modifier
                        .weight(1f)
                        .padding(4.dp)
@@ -125,18 +122,18 @@ fun AddressCard(modifier: Modifier, address: String, notice: String?, deleteAddr
                    Icon(
                        imageVector = Icons.Sharp.Close,
                        contentDescription = "",
-                       tint = Color.LightGray,
+                       tint = MaterialTheme.colorScheme.outline,
                        modifier = modifier.padding(4.dp)
                    )
                }
            }
            if (!notice.isNullOrEmpty()) {
-               HorizontalDivider(modifier = modifier, color = Color.LightGray, thickness = 1.dp)
+               HorizontalDivider(modifier = modifier, color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
                Text(
                    text = notice,
                    textAlign = TextAlign.Start,
-                   style = YouWaterTypography.subtitle2,
-                   color = Blue500,
+                   style = MaterialTheme.typography.labelLarge,
+                   color = MaterialTheme.colorScheme.primary,
                    fontStyle = FontStyle.Italic,
                    modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                )
@@ -150,7 +147,7 @@ fun DeleteAddressDialog(isVisible: Boolean, setVisible: (Boolean) -> Unit, delet
     if (isVisible) {
         AlertDialog(
             icon = {
-                Icon(imageVector = Icons.Filled.Delete, contentDescription = stringResource(id = R.string.delete_address_text), tint = Blue500 )
+                Icon(imageVector = Icons.Filled.Delete, contentDescription = stringResource(id = R.string.delete_address_text), tint = MaterialTheme.colorScheme.primary )
             },
             title = {
                 Text(text = stringResource(id = R.string.delete_address_quest_text))
@@ -158,7 +155,7 @@ fun DeleteAddressDialog(isVisible: Boolean, setVisible: (Boolean) -> Unit, delet
             onDismissRequest = { setVisible(false) },
             dismissButton = {
                 TextButton(onClick = { setVisible(false) }) {
-                    Text(text = stringResource(id = R.string.general_no), color = Blue500)
+                    Text(text = stringResource(id = R.string.general_no), color = MaterialTheme.colorScheme.primary)
                 }
             },
             confirmButton = {
@@ -166,7 +163,7 @@ fun DeleteAddressDialog(isVisible: Boolean, setVisible: (Boolean) -> Unit, delet
                     setVisible(false)
                     deleteDialog()
                 }) {
-                    Text(text = stringResource(id = R.string.general_yes), color = Blue500)
+                    Text(text = stringResource(id = R.string.general_yes), color = MaterialTheme.colorScheme.primary)
                 }
             }
         )
@@ -182,7 +179,7 @@ fun AddressesScreenPreview() {
             MenuButton(
                 modifier = modifier,
                 painter = painterResource(id = R.drawable.ic_black_place),
-                tint = Color.Black,
+                tint = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 nameButton = stringResource(id = R.string.fragment_add_address_label), description = ""
             ) {

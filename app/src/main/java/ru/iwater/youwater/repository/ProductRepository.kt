@@ -1,15 +1,18 @@
 package ru.iwater.youwater.repository
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import ru.iwater.youwater.bd.ProductDao
+import ru.iwater.youwater.bd.NewProductDao
 import ru.iwater.youwater.bd.YouWaterDB
 import ru.iwater.youwater.data.*
-import ru.iwater.youwater.data.payModule.MessagePay
+import ru.iwater.youwater.data.payModule.yookassa.Amount
+import ru.iwater.youwater.data.payModule.yookassa.Payment
+import ru.iwater.youwater.data.payModule.yookassa.PaymentInfo
 import ru.iwater.youwater.di.components.OnScreen
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
-import ru.iwater.youwater.network.ApiWater
+import ru.iwater.youwater.network.ApiClient
+import ru.iwater.youwater.network.ApiOrder
 import ru.iwater.youwater.network.ApiYookassa
-import ru.iwater.youwater.network.RetrofitFactory
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.Exception
@@ -20,57 +23,69 @@ class ProductRepository @Inject constructor(
     private val authClient: StorageStateAuthClient
 ) {
 
-    private val productDao: ProductDao = youWaterDB.productDao()
-    private val apiWater: ApiWater = RetrofitFactory.makeRetrofit()
-    private val yookassa: ApiYookassa = RetrofitFactory.makeYookassaApi()
+    private val productDao: NewProductDao = youWaterDB.newProductDao()
+    private val apiOrder: ApiOrder = ApiOrder.makeOrderApi(getAuthClient().accessToken)
+    private val apiClient: ApiClient = ApiClient.makeClientApi(getAuthClient().accessToken)
+    private val yookassa: ApiYookassa = ApiYookassa.makeYookassaApi()
 
     /**
      * получить список продуктов добавленых в корзину
      */
-    suspend fun getProductListOfCategory(): List<Product> {
-        return productDao.getAllProduct() ?: emptyList()
+    suspend fun getProductListOfCategory(): List<NewProduct> {
+        return productDao.getAllNewProduct() ?: emptyList()
     }
 
     /**
      * получить продукт в корзину
      */
-    suspend fun addProductInBasket(product: Product) {
+    suspend fun addProductInBasket(product: NewProduct) {
         productDao.save(product)
     }
 
     /**
      * получить продукт по id
      */
-    suspend fun getProductFromDB(id: Int): Product? {
+    suspend fun getProductFromDB(id: Int): NewProduct? {
         return productDao.getProduct(id)
     }
 
     /**
      * обновить продукт в корзине
      */
-    suspend fun updateProductInBasket(product: Product) {
-        productDao.updateProductInBasked(product)
+    suspend fun updateNewProductInBasket(product: NewProduct) {
+        productDao.updateNewProductInBasked(product)
     }
 
     /**
      * добавить продукт в корзину
      */
-    suspend fun deleteProductFromBasket(product: Product) {
+    suspend fun deleteProductFromBasket(product: NewProduct) {
         productDao.delete(product)
     }
 
     suspend fun getFavorite(): Favorite? {
         return try {
-            apiWater.getFavoriteProduct(authClient.get().clientId)
+            apiClient.getFavoriteList()
         } catch (e: Exception) {
             Timber.e("get favorite error: $e")
             null
         }
     }
 
+    suspend fun getProductByCategory(categoryId: Int): List<NewProduct> {
+        return try {
+            apiOrder.getProductByCategory(categoryId) ?: emptyList()
+        } catch (e: Exception) {
+            Timber.e("error get product by category $e")
+            emptyList()
+        }
+    }
+
     suspend fun addToFavoriteProduct(productId: Int): Boolean {
         return try {
-            apiWater.addToFavoriteProduct(authClient.get().clientId, productId)?.status ?: false
+            val favourite = JsonObject()
+            favourite.addProperty("product_id", productId)
+            apiClient.addFavoriteProduct(favourite)?.status ?: false
         } catch (e: Exception) {
             Timber.e("add to favorite error: $e")
             false
@@ -79,7 +94,9 @@ class ProductRepository @Inject constructor(
 
     suspend fun deleteFavorite(productId: Int): Boolean {
         return try {
-            apiWater.deleteFavoriteProduct(authClient.get().clientId, productId)?.status ?: false
+            val favourite = JsonObject()
+            favourite.addProperty("product_id", productId)
+            apiClient.deleteFavoriteProduct(favourite)?.status ?: false
         } catch (e: Exception) {
             Timber.e("delete favorite product error: $e")
             false
@@ -87,12 +104,14 @@ class ProductRepository @Inject constructor(
     }
 
     /**
-     * получить список банеров по акциям
+     * Получить список банеров по акциям
+     *
+     * @return список банеров
      */
-    suspend fun getPromoBanners(): List<PromoBanner> {
+    suspend fun getPromoBanners(): List<Banner> {
         return try {
-            val promoBanners = apiWater.getPromo()
-            if (promoBanners.isNullOrEmpty()) emptyList() else promoBanners
+            val promoBanners = apiOrder.getPromo()
+            promoBanners.banners.ifEmpty { emptyList() }
         }catch (e: Exception) {
             Timber.e("Error get promo banner: $e")
             emptyList()
@@ -103,9 +122,9 @@ class ProductRepository @Inject constructor(
     /**
      * получить список продуктов
      */
-    suspend fun getProductList(): List<Product> {
+    suspend fun getProductList(): List<NewProduct> {
         return try {
-            val productList = apiWater.getProductList().filter { it.app == 1 }
+            val productList = apiOrder.getProductList()
             productList.ifEmpty { emptyList() }
         } catch (e: Exception) {
             Timber.e("Error get product list: $e")
@@ -115,10 +134,11 @@ class ProductRepository @Inject constructor(
 
     /**
      * загрузить информацию о товаре по id
+     * @param productId индификатор продукта
      */
-    suspend fun getProduct(productId: Int): Product? {
+    suspend fun getProduct(productId: Int): InfoProduct? {
         return try {
-            apiWater.getProduct(productId)
+            apiOrder.getAboutProduct(productId)
         } catch (e: Exception) {
             Timber.e("Exception get product $e")
             null
@@ -126,19 +146,55 @@ class ProductRepository @Inject constructor(
     }
 
     /**
+     * загрузить информацию о товаре по id
+     */
+    suspend fun getNewProduct(productId: Int): NewProduct? {
+        return try {
+            val infoProduct = apiOrder.getAboutProduct(productId)
+            if (infoProduct != null) {
+                NewProduct(
+                    appName = infoProduct.appName ?: "",
+                    category = infoProduct.category,
+                    id = infoProduct.id,
+                    name = infoProduct.name,
+                    image = infoProduct.image ?: "",
+                    price = infoProduct.price
+                )
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Timber.e("Exception get product $e")
+            null
+        }
+    }
+
+    suspend fun getMeasureList():List<Measure> {
+        return try {
+            apiOrder.getMeasuresList()
+        }catch (e: Exception) {
+            Timber.e("Exeption get List measure $e")
+            emptyList()
+        }
+    }
+
+    /**
      * получить список категорий
      */
-    suspend fun getCategoryList(): List<TypeProduct> {
+    suspend fun getCategoryList(isStartPocket: Boolean): List<TypeProduct> {
         return try {
-            val startPocket = apiWater.isStartPocket(getAuthClient().clientId)?.status ?: false //стартовый пакет
-            val category = apiWater.getCategoryList()
-            if (!category.isNullOrEmpty()) {
-                if (!startPocket) {
-                    return category.filter { it.id != 20 && it.visible_app == 1 && it.company_id == "0007" }.sortedBy { it.priority }
+            val category = apiOrder.getCategoryList() ?: emptyList()
+            if (category.isNotEmpty()) {
+                Timber.d("Category is not empty")
+                return if (isStartPocket) {
+                    category.filter { it.visibleApp }
+                } else {
+                    category.filter { it.id != 20 && it.visibleApp }
                 }
-                return category.filter { it.visible_app == 1 && it.company_id == "0007"}.sortedBy { it.priority }
-            } else emptyList()
-        }catch (e: Exception) {
+            }
+            Timber.d("Category is empty")
+            category
+        } catch (e: Exception) {
             Timber.e("Error get catalog list: $e")
             emptyList()
         }
@@ -146,9 +202,9 @@ class ProductRepository @Inject constructor(
 
     suspend fun isStartPocket(): Boolean {
         return try {
-            apiWater.isStartPocket(getAuthClient().clientId)?.status ?: false
+            apiOrder.isStartPocket()?.status ?: false
         } catch (e: Exception) {
-            Timber.e("Error get catalog list: $e")
+            Timber.e("Error get start pocket: $e")
             false
         }
     }
@@ -158,7 +214,7 @@ class ProductRepository @Inject constructor(
      */
     suspend fun getLastOrder(): Int? {
         return try {
-            val listOrders = apiWater.getOrderClient(getAuthClient().clientId)
+            val listOrders = apiOrder.getOrderClient()
             if (!listOrders.isNullOrEmpty()) {
                 val order = listOrders[0]
                 order.id
@@ -169,32 +225,18 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    suspend fun getDelivery(address: RawAddress): DeliverySchedule? {
+    suspend fun getDelivery(address: NewAddress): DeliverySchedule? {
         return try {
-            val region = address.region ?: address.fullAddress.split(",")[0]
-            val city = address.factAddress.split(',')[0]
-            val street = address.factAddress.split(',')[1]
-            val house = address.factAddress.split(',')[2]
-            val jsonAddress = JsonObject().apply {
-                addProperty("region", region)
-                addProperty("city", city)
-                addProperty("floor", house)
-                addProperty("entrance", "")
-                addProperty("street", street)
-                addProperty("house", house)
-                addProperty("building", "")
-                addProperty("flat", "")
-            }
-            return apiWater.getDeliverySchedule(jsonAddress)
+            apiClient.getDeliverySchedule(address.getDeliveryProperty())
         } catch (e: Exception) {
             Timber.d("Error getDelivery: $e")
             null
         }
     }
 
-    suspend fun getAddress(): List<RawAddress> {
+    suspend fun getAddress(): List<NewAddress> {
         return try {
-            apiWater.getAllAddresses(getAuthClient().clientId)
+            apiClient.getAddressList() ?: emptyList()
         } catch (e: Exception) {
             Timber.e("Error get address: $e")
             emptyList()
@@ -203,8 +245,23 @@ class ProductRepository @Inject constructor(
 
     suspend fun createOrderApp(order: Order): Int {
         return try {
-            Timber.d("Create order app?")
-            apiWater.createOrder(order)?.data?.id ?: -1
+            val productList = JsonArray()
+            order.productList.forEach {
+                productList.add(it)
+            }
+            val newOrder = JsonObject()
+            newOrder.apply {
+                addProperty("client_id", order.clientId)
+                addProperty("date", order.date)
+                addProperty("time_from", order.timeFrom)
+                addProperty("time_to", order.timeTo)
+                addProperty("notice", order.notice)
+                addProperty("total_cost", order.totalCost)
+                addProperty("payment_type", order.paymentType)
+                addProperty("address_id", order.addressId)
+                add("product_list", productList)
+            }
+            apiOrder.createOrder(newOrder)?.id ?: -1
         } catch (e: Exception) {
             Timber.e("error create order: $e")
             -1
@@ -212,14 +269,10 @@ class ProductRepository @Inject constructor(
     }
 
 
-    suspend fun createPay(amount: String, description: String, paymentToken: String, capture: Boolean): MessagePay? {
+    suspend fun createPay(amount: String, description: String, paymentToken: String, capture: Boolean): PaymentInfo? {
         return try {
-            val payment = apiWater.createPay(amount, description, paymentToken, capture)
-            if (payment?.message == "Order created") {
-                payment
-            } else {
-                null
-            }
+            val payment = Payment(Amount(value = amount, currency = "RUB"), description, paymentToken, capture)
+            yookassa.createPayment(paymentToken.removeRange(5..9), payment)
         } catch (e: Exception) {
             Timber.e("error create pay $e")
             null
@@ -238,7 +291,7 @@ class ProductRepository @Inject constructor(
 
     suspend fun setStatusPayment(orderId: Int, parameters: JsonObject): Boolean {
         return try {
-            val answer = apiWater.setStatusPayment(orderId, parameters)
+            val answer = apiOrder.updatePayStatusInfo(orderId, parameters)
             answer.isSuccessful
         }catch (e: Exception) {
             Timber.e("error set payment status: $e")
@@ -246,28 +299,19 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    suspend fun getOrder(orderId: Int): OrderFromCRM? {
+    suspend fun getOrder(orderId: Int): CreatedOrder? {
        return try {
            Timber.d("get ORDER, ${getAuthClient().clientId}")
-            val listOrder = apiWater.getOrderClient(getAuthClient().clientId)
-            return if (listOrder.isNullOrEmpty()) {
-                null
-            } else {
-                listOrder.filter {
-                        orderFromCRM -> orderFromCRM.order_id == orderId
-                }
-                listOrder[0]
-            }
+            apiOrder.getCreatedOrder(orderId)
         } catch (e: Exception) {
             Timber.e("error get order: $e")
             null
         }
     }
 
-    suspend fun getOrdersList(): List<OrderFromCRM> {
+    suspend fun getOrdersList(): List<CreatedOrder> {
         return try {
-            val order = apiWater.getOrderClient(getAuthClient().clientId) ?: emptyList()
-            order
+            apiOrder.getOrderClient() ?: emptyList()
         } catch (e: Exception) {
             Timber.e("error get ordersList: $e")
             emptyList()
@@ -278,32 +322,28 @@ class ProductRepository @Inject constructor(
      * получить информацю о клиенте
      */
     suspend fun getClientInfo(): Client? {
-        try {
-            val client = apiWater.getClientDetail(getAuthClient().clientId)
-            if (client != null) {
-                return client
-            }
+        return try {
+            apiClient.getClient()
         } catch (e: Exception) {
             Timber.e("error get client: $e")
+            null
         }
-        return null
     }
 
-    suspend fun deleteAccount(clientId: Int, parameter: JsonObject): DeleteMessage? {
+    suspend fun deleteAccount(): DeleteMessage? {
         return try {
-            apiWater.deleteAccount(clientId, parameter)
+            apiClient.deleteAccount()
+            null
         } catch (e: Exception) {
             Timber.e("Error delete account: $e")
             null
         }
     }
 
-    suspend fun editUserData(clientId: Int, clientUserData: JsonObject): Boolean {
+    suspend fun editUserData(client: ClientEditData): Boolean {
         try {
-            val answer = apiWater.editUserData(clientId, clientUserData)
-            if (answer?.isSuccessful == true) {
-                return answer.body()?.get("status")?.asBoolean == true
-            }
+            val answer = apiClient.setDataClient(client)
+            return answer.isSuccessful
         } catch (e: java.lang.Exception) {
             Timber.e("error edit user data: $e")
         }
@@ -315,7 +355,7 @@ class ProductRepository @Inject constructor(
      */
     suspend fun inactiveAddress(id: Int): Boolean {
         return try {
-            val active = apiWater.deleteAddress(id)
+            val active = apiClient.deleteAddress(id)
             active.isSuccessful
         } catch (e: Exception) {
             Timber.e("delete address error $e")
@@ -327,36 +367,41 @@ class ProductRepository @Inject constructor(
      * отправить запрос на создание адреса
      */
     suspend fun createAddress(
-        newAddressParameters: JsonObject
-    ): String? {
+        newAddressParameters: AddressParameters
+    ): NewAddress? {
         return try {
-            val response = apiWater.createNewAddress(newAddressParameters)
-            if (response.isSuccessful) {
-                response.body()?.get("message")?.asString
-            } else null
+            apiClient.createNewAddress(newAddressParameters)
         } catch (e: Exception) {
             Timber.e("Error create address: $e")
             null
         }
     }
 
-    suspend fun setMailing(clientId: Int, isMailing: Boolean) {
+    suspend fun setMailing(isMailing: Boolean) {
         try {
             val mailing = JsonObject()
-            if (isMailing) {
-                mailing.addProperty("mailing_consent", 1)
-                apiWater.mailing(clientId, mailing)
-            } else {
-                mailing.addProperty("mailing_consent", 0)
-                apiWater.mailing(clientId, mailing)
-            }
+            mailing.addProperty("mailing_consent", isMailing)
+            apiClient.mailing(mailing)
         } catch (e: Exception) {
             Timber.e("error set mailing: $e")
         }
     }
 
     fun deleteClient() {
+//        val apiClient = ApiAuthClient.makeClientApi()
         authClient.remove()
+//        return try {
+//            val client = getAuthClient()
+//            if (apiClient.logout(client.clientId, client.refreshToken)) {
+//                authClient.remove()
+//                true
+//            } else {
+//                false
+//            }
+//        } catch (e: Exception) {
+//            false
+//        }
+
     }
 
     fun getAuthClient(): AuthClient = authClient.get()

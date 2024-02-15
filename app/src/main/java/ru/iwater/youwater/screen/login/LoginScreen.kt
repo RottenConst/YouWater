@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -23,9 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.R
-import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.vm.AuthViewModel
-import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.utils.MaskVisualTransformation
 import ru.iwater.youwater.utils.NumberDefaults
 
@@ -86,7 +85,7 @@ fun LoginTitle(title: String) {
                 bottom = 16.dp
             ),
             text = title,
-            style = YouWaterTypography.h4,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
     }
@@ -116,12 +115,12 @@ fun InputTelNumberField(phone: String, setPhone: (String) -> Boolean, isFullPhon
         MaskVisualTransformation(NumberDefaults.MASK_LOGIN_PHONE),
         maxLines = 1,
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+            unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+            errorContainerColor = MaterialTheme.colorScheme.onPrimary,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         )
     )
 }
@@ -130,7 +129,7 @@ fun DescriptionText(text: String) {
     Text(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
         textAlign = TextAlign.Center,
-        style = YouWaterTypography.body2,
+        style = MaterialTheme.typography.bodyMedium,
         text = text
     )
 }

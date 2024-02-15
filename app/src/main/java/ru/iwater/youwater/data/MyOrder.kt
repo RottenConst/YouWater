@@ -13,7 +13,7 @@ data class MyOrder(
     val cash: String,
     val date: String,
     @TypeConverters(ProductConverter::class)
-    val products: List<Product>,
+    val products: List<NewProduct>,
     val typeCash: String?,
     val status: Int,
     @PrimaryKey(autoGenerate = true)

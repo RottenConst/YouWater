@@ -17,6 +17,7 @@ class App : Application() {
         lateinit var appComponent: AppComponent
     }
 
+
     private val instanceID = "60f03696-9ffd-4b38-95ea-910ad9b90d3a"
 
     override fun onCreate() {

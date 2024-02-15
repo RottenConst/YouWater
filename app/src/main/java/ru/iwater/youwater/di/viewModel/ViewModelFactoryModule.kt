@@ -17,11 +17,6 @@ abstract class ViewModelFactoryModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(WatterViewModel::class)
-    abstract fun bindCatalogListViewModel(watterViewModel: WatterViewModel): ViewModel
-
-    @Binds
-    @IntoMap
     @ViewModelKey(AuthViewModel::class)
     abstract fun bindAuthViewModel(authViewModel: AuthViewModel): ViewModel
 }

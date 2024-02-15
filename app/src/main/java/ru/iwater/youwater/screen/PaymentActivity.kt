@@ -8,13 +8,11 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
-import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseActivity
-import ru.iwater.youwater.repository.AuthorisationRepository
 import ru.iwater.youwater.screen.navigation.PaymentScreen
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.WatterViewModel
+import ru.iwater.youwater.vm.PaymentViewModel
+import ru.iwater.youwater.vm.PaymentViewModelFactory
 import ru.yoomoney.sdk.kassa.payments.Checkout
 import ru.yoomoney.sdk.kassa.payments.checkoutParameters.Amount
 import ru.yoomoney.sdk.kassa.payments.checkoutParameters.PaymentMethodType
@@ -25,15 +23,10 @@ import ru.yoomoney.sdk.kassa.payments.ui.color.ColorScheme
 import timber.log.Timber
 import java.math.BigDecimal
 import java.util.Currency
-import javax.inject.Inject
 
 class PaymentActivity : BaseActivity() {
 
-    @Inject
-    lateinit var factory: ViewModelProvider.Factory
-    private val screenComponent = App().buildScreenComponent()
-    private lateinit var authRepository: AuthorisationRepository
-    private val viewModel: WatterViewModel by viewModels { factory }
+    private val viewModel: PaymentViewModel by viewModels { PaymentViewModelFactory() }
     private lateinit var amount: String
     private lateinit var idOrder: String
     private var tel = ""
@@ -41,20 +34,19 @@ class PaymentActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("Activity on create")
-        screenComponent.inject(this)
-        authRepository = AuthorisationRepository(screenComponent.clientStorage())
         val payData = intent.extras
         if (payData != null) {
-            Timber.d("start pay")
+            Timber.d("payment status ")
             val orderId = payData.getInt("orderId")
             val orderCost = payData.getInt("orderCost")
             val telNum = payData.getString("tel", "")
+            viewModel.setCompleteOrderId(orderId)
             amount = orderCost.toString()
             idOrder = orderId.toString()
             tel = telNum
             setContent {
                 YourWaterTheme {
-                    PaymentScreen(watterViewModel = viewModel, orderId = orderId)
+                    PaymentScreen(orderId = orderId, watterViewModel = viewModel)
                 }
             }
             onTokenizeButtonCLick(orderId, orderCost, tel)
@@ -103,8 +95,7 @@ class PaymentActivity : BaseActivity() {
             savePaymentMethod = SavePaymentMethod.OFF,
             paymentMethodTypes = paymentMethodTypes,
             customReturnUrl = "https://yourwater.ru/",
-            userPhoneNumber = tel,
-            authCenterClientId = "dg19ntb3llaovm6138rbotj9dile0j20"
+            userPhoneNumber = tel
         )
         val uiParameters = UiParameters(
             colorScheme = ColorScheme(Color.rgb(60, 136, 240))
@@ -123,8 +114,8 @@ class PaymentActivity : BaseActivity() {
     companion object {
         const val REQUEST_CODE_TOKENIZE = 1
 
-        const val shopId = "684191"
-        const val sdkKey = "test_MjI2MTA4MxLB9siXJQUoFkTR2ahVwsFFtNDAzEXf-XY"
+        const val shopId = "684191"//"225217"//"684191"
+        const val sdkKey = "test_MjI2MTA4MxLB9siXJQUoFkTR2ahVwsFFtNDAzEXf-XY"//"test_MjI2MTA4MxLB9siXJQUoFkTR2ahVwsFFtNDAzEXf-XY"
 
 
 //        const val shopId = "248648"

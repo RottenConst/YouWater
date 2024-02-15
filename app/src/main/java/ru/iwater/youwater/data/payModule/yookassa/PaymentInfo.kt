@@ -1,5 +1,7 @@
 package ru.iwater.youwater.data.payModule.yookassa
 
+import ru.iwater.youwater.data.payModule.Confirmation
+
 data class PaymentInfo(
     val amount: Amount,
     val created_at: String,
@@ -11,6 +13,7 @@ data class PaymentInfo(
     val payment_method: PaymentMethod,
     val recipient: Recipient,
     val refundable: Boolean,
+    val confirmation: Confirmation,
     val status: String,
     val test: Boolean
 )

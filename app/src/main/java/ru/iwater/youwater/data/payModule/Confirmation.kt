@@ -1,6 +1,9 @@
 package ru.iwater.youwater.data.payModule
 
+import com.google.gson.annotations.SerializedName
+
 data class Confirmation(
-    val confirmation_url: String,
+    @SerializedName("confirmation_url")
+    val confirmationUrl: String,
     val type: String
 )

@@ -6,7 +6,7 @@ import ru.iwater.youwater.data.Product
 @Dao
 interface ProductDao {
     @Insert
-    suspend fun save(product: Product?)
+    suspend fun save(product: Product)
 
     @Query("SELECT * FROM Product")
     suspend fun getAllProduct(): List<Product>?

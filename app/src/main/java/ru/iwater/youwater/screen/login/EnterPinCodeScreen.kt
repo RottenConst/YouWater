@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -31,7 +32,6 @@ import ru.iwater.youwater.R
 import ru.iwater.youwater.vm.AuthViewModel
 import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.screen.StartActivity
-import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.utils.StatusPinCode.*
 import timber.log.Timber
@@ -54,7 +54,12 @@ fun EnterPinCodeScreen(
         var isCheckPinCode by rememberSaveable { mutableStateOf(false) }
         var pinCode by rememberSaveable{ mutableStateOf("") }
         val statusPinCode by authViewModel.statusPinCode.observeAsState()
-        authViewModel.checkPin(pinCode, clientId, isCheck = isCheckPinCode)
+        authViewModel.checkPin(
+            clientId = clientId,
+            pinCode = pinCode,
+            phone = phone,
+            isCheck = isCheckPinCode
+        )
         when (statusPinCode) {
             DONE -> {
                 isCheckPinCode = false
@@ -94,7 +99,7 @@ fun EnterPinCodeScreen(
         OtpTextFieldTheme(
             pinCode = pinCode,
             setPinCode = {pinCode = it},
-            color = Blue500,
+            color = MaterialTheme.colorScheme.primary,
             maxLength = 4,
             isFullPinCode = {isCheckPinCode = it}
         )
@@ -120,7 +125,7 @@ fun ButtonEnter(text: String, isEnabledButton: Boolean, onEvent: () -> Unit) {
             .padding(top = 24.dp, start = 52.dp, end = 52.dp),
         shape = RoundedCornerShape(8.dp),
         enabled = isEnabledButton,
-        colors = ButtonDefaults.buttonColors(containerColor = Blue500),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         onClick = {
             onEvent()
         }) {
@@ -201,7 +206,7 @@ private fun EnterPinCodeScreenPreview() {
             OtpTextFieldTheme(
                 pinCode = pinCode,
                 setPinCode = {pinCode = it},
-                color = Blue500,
+                color = MaterialTheme.colorScheme.primary,
                 maxLength = 4,
                 isFullPinCode = {isEnabledButton = it},
             )

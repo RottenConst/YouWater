@@ -5,12 +5,14 @@ import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import ru.iwater.youwater.data.*
+import ru.iwater.youwater.utils.PriceConverter
 import ru.iwater.youwater.utils.ProductConverter
 
 @Database(
     version = 7,
     entities = [
         Product::class,
+        NewProduct::class,
         Address::class,
         MyOrder::class
     ],
@@ -19,9 +21,10 @@ import ru.iwater.youwater.utils.ProductConverter
 //    ],
     exportSchema = false
 )
-@TypeConverters(ProductConverter::class )
+@TypeConverters(ProductConverter::class, PriceConverter::class )
 abstract class YouWaterDB: RoomDatabase() {
     abstract fun productDao(): ProductDao
+    abstract fun newProductDao(): NewProductDao
     abstract fun addressDao(): AddressDao
     abstract fun myOrderDao(): MyOrderDao
 
@@ -96,3 +99,12 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
         )
     }
 }
+
+//val MIGRATION_7_8 = object : Migration(7, 8) {
+//    override fun migrate(db: SupportSQLiteDatabase) {
+//        db.execSQL(
+//            "DROP TABLE IF EXISTS Product"
+//        )
+//
+//    }
+//}

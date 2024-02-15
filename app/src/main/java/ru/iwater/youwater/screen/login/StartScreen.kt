@@ -5,7 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -24,7 +24,6 @@ import ru.iwater.youwater.vm.AuthViewModel
 import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.screen.StartActivity
 import ru.iwater.youwater.screen.navigation.StartNavRoute
-import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.utils.StatusSession
@@ -35,14 +34,9 @@ fun StartAppScreen(
     authViewModel: AuthViewModel,
     navController: NavHostController
 ) {
-    authViewModel.checkSession()
     val statusSession by authViewModel.statusSession.observeAsState()
-    Background(
-        R.drawable.splash_bottom,
-        R.drawable.splash_top,
-        R.string.description_image_background
-    )
-    statusSession?.let { status ->
+    Background()
+    statusSession.let { status ->
         when(status) {
             StatusSession.TRY -> {
                 StartLogoContent(visibleStartButton = false) { navController.navigate(StartFragmentDirections.actionStartFragmentToLoginFragment()) }
@@ -55,6 +49,12 @@ fun StartAppScreen(
             StatusSession.ERROR -> {
                 StartLogoContent(visibleStartButton = true) { navController.navigate(StartNavRoute.LoginScreen.path) }
             }
+            StatusSession.CHECKED -> {
+                authViewModel.checkSession()
+                StartLogoContent(visibleStartButton = false) {  }
+            }
+
+            else -> {}
         }
     }
 
@@ -69,24 +69,26 @@ private fun StartLogoContent(visibleStartButton: Boolean, navigateToLoginScreen:
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Surface(
+        Card(
             modifier = Modifier
                 .padding(8.dp)
                 .width(246.dp)
                 .height(246.dp),
             shape = CircleShape,
-            elevation = 2.dp,
+            elevation = CardDefaults.cardElevation(8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary)
         ) {
             Image(
-                modifier = Modifier.padding(52.dp),
+                modifier = Modifier.padding(52.dp).fillMaxSize(),
                 painter = painterResource(id = R.drawable.ic_your_water_logo),
-                contentDescription = stringResource(id = R.string.description_your_watter_logo)
+                contentDescription = stringResource(id = R.string.description_your_watter_logo),
+                alignment = Alignment.Center
             )
         }
         Text(
             text = stringResource(id = R.string.start_fragment_about_app_logo),
-            color = Blue500,
-            style = YouWaterTypography.h6,
+            color = MaterialTheme.colorScheme.primary,
+            style = YouWaterTypography.titleMedium,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
@@ -109,11 +111,7 @@ private fun StartLogoContent(visibleStartButton: Boolean, navigateToLoginScreen:
 }
 
 @Composable
-private fun Background(
-    idImageBottom: Int,
-    idImageTop: Int,
-    idContentDescription: Int
-) {
+private fun Background() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -121,14 +119,14 @@ private fun Background(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Image(
-            painter = painterResource(id = idImageTop),
-            contentDescription = stringResource(id = idContentDescription),
+            painter = painterResource(id = R.drawable.splash_top),
+            contentDescription = stringResource(id = R.string.description_image_background),
             alignment = Alignment.TopCenter
         )
 
         Image(
-            painter = painterResource(id = idImageBottom),
-            contentDescription = stringResource(id = idContentDescription),
+            painter = painterResource(id = R.drawable.splash_bottom),
+            contentDescription = stringResource(id = R.string.description_image_background),
             alignment = Alignment.BottomCenter
         )
     }
@@ -138,7 +136,7 @@ private fun Background(
 @Composable
 private fun StartAppScreenPreview() {
     YourWaterTheme {
-        Background(idImageBottom = R.drawable.splash_bottom, idImageTop = R.drawable.splash_top, idContentDescription = R.string.description_image_background)
+        Background()
         StartLogoContent(visibleStartButton = true) {
         }
     }

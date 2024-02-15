@@ -15,10 +15,12 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -30,11 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.pagerTabIndicatorOffset
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.R
-import ru.iwater.youwater.theme.Blue500
-import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -49,7 +48,7 @@ fun DeliveryInfoScreen() {
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabLayout(tabData = tabData, pagerState = pagerState)
-        TabContent(tabData = tabData, pagerState = pagerState)
+        TabContent(pagerState = pagerState)
     }
 }
 
@@ -70,34 +69,34 @@ fun DeliveryInfoTwoHour(modifier: Modifier) {
         )
         Text(
             text = stringResource(id = R.string.fragment_delivery_two_hour_logo),
-            style = YouWaterTypography.h6,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = modifier.padding(4.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_delivery_two_hour_description_text),
-            style = YouWaterTypography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             modifier = modifier.padding(4.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_delivery_two_hour_time_interval_text),
-            style = YouWaterTypography.body1,
-            color = Color.Gray,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(4.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_delivery_two_hour_time_interval_delivery),
-            style = YouWaterTypography.body1,
-            color = Color.Gray,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(4.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_delivery_two_hour_delivery_sat_two_hour),
-            style = YouWaterTypography.body1,
-            color = Color.Gray,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(4.dp)
         )
@@ -122,34 +121,34 @@ fun DeliveryInfoStd(modifier: Modifier) {
         )
         Text(
             text = stringResource(id = R.string.fragment_delivery_std_delivery_logo_stg),
-            style = YouWaterTypography.h6,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = modifier.padding(4.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_delivery_std_delivery_text_std ),
-            style = YouWaterTypography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             modifier = modifier.padding(4.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_delivery_std_time_delivery),
-            style = YouWaterTypography.body1,
-            color = Color.Gray,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(4.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_delivery_std_delivery_std_1_4),
-            style = YouWaterTypography.body1,
-            color = Color.Gray,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(4.dp)
         )
         Text(
             text = stringResource(id = R.string.fragment_delivery_std_delivery_std_5),
-            style = YouWaterTypography.body1,
-            color = Color.Gray,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(4.dp)
         )
@@ -167,7 +166,7 @@ fun DeliveryInfoSuburbs(modifier: Modifier) {
         Column(modifier = modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_text_logo),
-                style = YouWaterTypography.h6,
+                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 modifier = modifier.padding(8.dp)
@@ -180,7 +179,7 @@ fun DeliveryInfoSuburbs(modifier: Modifier) {
                 .verticalScroll(scrollState, true)) {
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_pushkin),
-                style = YouWaterTypography.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
                 modifier = modifier
@@ -189,8 +188,8 @@ fun DeliveryInfoSuburbs(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_pushkin_text),
-                style = YouWaterTypography.body2,
-                color = Color.Gray,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
                 textAlign = TextAlign.Start,
                 modifier = modifier
                     .padding(4.dp)
@@ -198,7 +197,7 @@ fun DeliveryInfoSuburbs(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_kolino),
-                style = YouWaterTypography.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
                 modifier = modifier
@@ -207,14 +206,14 @@ fun DeliveryInfoSuburbs(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_kolino_text),
-                style = YouWaterTypography.body2,
-                color = Color.Gray,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(4.dp)
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_krondshtat),
-                style = YouWaterTypography.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
                 modifier = modifier
@@ -223,14 +222,14 @@ fun DeliveryInfoSuburbs(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_krondshtat_text),
-                style = YouWaterTypography.body2,
+                style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray,
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(4.dp)
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_metalstroy),
-                style = YouWaterTypography.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
                 modifier = modifier
@@ -239,14 +238,14 @@ fun DeliveryInfoSuburbs(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_metalstroy_text),
-                style = YouWaterTypography.body2,
-                color = Color.Gray,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(4.dp)
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_krasnoe_selo),
-                style = YouWaterTypography.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
                 modifier = modifier
@@ -255,14 +254,14 @@ fun DeliveryInfoSuburbs(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_krasnoe_selo_text),
-                style = YouWaterTypography.body2,
-                color = Color.Gray,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(4.dp)
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_shushari),
-                style = YouWaterTypography.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
                 modifier = modifier
@@ -271,14 +270,14 @@ fun DeliveryInfoSuburbs(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_shushari_text),
-                style = YouWaterTypography.body2,
-                color = Color.Gray,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(4.dp)
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_petergof),
-                style = YouWaterTypography.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
                 modifier = modifier
@@ -287,8 +286,8 @@ fun DeliveryInfoSuburbs(modifier: Modifier) {
             )
             Text(
                 text = stringResource(id = R.string.fragment_delivery_suburbs_petergof_text),
-                style = YouWaterTypography.body2,
-                color = Color.Gray,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(4.dp)
             )
@@ -306,14 +305,12 @@ fun TabLayout(tabData: List<String>, pagerState: PagerState){
             Spacer(modifier =Modifier.height(4.dp))
         },
         indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                modifier =
-                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
+            TabRowDefaults.SecondaryIndicator(
+                modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),//pagerTabIndicatorOffset(pagerState, tabPositions),
                 height = 2.dp,
-                color = Blue500
+                color = MaterialTheme.colorScheme.primary
             )
         },
-        backgroundColor = Color.White,
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
@@ -329,8 +326,8 @@ fun TabLayout(tabData: List<String>, pagerState: PagerState){
                 text = {
                     Text(text = s)
                 },
-                selectedContentColor = Blue500,
-                unselectedContentColor = Color.Gray
+                selectedContentColor = MaterialTheme.colorScheme.secondary,
+                unselectedContentColor = MaterialTheme.colorScheme.outlineVariant
             )
         }
     }
@@ -338,7 +335,7 @@ fun TabLayout(tabData: List<String>, pagerState: PagerState){
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TabContent(tabData: List<String>, pagerState: PagerState){
+fun TabContent(pagerState: PagerState){
     HorizontalPager(state = pagerState) { index ->
         when(index) {
             0 -> {
@@ -352,7 +349,6 @@ fun TabContent(tabData: List<String>, pagerState: PagerState){
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
 fun DeliveryInfoPreview() {

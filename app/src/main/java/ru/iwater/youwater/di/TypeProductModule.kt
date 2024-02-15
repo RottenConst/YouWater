@@ -10,5 +10,12 @@ class TypeProductModule {
 
     @Provides
     @OnScreen
-    fun provideTypeProduct(): TypeProduct = TypeProduct("", "", 0, "", 0, 0)
+    fun provideTypeProduct(): TypeProduct = TypeProduct(
+        id = 0,
+        companyId = 7,
+        name = "",
+        image = "",
+        visibleApp = true,
+        status = true
+    )
 }

@@ -8,12 +8,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,26 +23,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.iwater.youwater.R
-import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.Red800
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
 fun UserDataScreen(
-    watterViewModel: WatterViewModel = viewModel(),
-    mainActivity: MainActivity,
+    clientName: String,
+    clientPhone: String,
+    clientEmail: String,
+    deleteAccount: () -> Unit,
     sendUserData: Boolean
 ) {
-    LaunchedEffect(Unit) {
-        watterViewModel.getClientInfo()
-    }
-
-    val client by watterViewModel.client.observeAsState()
     val modifier = Modifier
 
     var isVisibleDialog by remember {
@@ -52,14 +45,14 @@ fun UserDataScreen(
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(horizontal = 16.dp)) {
-        NameInfoClient(modifier = modifier, name = client?.name ?: "")
-        PhoneInfoClient(modifier = modifier, phone = client?.contact ?: "")
-        EmailInfoClient(modifier = modifier, email = client?.email ?: "")
+        NameInfoClient(modifier = modifier, name = clientName)
+        PhoneInfoClient(modifier = modifier, phone = clientPhone)
+        EmailInfoClient(modifier = modifier, email = clientEmail)
         if (sendUserData) {
             Text(
                 text = stringResource(id = R.string.fragment_user_data_user_data_sent_for_moderation),
-                style = YouWaterTypography.subtitle2,
-                color = Blue500,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,
                 modifier = modifier
                     .padding(16.dp)
@@ -67,11 +60,7 @@ fun UserDataScreen(
             )
         }
         DeleteAccountDialog(isVisible = isVisibleDialog, setVisible = {isVisibleDialog = !isVisibleDialog}) {
-            watterViewModel.deleteAccount(
-                clientId = client?.client_id ?: 0,
-                phone = client?.contact ?: "",
-                mainActivity = mainActivity
-            )
+            deleteAccount()
         }
         DeleteAccountButton(
             onDelete = {
@@ -88,11 +77,11 @@ fun NameInfoClient (modifier: Modifier, name: String) {
         .fillMaxWidth()){
         Text(
             text = stringResource(id = R.string.fragment_user_data_name_user),
-            style = YouWaterTypography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
         Text(
             text = name,
-            style = YouWaterTypography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold
         )
     }
@@ -105,11 +94,11 @@ fun LastNameInfoClient(modifier: Modifier, lastName: String) {
         .fillMaxWidth()) {
         Text(
             text = stringResource(id = R.string.fragment_user_data_last_name),
-            style = YouWaterTypography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
         Text(
             text = lastName,
-            style = YouWaterTypography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold
         )
     }
@@ -122,11 +111,11 @@ fun PhoneInfoClient(modifier: Modifier, phone: String) {
         .fillMaxWidth()) {
         Text(
             text = stringResource(id = R.string.fragment_user_data_phone),
-            style = YouWaterTypography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
         Text(
             text = phone,
-            style = YouWaterTypography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold
         )
     }
@@ -139,11 +128,11 @@ fun EmailInfoClient(modifier: Modifier, email: String) {
         .fillMaxWidth()) {
         Text(
             text = stringResource(id = R.string.fragment_user_data_email),
-            style = YouWaterTypography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
         Text(
             text = email,
-            style = YouWaterTypography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold
         )
     }
@@ -158,8 +147,8 @@ fun DeleteAccountButton(onDelete: () -> Unit) {
         onClick = { onDelete() }) {
         Text(
             text = "Удалить Аккаунт",
-            style = YouWaterTypography.body1,
-            color = Color.Red
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.error
         )
     }
 }
@@ -203,7 +192,7 @@ fun UserDataPreview() {
             LastNameInfoClient(modifier = modifier, lastName = "Lastname")
             PhoneInfoClient(modifier = modifier, phone = "+123123123")
             EmailInfoClient(modifier = modifier, email = "mail@mail.com")
-            DeleteAccountButton({})
+            DeleteAccountButton {}
         }
 
     }

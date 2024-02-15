@@ -24,7 +24,7 @@ class AuthViewModel @Inject constructor(
     val statusPinCode: LiveData<StatusPinCode>
         get() = _statusPinCode
 
-    private val _statusSession: MutableLiveData<StatusSession> = MutableLiveData()
+    private val _statusSession: MutableLiveData<StatusSession> = MutableLiveData(StatusSession.CHECKED)
     val statusSession: LiveData<StatusSession>
         get() = _statusSession
 
@@ -70,21 +70,21 @@ class AuthViewModel @Inject constructor(
     /*
         проверка пин кода
      */
-    fun checkPin(pinCode: String, clientId: Int, isCheck: Boolean) {
+    fun checkPin(clientId: Int, phone: String, pinCode: String, isCheck: Boolean) {
         viewModelScope.launch {
             if (isCheck) {
-                val clientFullAuth = authorisationRepository.checkCode(clientId, pinCode)
+                val clientFullAuth = authorisationRepository.checkCode(clientId = clientId, phone = phone, pinCode = pinCode)
                 when {
                     clientFullAuth == null -> {
                         _statusPinCode.value = StatusPinCode.NET_ERROR
                     }
 
-                    clientFullAuth.session.isNotEmpty() -> {
+                    clientFullAuth.accessToken.isNotEmpty() -> {
                         _statusPinCode.value = StatusPinCode.DONE
                         saveClient(clientFullAuth)
                     }
 
-                    clientFullAuth.session.isEmpty() -> {
+                    clientFullAuth.accessToken.isEmpty() -> {
                         _statusPinCode.value = StatusPinCode.ERROR
                     }
                 }
@@ -99,7 +99,8 @@ class AuthViewModel @Inject constructor(
      */
     fun checkSession() {
         viewModelScope.launch {
-            when (authorisationRepository.checkSession(clientAuth)) {
+            val client = authorisationRepository.checkSession(clientAuth)
+            when (client) {
                 true -> _statusSession.value = StatusSession.TRY
                 false -> _statusSession.value = StatusSession.FALSE
                 else -> _statusSession.value = StatusSession.ERROR
@@ -126,7 +127,7 @@ class AuthViewModel @Inject constructor(
         navController: NavHostController
     ) {
         val registerClient = authorisationRepository.registerClient(
-            phone, name, email
+            phone, name, email, isMailing
         )
         if (registerClient != null && registerClient["status"].asBoolean) {
             isRegisteredClient(
@@ -147,7 +148,7 @@ class AuthViewModel @Inject constructor(
         navController: NavHostController
     ) {
         if (authorisationRepository.authPhone(phone)?.status == true) {
-            authorisationRepository.setMailing(clientId, isMailing)
+//            authorisationRepository.setMailing(clientId, isMailing)
             navController.navigate(
                 StartNavRoute.EnterPinCodeScreen.withArgs(phone, clientId.toString())
             )

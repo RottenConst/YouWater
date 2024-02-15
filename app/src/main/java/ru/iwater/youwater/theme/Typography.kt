@@ -1,6 +1,6 @@
 package ru.iwater.youwater.theme
 
-import androidx.compose.material.Typography
+import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -21,80 +21,148 @@ private val Arimo = FontFamily(
 )
 
 val YouWaterTypography = Typography(
-    h1 = TextStyle(
-        fontFamily = Inter,
-        fontWeight = FontWeight.Light,
-        fontSize = 93.sp,
-        letterSpacing = (-1.5).sp
-    ),
-    h2 = TextStyle(
-        fontFamily = Inter,
-        fontWeight = FontWeight.Light,
-        fontSize = 58.sp
-    ),
-    h3 = TextStyle(
-        fontFamily = Inter,
-        fontWeight = FontWeight.Normal,
-        fontSize = 47.sp,
-        letterSpacing = (-0.5).sp
-    ),
-    h4 = TextStyle(
+    headlineMedium = TextStyle(
         fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 33.sp,
         letterSpacing = 0.25.sp
     ),
-    h5 = TextStyle(
+    headlineSmall = TextStyle(
         fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 23.sp
     ),
-    h6 = TextStyle(
+    titleLarge = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp,
+    ),
+    titleMedium = TextStyle(
         fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 19.sp,
         letterSpacing = 0.15.sp
     ),
-    subtitle1 = TextStyle(
-        fontFamily = Inter,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        letterSpacing = 0.15.sp
-    ),
-    subtitle2 = TextStyle(
+    titleSmall = TextStyle(
         fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
-        letterSpacing = 0.1.sp
+        letterSpacing = (-0.1).sp
     ),
-    body1 = TextStyle(
+    bodyLarge = TextStyle(
         fontFamily = Arimo,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.SemiBold,
+        lineHeight = 24.sp,
         fontSize = 16.sp,
         letterSpacing = 0.5.sp
     ),
-    body2 = TextStyle(
+    bodyMedium = TextStyle(
         fontFamily = Arimo,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         letterSpacing = 0.25.sp
     ),
-    button = TextStyle(
-        fontFamily = Arimo,
-        fontWeight = FontWeight.Bold,
-        fontSize = 14.sp,
-        letterSpacing = 1.25.sp
-    ),
-    caption = TextStyle(
+    bodySmall = TextStyle(
         fontFamily = Arimo,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         letterSpacing = 0.4.sp
     ),
-    overline = TextStyle(
+    labelLarge = TextStyle(
+        fontFamily = Arimo,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp,
+        letterSpacing = 1.25.sp
+    ),
+    labelMedium = TextStyle(
+        fontFamily = Arimo,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        letterSpacing = 0.4.sp
+    ),
+    labelSmall = TextStyle(
         fontFamily = Arimo,
         fontWeight = FontWeight.Normal,
         fontSize = 10.sp,
         letterSpacing = 1.5.sp
-    )
+    ),
 )
+
+//val YouWaterTypography = Typography(
+//    h1 = TextStyle(
+//        fontFamily = Inter,
+//        fontWeight = FontWeight.Light,
+//        fontSize = 93.sp,
+//        letterSpacing = (-1.5).sp
+//    ),
+//    h2 = TextStyle(
+//        fontFamily = Inter,
+//        fontWeight = FontWeight.Light,
+//        fontSize = 58.sp
+//    ),
+//    h3 = TextStyle(
+//        fontFamily = Inter,
+//        fontWeight = FontWeight.Normal,
+//        fontSize = 47.sp,
+//        letterSpacing = (-0.5).sp
+//    ),
+//    h4 = TextStyle(
+//        fontFamily = Inter,
+//        fontWeight = FontWeight.Normal,
+//        fontSize = 33.sp,
+//        letterSpacing = 0.25.sp
+//    ),
+//    h5 = TextStyle(
+//        fontFamily = Inter,
+//        fontWeight = FontWeight.Normal,
+//        fontSize = 23.sp
+//    ),
+//    h6 = TextStyle(
+//        fontFamily = Inter,
+//        fontWeight = FontWeight.Medium,
+//        fontSize = 19.sp,
+//        letterSpacing = 0.15.sp
+//    ),
+//    subtitle1 = TextStyle(
+//        fontFamily = Inter,
+//        fontWeight = FontWeight.Normal,
+//        fontSize = 16.sp,
+//        letterSpacing = 0.15.sp
+//    ),
+//    subtitle2 = TextStyle(
+//        fontFamily = Inter,
+//        fontWeight = FontWeight.Medium,
+//        fontSize = 14.sp,
+//        letterSpacing = 0.1.sp
+//    ),
+//    body1 = TextStyle(
+//        fontFamily = Arimo,
+//        fontWeight = FontWeight.Normal,
+//        fontSize = 16.sp,
+//        letterSpacing = 0.5.sp
+//    ),
+//    body2 = TextStyle(
+//        fontFamily = Arimo,
+//        fontWeight = FontWeight.Normal,
+//        fontSize = 14.sp,
+//        letterSpacing = 0.25.sp
+//    ),
+//    button = TextStyle(
+//        fontFamily = Arimo,
+//        fontWeight = FontWeight.Bold,
+//        fontSize = 14.sp,
+//        letterSpacing = 1.25.sp
+//    ),
+//    caption = TextStyle(
+//        fontFamily = Arimo,
+//        fontWeight = FontWeight.Normal,
+//        fontSize = 12.sp,
+//        letterSpacing = 0.4.sp
+//    ),
+//    overline = TextStyle(
+//        fontFamily = Arimo,
+//        fontWeight = FontWeight.Normal,
+//        fontSize = 10.sp,
+//        letterSpacing = 1.5.sp
+//    )
+//)

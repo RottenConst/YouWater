@@ -12,18 +12,21 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
-import ru.iwater.youwater.vm.WatterViewModel
+import ru.iwater.youwater.vm.PaymentViewModel
+import timber.log.Timber
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun LoadUrl(
-    watterViewModel: WatterViewModel,
+    watterViewModel: PaymentViewModel,
     navController: NavHostController
 ) {
+    Timber.d("started LOAD URL SCREEN")
     val checkUrl = watterViewModel.getCheckUrl()
     var endUrl by rememberSaveable {
         mutableStateOf("")
     }
+    Timber.d("check url = $checkUrl")
     if (!endUrl.contentEquals("https://yourwater.ru/")) {
         AndroidView(factory = {
             WebView(it).apply {

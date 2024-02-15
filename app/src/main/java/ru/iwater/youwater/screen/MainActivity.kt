@@ -13,6 +13,8 @@ import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.material3.Surface
+import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +30,8 @@ import ru.iwater.youwater.R
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.base.BaseActivity
 import ru.iwater.youwater.bd.YouWaterDB
+import ru.iwater.youwater.iteractor.ClientStorage
+import ru.iwater.youwater.iteractor.StorageStateAuthClient
 import ru.iwater.youwater.repository.AuthorisationRepository
 import ru.iwater.youwater.screen.navigation.MainScreen
 import ru.iwater.youwater.theme.YourWaterTheme
@@ -42,7 +46,6 @@ class MainActivity : BaseActivity() {
     lateinit var factory: ViewModelProvider.Factory
     private val screenComponent = App().buildScreenComponent()
     private lateinit var authRepository: AuthorisationRepository
-    private val viewModel: WatterViewModel by viewModels { factory }
 
 
     private val authURLString = "http://docs.iwatercrm.ru:8080/pusher/beams-auth"
@@ -52,7 +55,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         screenComponent.inject(this)
-        authToken = viewModel.getAuthClient().session
+        authToken = ClientStorage(this).get().accessToken
         tokenProvider = BeamsTokenProvider(
             authURLString,
             object: AuthDataGetter {
@@ -67,13 +70,17 @@ class MainActivity : BaseActivity() {
         authRepository = AuthorisationRepository(screenComponent.clientStorage())
         setContent {
             YourWaterTheme {
-                MainScreen(watterViewModel = viewModel, mainActivity = this)
+//                Surface(tonalElevation = 4.dp) {
+                    MainScreen()
+//                }
+
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
+        PushNotifications.clearAllState()
         PushNotifications.setUserId(
             "user-${authRepository.getAuthClient().clientId}",
             tokenProvider,
@@ -139,6 +146,10 @@ class MainActivity : BaseActivity() {
                             Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                         CoroutineScope(Dispatchers.Default).launch {
                             YouWaterDB.getYouWaterDB(applicationContext)?.clearAllTables()
+                            PushNotifications.clearAllState()
+                            PushNotifications.clearDeviceInterests()
+                            ClientStorage(this@MainActivity).remove()
+//                            viewModel.exitClient()
                         }
                         PushNotifications.clearAllState()
                         PushNotifications.clearDeviceInterests()

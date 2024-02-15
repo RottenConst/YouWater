@@ -1,5 +1,6 @@
 package ru.iwater.youwater.screen.navigation
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
@@ -8,7 +9,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import ru.iwater.youwater.screen.MainActivity
+import ru.iwater.youwater.data.Client
+import ru.iwater.youwater.data.Favorite
+import ru.iwater.youwater.data.NewAddress
+import ru.iwater.youwater.data.NewProduct
 import ru.iwater.youwater.screen.basket.BasketScreen
 import ru.iwater.youwater.screen.basket.CompleteOrderScreen
 import ru.iwater.youwater.screen.basket.CreateOrderScreen
@@ -28,53 +32,102 @@ import ru.iwater.youwater.screen.profile.MyOrdersScreen
 import ru.iwater.youwater.screen.profile.NotificationScreen
 import ru.iwater.youwater.screen.profile.ProfileScreen
 import ru.iwater.youwater.screen.profile.UserDataScreen
-import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
-fun MainNavGraph(modifier: Modifier = Modifier, navController: NavHostController, watterViewModel: WatterViewModel, mainActivity: MainActivity) {
+fun MainNavGraph(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    context: Context,
+    client: Client?,
+    productsList: List<NewProduct>,
+    addProductInBasket: (NewProduct, Int, Boolean) -> Unit,
+    updateProduct: (NewProduct, Int) -> Unit,
+    deleteProduct: (Int) -> Unit,
+    addressList: List<NewAddress>,
+    favorite: Favorite,
+    onCheckedFavorite: (NewProduct, Boolean) -> Unit,
+    deleteAddress: (Int) -> Unit,
+    createNewAddress: (String, String, String, String, String, String, String, String, String, String, Boolean, NavHostController) -> Unit,
+    deleteAccount: () -> Unit,
+    getEditClientPhone: (String) -> String,
+    setClientName: (String, String, String) -> Boolean,
+    setClientPhone: (String, String, String) -> Boolean,
+    setClientEmail: (String, String, String) -> Boolean,
+    setMailing: (Boolean) -> Unit
+) {
     NavHost(
         modifier = modifier,
         navController = navController,
         startDestination = MainNavRoute.HomeScreen.path
     ) {
-        addHomeScreen(watterViewModel, navController, this)
-        addAboutProductScreen(watterViewModel, navController, this)
+        addHomeScreen(
+            favorite = favorite,
+            addProductInBasket = addProductInBasket,
+            onCheckedFavorite = onCheckedFavorite,
+            navController = navController,
+            navGraphBuilder = this
+        )
+        addAboutProductScreen(addProductInBasket = addProductInBasket, navController, this)
 
-        addCatalogScreen(watterViewModel, navController, this)
-        addProductByCategoryScreen(watterViewModel, navController, this)
+        addCatalogScreen( navController, this)
+        addProductByCategoryScreen(
+            favorite = favorite,
+            addProductInBasket = addProductInBasket,
+            onCheckedFavorite = onCheckedFavorite,
+            navController = navController,
+            navGraphBuilder = this
+        )
 
-        addBasketScreen(watterViewModel, navController, this)
-        addCreateOrderScreen(watterViewModel, navController, this)
-        addCompleteOrderScreen(watterViewModel = watterViewModel, navController = navController, navGraphBuilder = this)
+        addBasketScreen(productsList = productsList, updateProduct = updateProduct, deleteProduct = deleteProduct, navController = navController, navGraphBuilder = this)
+        addCreateOrderScreen(
+            clientId = client?.id ?: 0,
+            clientName = client?.name ?: "",
+            clientPhone = client?.phone ?: "",
+            addressList = addressList,
+            navController = navController,
+            navGraphBuilder = this
+        )
+        addCompleteOrderScreen( navController = navController, navGraphBuilder = this)
 
-        addProfileScreen(watterViewModel, navController, this)
-        addMyOrdersScreen(watterViewModel = watterViewModel, navController = navController, this)
-        addUserDataScreen(watterViewModel = watterViewModel, mainActivity = mainActivity, this)
-        addEditUserData(watterViewModel = watterViewModel, this)
-        addFavoriteScreen(watterViewModel = watterViewModel, navController = navController, this)
-        addAddressesScreen(watterViewModel = watterViewModel, navController = navController, this)
-        addAddAddressScreen(watterViewModel = watterViewModel, navController = navController, this)
-        addNotificationScreen(watterViewModel = watterViewModel, this)
+        addProfileScreen(clientName = client?.name ?: "", navController, this)
+        addMyOrdersScreen( navController = navController, this)
+        addUserDataScreen(clientName = client?.name ?: "", clientPhone = client?.phone ?: "", clientEmail = client?.email ?: "", deleteAccount = deleteAccount, this)
+        addEditUserData(
+            clientName = client?.name ?: "",
+            clientPhone = client?.phone ?: "",
+            clientEmail = client?.email ?: "",
+            getEditClientPhone = getEditClientPhone,
+            setClientName = setClientName,
+            setClientPhone = setClientPhone,
+            setClientEmail = setClientEmail,
+            navGraphBuilder = this
+        )
+        addFavoriteScreen(favorite = favorite, addProductInBasket = addProductInBasket, onCheckedFavorite = onCheckedFavorite, navController = navController, this)
+        addAddressesScreen(addressList = addressList, deleteAddress = deleteAddress,  navController = navController, this)
+        addAddAddressScreen(createNewAddress = createNewAddress, navController = navController, navGraphBuilder = this)
+        addNotificationScreen(mailingConsent = client?.mailingConsent == true, setMailing = setMailing, this)
 
         addAboutCompanyScreen(this)
-        addContactScreen(mainActivity, this)
+        addContactScreen(context, this)
         addDeliveryInfoScreen(this)
         addFaqScreen(this)
     }
 }
 
 private fun addHomeScreen(
-    watterViewModel: WatterViewModel,
+    favorite: Favorite,
+    addProductInBasket: (NewProduct, Int, Boolean) -> Unit,
+    onCheckedFavorite: (NewProduct, Boolean) -> Unit,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(route = MainNavRoute.HomeScreen.path) {
-        HomeScreen(navController = navController, watterViewModel = watterViewModel)
+        HomeScreen(addProductInBasket = addProductInBasket, onCheckedFavorite = onCheckedFavorite, favorite = favorite, navController = navController)
     }
 }
 
 private fun addAboutProductScreen(
-    watterViewModel: WatterViewModel,
+    addProductInBasket: (NewProduct, Int, Boolean) -> Unit,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
@@ -90,7 +143,7 @@ private fun addAboutProductScreen(
         val args = navBackStackEntry.arguments
 
         AboutProductScreen(
-            watterViewModel = watterViewModel,
+            addProductInBasket = addProductInBasket,
             productId = args?.getInt(MainNavRoute.AboutProductScreen.productId)!!,
             navController = navController
         )
@@ -98,19 +151,20 @@ private fun addAboutProductScreen(
 }
 
 private fun addCatalogScreen(
-    watterViewModel: WatterViewModel,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
         route = MainNavRoute.CatalogScreen.path
     ) {
-        CatalogScreen(watterViewModel = watterViewModel, navController = navController)
+        CatalogScreen(navController = navController)
     }
 }
 
 private fun addProductByCategoryScreen(
-    watterViewModel: WatterViewModel,
+    favorite: Favorite,
+    addProductInBasket: (NewProduct, Int, Boolean) -> Unit,
+    onCheckedFavorite: (NewProduct, Boolean) -> Unit,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
@@ -125,24 +179,29 @@ private fun addProductByCategoryScreen(
 
         val args = navBackStackEntry.arguments
 
-        ProductByCategory(catalogId = args?.getInt(MainNavRoute.ProductsByCategoryScreen.catalogId)!!, watterViewModel = watterViewModel, navController = navController)
+        ProductByCategory(favorite = favorite, addProductInBasket = addProductInBasket, onCheckedFavorite = onCheckedFavorite, catalogId = args?.getInt(MainNavRoute.ProductsByCategoryScreen.catalogId)!!, navController = navController)
     }
 }
 
 private fun addBasketScreen(
-    watterViewModel: WatterViewModel,
+    productsList: List<NewProduct>,
+    deleteProduct: (Int) -> Unit,
+    updateProduct: (NewProduct, Int) -> Unit,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
         route = MainNavRoute.BasketScreen.path
     ) {
-        BasketScreen(watterViewModel = watterViewModel, navController = navController)
+        BasketScreen(productsList = productsList, updateProduct = updateProduct, deleteProduct = deleteProduct,navController = navController)
     }
 }
 
 private fun addCreateOrderScreen(
-    watterViewModel: WatterViewModel,
+    clientId: Int,
+    clientName: String,
+    clientPhone: String,
+    addressList: List<NewAddress>,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
@@ -161,7 +220,10 @@ private fun addCreateOrderScreen(
         val args = navBackStackEntry.arguments
 
         CreateOrderScreen(
-            watterViewModel = watterViewModel,
+            clientId = clientId,
+            clientName = clientName,
+            clientPhone = clientPhone,
+            addressList = addressList,
             repeatOrder = args?.getInt(MainNavRoute.CreateOrderScreen.lastOrderId)!!,
             isShowMessage = args.getBoolean(MainNavRoute.CreateOrderScreen.isShowMessage),
             navController = navController,
@@ -170,45 +232,58 @@ private fun addCreateOrderScreen(
 }
 
 private fun addProfileScreen(
-    watterViewModel: WatterViewModel,
+    clientName: String,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
         route = MainNavRoute.ProfileMenuScreen.path
     ) {
-        ProfileScreen(watterViewModel, navController = navController)
+        ProfileScreen(clientName = clientName, navController = navController)
     }
 }
 
 private fun addMyOrdersScreen(
-    watterViewModel: WatterViewModel,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
         route = MainNavRoute.MyOrderScreen.path
     ) {
-        MyOrdersScreen(navController = navController, watterViewModel = watterViewModel)
+        MyOrdersScreen(navController = navController)
     }
 }
 
 private fun addEditUserData(
-    watterViewModel: WatterViewModel,
+    clientName: String,
+    clientPhone: String,
+    clientEmail: String,
+    getEditClientPhone: (String) -> String,
+    setClientName: (String, String, String) -> Boolean,
+    setClientPhone: (String, String, String) -> Boolean,
+    setClientEmail: (String, String, String) -> Boolean,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
         route = MainNavRoute.EditUserDataScreen.path
     ) {
         EditUserDataScreen(
-            watterViewModel = watterViewModel,
+            clientName = clientName,
+            clientPhone = clientPhone,
+            clientEmail = clientEmail,
+            getEditClientPhone,
+            setClientName,
+            setClientPhone,
+            setClientEmail,
         )
     }
 }
 
 private fun addUserDataScreen(
-    watterViewModel: WatterViewModel,
-    mainActivity: MainActivity,
+    clientName: String,
+    clientPhone: String,
+    clientEmail: String,
+    deleteAccount: () -> Unit,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
@@ -222,37 +297,46 @@ private fun addUserDataScreen(
 
         val args = navBackStackEntry.arguments
 
-        UserDataScreen(sendUserData = args?.getBoolean(MainNavRoute.UserDataScreen.sendUserData)!!, mainActivity = mainActivity, watterViewModel = watterViewModel)
+        UserDataScreen(
+            clientName = clientName,
+            clientPhone = clientPhone,
+            clientEmail = clientEmail,
+            deleteAccount = deleteAccount,
+            sendUserData = args?.getBoolean(MainNavRoute.UserDataScreen.sendUserData)!!
+        )
     }
 }
 
 private fun addFavoriteScreen(
-    watterViewModel: WatterViewModel,
+    favorite: Favorite,
+    addProductInBasket: (NewProduct, Int, Boolean) -> Unit,
+    onCheckedFavorite: (NewProduct, Boolean) -> Unit,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
         route = MainNavRoute.FavoriteProductScreen.path
     ) {
-        FavoriteScreen(navController = navController, watterViewModel = watterViewModel)
+        FavoriteScreen(addProductInBasket = addProductInBasket, favorite = favorite, onCheckedFavorite = onCheckedFavorite, navController = navController)
     }
 }
 
 private fun addAddressesScreen(
-    watterViewModel: WatterViewModel,
+    addressList: List<NewAddress>,
+    deleteAddress: (Int) -> Unit,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
         route = MainNavRoute.AddressesScreen.path
     ) {
-        AddressesScreen(navController = navController, watterViewModel = watterViewModel)
+        AddressesScreen(deleteAddress = deleteAddress, addressList1 = addressList, navController = navController)
     }
 }
 
 private fun addAddAddressScreen(
-    watterViewModel: WatterViewModel,
     navController: NavHostController,
+    createNewAddress: (String, String, String, String, String, String, String, String, String, String, Boolean, NavHostController) -> Unit,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
@@ -265,23 +349,23 @@ private fun addAddAddressScreen(
     ) {navBackStackEntry ->
         val args = navBackStackEntry.arguments
 
-        AddAddressScreen(navController = navController, isFromOrder = args?.getBoolean(MainNavRoute.AddAddressScreen.isFromOrder)!!, watterViewModel = watterViewModel)
+        AddAddressScreen(createNewAddress = createNewAddress, navController = navController, isFromOrder = args?.getBoolean(MainNavRoute.AddAddressScreen.isFromOrder)!!)
     }
 }
 
 private fun addNotificationScreen(
-    watterViewModel: WatterViewModel,
+    mailingConsent: Boolean,
+    setMailing: (Boolean) -> Unit,
     navGraphBuilder: NavGraphBuilder
 ) {
     navGraphBuilder.composable(
         route = MainNavRoute.NotificationScreen.path
     ) {
-        NotificationScreen(watterViewModel)
+        NotificationScreen(mailingConsent = mailingConsent, setMailing = setMailing)
     }
 }
 
 private fun addCompleteOrderScreen(
-    watterViewModel: WatterViewModel,
     navController: NavHostController,
     navGraphBuilder: NavGraphBuilder
 ) {
@@ -298,7 +382,6 @@ private fun addCompleteOrderScreen(
     ) { navBackStackEntry ->
         val args = navBackStackEntry.arguments
         CompleteOrderScreen(
-            watterViewModel = watterViewModel,
             orderId = args?.getInt(MainNavRoute.CompleteOrderScreen.orderId)!!,
             isPayment = args.getBoolean(MainNavRoute.CompleteOrderScreen.isPayment),
             navController = navController
@@ -317,13 +400,13 @@ private fun addAboutCompanyScreen(
 }
 
 private fun addContactScreen(
-    mainActivity: MainActivity,
+    context: Context,
     navGraphBuilder: NavGraphBuilder,
 ) {
     navGraphBuilder.composable(
         route = MainNavRoute.ContactScreen.path
     ) {
-        ContactScreen(mainActivity = mainActivity)
+        ContactScreen(context = context)
     }
 }
 

@@ -12,19 +12,25 @@ class ClientStorage(context: Context) : StorageStateAuthClient {
 
     override fun save(data: AuthClient) {
         val editor = preferencesStateAccount.edit()
-        editor.putString(STATE_ACCOUNT + "session", data.session)
         editor.putInt(STATE_ACCOUNT, data.clientId)
         editor.putString(STATE_ACCOUNT + "company", data.company)
-
+        editor.putString(STATE_ACCOUNT + "access_token", data.accessToken)
+        editor.putString(STATE_ACCOUNT + "refresh_token", data.refreshToken)
         editor.apply()
     }
 
     override fun get(): AuthClient {
-        val session = preferencesStateAccount.getString(STATE_ACCOUNT + "session", "").toString()
+        val accessToken = preferencesStateAccount.getString(STATE_ACCOUNT + "access_token", "").toString()
+        val refreshToken = preferencesStateAccount.getString(STATE_ACCOUNT + "refresh_token", "").toString()
         val id = preferencesStateAccount.getInt(STATE_ACCOUNT, 0)
         val company = preferencesStateAccount.getString(STATE_ACCOUNT + "company", "").toString()
 
-        return AuthClient(id, company, session)
+        return AuthClient(
+            clientId = id,
+            company = company,
+            accessToken = accessToken,
+            refreshToken = refreshToken
+        )
     }
 
     override fun remove() {

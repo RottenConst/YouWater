@@ -19,6 +19,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -31,25 +32,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.screen.login.ButtonEnter
 import ru.iwater.youwater.theme.Blue500
-import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
-import ru.iwater.youwater.vm.WatterViewModel
 
 @Composable
 fun AddAddressScreen(
-    watterViewModel: WatterViewModel = viewModel(),
+    createNewAddress: (String, String, String, String, String, String, String, String, String, String, Boolean, NavHostController) -> Unit,
     navController: NavHostController,
     isFromOrder: Boolean
 ) {
@@ -70,7 +67,7 @@ fun AddAddressScreen(
     var house by rememberSaveable {
         mutableStateOf("")
     }
-    var structure by rememberSaveable {
+    var block by rememberSaveable {
         mutableStateOf("")
     }
     var entrance by rememberSaveable {
@@ -127,20 +124,20 @@ fun AddAddressScreen(
             isVisibleDialog = isVisibleDialog,
             setVisible = {isVisibleDialog = !isVisibleDialog},
             saveAddress = {
-                watterViewModel.createNewAddress(
-                    region = selectRegion,
-                    city = city,
-                    street = street,
-                    house = house,
-                    building = structure,
-                    entrance = entrance,
-                    floor = floor,
-                    flat = apartment,
-                    contact = contact,
-                    notice = notice,
+                createNewAddress(
+                    selectRegion,
+                    city,
+                    street,
+                    house,
+                    block,
+                    entrance,
+                    floor,
+                    apartment,
+                    contact,
+                    notice,
                     isFromOrder,
-                    navController = navController
-                )
+                    navController
+                    )
             }
         )
         Box {
@@ -159,7 +156,7 @@ fun AddAddressScreen(
                         SetHome(home = house, setHome = {house = it}, isValidateText = isValidateHouse, setValidation = {isValidateHouse = it})
                     }
                     Box(modifier = modifier.weight(1f)) {
-                        SetStructure(structure = structure, setStructure = {structure = it}, isValidateText = isValidateStructure, setValidation = {isValidateStructure = it})
+                        SetStructure(structure = block, setStructure = {block = it}, isValidateText = isValidateStructure, setValidation = {isValidateStructure = it})
                     }
                 }
                 Row (modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
@@ -196,7 +193,7 @@ fun TitleAddAddress(modifier: Modifier) {
     Text(
         text = stringResource(id = R.string.fragment_add_address_label),
         textAlign = TextAlign.Center,
-        style = YouWaterTypography.body1,
+        style = MaterialTheme.typography.bodyLarge,
         fontWeight = FontWeight.Bold,
         modifier = modifier
             .fillMaxWidth()
@@ -232,17 +229,17 @@ fun SetRegion(
                 label = {
                     Text(
                         text = stringResource(id = R.string.region),
-                        style = YouWaterTypography.body1
+                        style = MaterialTheme.typography.bodyLarge
                     )},
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedRegion)
                 },
                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedLabelColor = Blue500,
-                    focusedTextColor = Blue500,
-                    focusedBorderColor = Blue500
+                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    focusedTextColor = MaterialTheme.colorScheme.primary,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary
                 )
             )
             ExposedDropdownMenu(
@@ -259,17 +256,17 @@ fun SetRegion(
                         text = {
                             Text(
                                 text = region,
-                                style = YouWaterTypography.body1
+                                style = MaterialTheme.typography.bodyLarge
                             )
                         },
                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         colors = MenuDefaults.itemColors(
-                            leadingIconColor = Blue500,
-                            textColor = Color.Black,
-                            trailingIconColor = Color.Red,
-                            disabledTextColor = Color.Gray,
-                            disabledLeadingIconColor = Color.Green,
-                            disabledTrailingIconColor = Color.White
+                            leadingIconColor = MaterialTheme.colorScheme.primary,
+                            textColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            trailingIconColor = MaterialTheme.colorScheme.error,
+                            disabledTextColor = MaterialTheme.colorScheme.outline,
+                            disabledLeadingIconColor = MaterialTheme.colorScheme.tertiary,
+                            disabledTrailingIconColor = MaterialTheme.colorScheme.primaryContainer
                         )
                     )
                 }
@@ -288,22 +285,22 @@ fun SetCity(city: String, setCity: (String) -> Unit, isValidateText: Boolean = t
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         onValueChange = {
             setCity(it)
-            setValidation(!it.contains(Regex("""[^А-я\s]""")))
+            setValidation(!it.contains(Regex("""[^А-я\s] -""")))
                         },
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_city),
-                style = YouWaterTypography.body1
+                style = MaterialTheme.typography.bodyLarge
             )},
         isError = !isValidateText,
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            focusedTextColor = Blue500,
-            errorContainerColor = Color.White,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            focusedTextColor = MaterialTheme.colorScheme.primary,
+            errorContainerColor = MaterialTheme.colorScheme.errorContainer,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         maxLines = 1
     )
@@ -323,16 +320,16 @@ fun SetStreet(street: String, setStreet: (String) -> Unit, isValidateText: Boole
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_street),
-                style = YouWaterTypography.body1
+                style = MaterialTheme.typography.bodyLarge
             )},
         isError = !isValidateText,
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            errorContainerColor = MaterialTheme.colorScheme.errorContainer,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         maxLines = 1
     )
@@ -353,16 +350,16 @@ fun SetHome(home: String, setHome: (String) -> Unit, isValidateText: Boolean = t
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_home),
-                style = YouWaterTypography.body1
+                style = MaterialTheme.typography.bodyLarge
             )},
         isError = !isValidateText,
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            errorContainerColor = MaterialTheme.colorScheme.errorContainer,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         maxLines = 1
     )
@@ -382,16 +379,16 @@ fun SetStructure(structure: String, setStructure: (String) -> Unit, isValidateTe
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_structure),
-                style = YouWaterTypography.body1
+                style = MaterialTheme.typography.bodyLarge
             )},
         isError = !isValidateText,
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            errorContainerColor = MaterialTheme.colorScheme.errorContainer,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         maxLines = 1
     )
@@ -412,16 +409,16 @@ fun SetEntrance(entrance: String, setEntrance: (String) -> Unit, isValidateText:
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_entrance),
-                style = YouWaterTypography.body1
+                style = MaterialTheme.typography.bodyLarge
             )},
         isError = !isValidateText,
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            errorContainerColor = MaterialTheme.colorScheme.errorContainer,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         maxLines = 1
     )
@@ -442,16 +439,16 @@ fun SetApartment(apartment: String, setApartment: (String) -> Unit, isValidateTe
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_apartment),
-                style = YouWaterTypography.body1
+                style = MaterialTheme.typography.bodyLarge
             )},
         isError = !isValidateText,
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            errorContainerColor = MaterialTheme.colorScheme.errorContainer,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         maxLines = 1
     )
@@ -472,16 +469,16 @@ fun SetFloor(floor: String, setFloor: (String) -> Unit, isValidateText: Boolean 
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_floor),
-                style = YouWaterTypography.body1
+                style = MaterialTheme.typography.bodyLarge
             )},
         isError = !isValidateText,
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            errorContainerColor = MaterialTheme.colorScheme.errorContainer,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         maxLines = 1
     )
@@ -499,14 +496,14 @@ fun SetNotice(notice: String, setNotice: (String) -> Unit) {
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_notice),
-                style = YouWaterTypography.body1
+                style = MaterialTheme.typography.bodyLarge
             )},
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            focusedLabelColor = Blue500,
-            cursorColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
         )
     )
 }
@@ -522,13 +519,13 @@ fun SetAltContact(contact: String, setContact: (String) -> Unit) {
         label = {
             Text(
                 text = stringResource(id = R.string.fragment_add_address_contact),
-                style = YouWaterTypography.body1
+                style = MaterialTheme.typography.bodyLarge
             )},
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Blue500,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            focusedLabelColor = Blue500
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedLabelColor = MaterialTheme.colorScheme.primary
         )
     )
 }

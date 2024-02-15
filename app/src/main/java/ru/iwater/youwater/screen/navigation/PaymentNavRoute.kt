@@ -1,9 +1,9 @@
 package ru.iwater.youwater.screen.navigation
 
 sealed class PaymentNavRoute (val path: String) {
-    object CompleteOrderScreen: PaymentNavRoute("CompleteOrder")
+    data object CompleteOrderScreen: PaymentNavRoute("CompleteOrder")
 
-    object CheckPaymentScreen: PaymentNavRoute("CheckPay")
+    data object CheckPaymentScreen: PaymentNavRoute("CheckPay")
 
 
     fun withArgs(vararg args: String): String {

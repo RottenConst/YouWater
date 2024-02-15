@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,12 +24,10 @@ import androidx.compose.ui.unit.dp
 import ru.iwater.youwater.R
 import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.Green100
-import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 
 @Composable
-fun AboutCompanyScreen() {
-    val modifier = Modifier
+fun AboutCompanyScreen(modifier: Modifier = Modifier) {
     AboutCompany(modifier = modifier)
 }
 
@@ -51,12 +50,12 @@ fun AboutCompany(modifier: Modifier) {
         Text(
             text = stringResource(id = R.string.about_company),
             textAlign = TextAlign.Center,
-            style = YouWaterTypography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
         Text(
             text = stringResource(id = R.string.why_choose_us),
             color = Blue500,
-            style = YouWaterTypography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             modifier = modifier.padding(16.dp)
         )
@@ -103,12 +102,12 @@ fun AnswerQuestion(modifier: Modifier, image: Painter, title: String, text: Stri
         Column(modifier = modifier.padding(4.dp)) {
             Text(
                 text = title,
-                style = YouWaterTypography.body2,
+                style = MaterialTheme.typography.bodyMedium,
                 color = Green100
             )
             Text(
                 text = text,
-                style = YouWaterTypography.body2
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }

@@ -12,26 +12,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.sharp.CheckCircle
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,34 +44,36 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.MyOrder
-import ru.iwater.youwater.data.Product
+import ru.iwater.youwater.data.NewProduct
 import ru.iwater.youwater.screen.MainActivity
+import ru.iwater.youwater.screen.component.product.ImageProduct
 import ru.iwater.youwater.screen.navigation.MainNavRoute
 import ru.iwater.youwater.screen.navigation.PaymentNavRoute
-import ru.iwater.youwater.theme.Blue500
 import ru.iwater.youwater.theme.YouWaterTypography
 import ru.iwater.youwater.theme.YourWaterTheme
 import ru.iwater.youwater.utils.StatusPayment
-import ru.iwater.youwater.vm.WatterViewModel
+import ru.iwater.youwater.vm.PaymentViewModel
+import ru.iwater.youwater.vm.PaymentViewModelFactory
 import timber.log.Timber
 
 @Composable
 fun CompleteOrderScreen(
     modifier: Modifier = Modifier,
-    watterViewModel: WatterViewModel = viewModel(),
     orderId: Int,
-    isPayment: Boolean = false,
-    navController: NavHostController
+    isPayment: Boolean,
+    navController: NavHostController,
+    watterViewModel: PaymentViewModel = viewModel(factory = PaymentViewModelFactory(orderId))
 ) {
     LaunchedEffect(Unit) {
-        watterViewModel.clearBasket()
-        watterViewModel.getOrderCrm(orderId)
+        watterViewModel.setCompleteOrderId(orderId)
     }
 
     val completeOrder by watterViewModel.completedOrder.observeAsState()
-    val paymentStatus by watterViewModel.paymentStatus.observeAsState()
+    val paymentStatus by watterViewModel.paymentStatus.observeAsState(initial = StatusPayment.LOAD)
+
+
     var pay by remember {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -103,19 +106,21 @@ fun InfoStatusCreate(modifier: Modifier, isPayment: Boolean, isPay: StatusPaymen
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (isPayment) {
+            Timber.d("is payment ${isPay?.name}")
             when (isPay) {
                 StatusPayment.DONE -> {
+                    Timber.d("is Done")
                     Icon(
                         modifier = modifier.size(42.dp, 42.dp),
                         imageVector = Icons.Sharp.CheckCircle,
                         contentDescription = "",
-                        tint = Blue500
+                        tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = stringResource(id = R.string.fragment_complete_order_complete_text),
-                        style = YouWaterTypography.h6,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Blue500
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = stringResource(id = R.string.fragment_complete_order_connect_order_delivery),
@@ -128,14 +133,14 @@ fun InfoStatusCreate(modifier: Modifier, isPayment: Boolean, isPay: StatusPaymen
                         modifier = modifier.size(42.dp, 42.dp),
                         imageVector = Icons.Rounded.Close,
                         contentDescription = "",
-                        tint = Color.Red
+                        tint = MaterialTheme.colorScheme.error
                     )
                     Text(
                         text = stringResource(id = R.string.error_pay_order_text),
-                        style = YouWaterTypography.h6,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = Blue500
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -166,17 +171,18 @@ fun InfoStatusCreate(modifier: Modifier, isPayment: Boolean, isPay: StatusPaymen
                 }
             }
         } else {
+            Timber.d("is payment $isPayment")
             Icon(
                 modifier = modifier.size(42.dp, 42.dp),
                 imageVector = Icons.Sharp.CheckCircle,
                 contentDescription = "",
-                tint = Blue500
+                tint = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = stringResource(id = R.string.fragment_complete_order_complete_text),
-                style = YouWaterTypography.h6,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Blue500
+                color = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = stringResource(id = R.string.fragment_complete_order_connect_order_delivery),
@@ -191,13 +197,13 @@ fun NumberOrderText(numberOrder: Int) {
     Row {
         Text(
             text = stringResource(id = R.string.order_number_text),
-            style = YouWaterTypography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Black
         )
         Text(
             text = "$numberOrder",
-            style = YouWaterTypography.body1,
-            color = Blue500,
+            style = YouWaterTypography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold
         )
     }
@@ -213,12 +219,12 @@ fun InfoAddressOrder(modifier: Modifier, address: String) {
         Icon(
             imageVector = Icons.Outlined.LocationOn,
             contentDescription = "",
-            tint = Blue500
+            tint = MaterialTheme.colorScheme.primary
         )
         Text(
             modifier = modifier.padding(8.dp),
             text = address,
-            style = YouWaterTypography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Start
         )
     }
@@ -234,12 +240,12 @@ fun InfoTimeOrder(modifier: Modifier, time: String) {
         Icon(
             painter = painterResource(id = R.drawable.ic_time_24),
             contentDescription = "",
-            tint = Blue500
+            tint = MaterialTheme.colorScheme.primary
         )
         Text(
             modifier = modifier.padding(8.dp),
             text = time,
-            style = YouWaterTypography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Start
         )
     }
@@ -257,14 +263,14 @@ fun PriceOrder(modifier: Modifier, priceOder: String) {
         Text(
             modifier = modifier.padding(8.dp),
             text = stringResource(id = R.string.item_order_total_sum),
-            style = YouWaterTypography.subtitle2,
+            style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Black
         )
         Text(
             modifier = modifier.padding(8.dp),
             text = "${priceOder}₽",
-            style = YouWaterTypography.subtitle2,
-            color = Blue500,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold
         )
     }
@@ -282,7 +288,7 @@ fun TypePayOrder(modifier: Modifier, typePay: String) {
         Text(
             modifier = modifier.padding(8.dp),
             text = stringResource(id = R.string.item_order_description_complete_order),
-            style = YouWaterTypography.subtitle2,
+            style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Black
         )
         Text(
@@ -302,17 +308,17 @@ fun TypePayOrder(modifier: Modifier, typePay: String) {
 
                 else -> {typePay}
             },
-            style = YouWaterTypography.subtitle2,
+            style = MaterialTheme.typography.titleSmall,
         )
     }
 }
 
 @Composable
 fun CardOrderInfo(modifier: Modifier, order: MyOrder) {
-    Surface(
+    Card(
         modifier = modifier.padding(16.dp),
-        shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary)
     ) {
         Column(modifier = modifier.fillMaxWidth()) {
             Row(
@@ -341,25 +347,25 @@ fun CardOrderInfo(modifier: Modifier, order: MyOrder) {
                         }
                         else -> {""}
                     },
-                    style = YouWaterTypography.body1,
-                    color = Blue500
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
-            Divider(color = Color.LightGray, thickness = 1.dp)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
             InfoAddressOrder(modifier = modifier, address = order.address)
-            Divider(color = Color.LightGray, thickness = 1.dp)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
             InfoTimeOrder(modifier = modifier, time = order.date)
-            Divider(color = Color.LightGray, thickness = 1.dp)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
             ProductsOrderList(modifier = modifier, products = order.products)
             PriceOrder(modifier = modifier, priceOder = order.cash)
-            Divider(color = Color.LightGray, thickness = 1.dp)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
             TypePayOrder(modifier = modifier, typePay = order.typeCash ?: "")
         }
     }
 }
 
 @Composable
-fun ProductsOrderList(modifier: Modifier, products: List<Product>) {
+fun ProductsOrderList(modifier: Modifier, products: List<NewProduct>) {
     Box(modifier = modifier
         .height(((products.size + 1) * 66).dp)
         .fillMaxWidth()) {
@@ -368,20 +374,20 @@ fun ProductsOrderList(modifier: Modifier, products: List<Product>) {
                 Text(
                     modifier = modifier.padding(8.dp),
                     text = stringResource(id = R.string.item_order_info_order),
-                    style = YouWaterTypography.body2,
+                    style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
                 )
             }
             items(products.size) { productIndex ->
                 ItemProductOrder(modifier = modifier, products[productIndex])
-                Divider(color = Color.LightGray, thickness = 1.dp)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
             }
         }
     }
 }
 
 @Composable
-fun ItemProductOrder(modifier: Modifier, product: Product) {
+fun ItemProductOrder(modifier: Modifier, product: NewProduct) {
     Row(
         modifier = modifier
             .padding(8.dp)
@@ -390,10 +396,10 @@ fun ItemProductOrder(modifier: Modifier, product: Product) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        ImageProduct(image = product.gallery)
+        ImageProduct(image = product.image)
         Text(
             text = product.name,
-            style = YouWaterTypography.caption,
+            style = MaterialTheme.typography.labelMedium,
             textAlign = TextAlign.Start,
             modifier = Modifier.width(156.dp)
         )
@@ -405,22 +411,22 @@ fun ItemProductOrder(modifier: Modifier, product: Product) {
             if (product.getPriceNoDiscount(product.count) != product.getPriceOnCount(product.count)) {
                 Text(
                     text = "${product.getPriceNoDiscount(product.count)}P",
-                    style = YouWaterTypography.caption,
+                    style = MaterialTheme.typography.labelMedium,
                     textDecoration = TextDecoration.LineThrough,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
             Text(
                 text = "${product.getPriceOnCount(product.count)}",
-                style = YouWaterTypography.caption,
+                style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                color = Blue500
+                color = MaterialTheme.colorScheme.primary
             )
         }
         Text(
             text = "${product.count} шт.",
-            style = YouWaterTypography.caption,
+            style = MaterialTheme.typography.labelMedium,
         )
     }
 }

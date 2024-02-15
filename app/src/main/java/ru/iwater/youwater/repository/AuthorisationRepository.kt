@@ -2,11 +2,9 @@ package ru.iwater.youwater.repository
 
 import com.google.gson.JsonObject
 import ru.iwater.youwater.data.AuthClient
-import ru.iwater.youwater.data.Client
 import ru.iwater.youwater.data.PhoneStatusClient
 import ru.iwater.youwater.iteractor.StorageStateAuthClient
-import ru.iwater.youwater.network.ApiWater
-import ru.iwater.youwater.network.RetrofitFactory
+import ru.iwater.youwater.network.ApiAuthClient
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -14,11 +12,13 @@ class AuthorisationRepository @Inject constructor(
     private val authStorage: StorageStateAuthClient
 ) {
 
-    private val apiAuth: ApiWater = RetrofitFactory.makeRetrofit()
+    private val apiAuth: ApiAuthClient = ApiAuthClient.makeClientApi()
 
+    //проверка номера телефона в базе,
     suspend fun authPhone(phone: String): PhoneStatusClient? {
         val phoneAnswer = JsonObject()
         phoneAnswer.addProperty("phone", phone)
+        phoneAnswer.addProperty("company_id", 7)
         return try {
             val phoneStatus = apiAuth.authPhone(phoneAnswer)
             phoneStatus
@@ -28,16 +28,21 @@ class AuthorisationRepository @Inject constructor(
         }
     }
 
-    suspend fun checkCode(clientId: Int, pinCode: String): AuthClient? {
+    suspend fun checkCode(clientId: Int, phone: String, pinCode: String): AuthClient? {
         val code = JsonObject()
-        code.addProperty("client_id", clientId)
-        code.addProperty("code", pinCode)
+        code.addProperty("phone", phone)
+        code.addProperty("company_id", 7)
+        code.addProperty("sms", pinCode)
         try {
-            val authClient = apiAuth.checkCode(code)
-            if (authClient != null) {
-                Timber.i("Client = ${authClient.clientId} ${authClient.company} ${authClient.session}")
-                authClient.clientId = clientId
-                return authClient
+            val token = apiAuth.checkCode(code)
+            if (token != null) {
+                Timber.i("Client = ${token.accessToken} ${token.refreshToken}")
+                return AuthClient(
+                    clientId = clientId,
+                    company = "7",
+                    accessToken = token.accessToken,
+                    refreshToken = token.refreshToken
+                )
             }
         }catch (e: Exception) {
             Timber.e("error check code: $e")
@@ -45,36 +50,38 @@ class AuthorisationRepository @Inject constructor(
         return null
     }
 
-    suspend fun checkSession(clientAuth: AuthClient): Boolean? {
-        val client = JsonObject()
-        if (clientAuth.clientId > 0) {
-            clientAuth.clientId
-            client.addProperty("client_id", clientAuth.clientId)
-            client.addProperty("session", clientAuth.session)
+    suspend fun checkSession(clientAuth: AuthClient): Boolean {
+        val refreshToken = JsonObject()
+        if (clientAuth.refreshToken.isNotEmpty()) {
+            Timber.d("TOKEN = ${clientAuth.refreshToken}")
+            refreshToken.addProperty("refresh_token", clientAuth.refreshToken)
             try {
-                return apiAuth.checkSession(client)?.get("check")?.asBoolean
+                val token = apiAuth.refreshTokens(refreshToken)
+                val authClient = AuthClient(
+                    clientId = clientAuth.clientId,
+                    company = clientAuth.company,
+                    accessToken = token?.accessToken ?: "",
+                    refreshToken = token?.refreshToken ?: ""
+                )
+                Timber.d("auth client = ${authClient.accessToken}")
+                saveAuthClient(authClient)
+                return authClient.refreshToken.isNotEmpty() && authClient.accessToken.isNotEmpty()
             } catch (e: Exception) {
-                Timber.e("error check session")
+                Timber.e("error check session $e")
             }
         }
         return false
     }
 
-    suspend fun getClientInfo(clientId: Int): Client? {
-        try {
-            val client = apiAuth.getClientDetail(clientId)
-            if (client != null) {
-                return client
-            }
-        }catch (e: Exception) {
-            Timber.e("error get client: $e")
-        }
-        return null
-    }
-
-    suspend fun registerClient(phone: String, name: String, email: String): JsonObject? {
+    suspend fun registerClient(phone: String, name: String, email: String, mailingConsent: Boolean, companyId: Int = 7): JsonObject? {
+        val registerClient = JsonObject()
+        registerClient.addProperty("phone", phone)
+        registerClient.addProperty("name", name)
+        registerClient.addProperty("email", email)
+        registerClient.addProperty("mailing_consent", mailingConsent)
+        registerClient.addProperty("company_id", companyId)
         return try {
-            val client = apiAuth.register(phone, name, email)
+            val client = apiAuth.register(registerClient)
             if (client.isSuccessful) {
                client.body()
             } else {
@@ -100,18 +107,6 @@ class AuthorisationRepository @Inject constructor(
             Timber.e("error set mailing: $e")
         }
 
-    }
-
-    suspend fun editUserData(clientId: Int, clientUserData: JsonObject): Boolean {
-        try {
-            val answer = apiAuth.editUserData(clientId, clientUserData)
-            if (answer?.isSuccessful == true) {
-                return answer.body()?.get("status")?.asBoolean == true
-            }
-        } catch (e: java.lang.Exception) {
-            Timber.e("error edit user data: $e")
-        }
-        return false
     }
 
     fun saveAuthClient(authClient: AuthClient?) {

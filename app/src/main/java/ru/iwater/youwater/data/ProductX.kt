@@ -1,9 +1,6 @@
 package ru.iwater.youwater.data
 
-import androidx.annotation.Keep
-
-@Keep
-data class ProductXX(
+data class ProductX(
     val id: Int,
     val name: String
 )
