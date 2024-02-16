@@ -563,26 +563,12 @@ fun ProductCost(id: Int, minPrice: Int, nameProduct: String, prices: List<String
         contentAlignment = Alignment.BottomStart
     ) {
         Column {
-            if (id == 81 || id == 84) {
-                Text(
-                    text = "oт ${minPrice}₽",
-                    color = Color.Gray,
-                    fontWeight = FontWeight.Light,
-                    textAlign = TextAlign.Start,
-                    textDecoration = TextDecoration.LineThrough,
-                    style = YouWaterTypography.caption
-                )
-            }
             Row(
                 modifier = Modifier.padding(0.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
                 Text(
-                    text = when (id) {
-                        81 -> "от ${minPrice - 30}₽"
-                        84 -> "от ${minPrice - 30}₽"
-                        else -> "от ${minPrice}₽"
-                    },
+                    text = "от ${minPrice}₽",
                     color = Blue500,
                     style = YouWaterTypography.body2,
                     fontWeight = FontWeight.Bold

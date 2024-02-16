@@ -13,11 +13,13 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 
-//const val ImageUrl = "https://crm.new.iwatercrm.ru/iwatercrm/images"//prod
-//const val BASE_URL_API = "https://app.iwatercrm.ru/iwater/" //prod
+const val ImageUrl = "https://crm.new.iwatercrm.ru/iwatercrm/images"//prod
+const val BASE_URL_API = "https://app.iwatercrm.ru/iwater/" //prod
 //
-const val BASE_URL_API = "https://api.iwatercrm.ru/iwater/" //test
-const val ImageUrl = "https://dev.new.iwatercrm.ru/iwatercrm/images"//test
+const val ShopId = "248648"
+const val Key = "live_VPol5OKACLck1xIFichGArRTc4mJdso46woVL9AC2Jk"
+//const val BASE_URL_API = "https://api.iwatercrm.ru/iwater/" //test
+//const val ImageUrl = "https://dev.new.iwatercrm.ru/iwatercrm/images"//test
 
 object RetrofitFactory {
     private const val AUTH_KEY = "3OSkO8gl.puTQf56Hi8BuTRFTpEDZyNjkkOFkvlPX"

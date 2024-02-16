@@ -36,7 +36,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -402,16 +401,8 @@ fun ItemProductOrder(modifier: Modifier, product: Product) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (product.getPriceNoDiscount(product.count) != product.getPriceOnCount(product.count)) {
-                Text(
-                    text = "${product.getPriceNoDiscount(product.count)}P",
-                    style = YouWaterTypography.caption,
-                    textDecoration = TextDecoration.LineThrough,
-                    color = Color.Gray
-                )
-            }
             Text(
-                text = "${product.getPriceOnCount(product.count)}",
+                text = "${product.getPriceNoDiscount(product.count)}",
                 style = YouWaterTypography.caption,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,

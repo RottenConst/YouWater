@@ -73,8 +73,7 @@ fun BasketScreen(
                         id = product.id,
                         name = product.name,
                         urlImage = product.gallery,
-                        priceNoDiscount = {product.getPriceNoDiscount(count)},
-                        costProducts = { product.getPriceOnCount(count) },
+                        costProducts = { product.getPriceNoDiscount(count) },
                         count = count,
                         getAboutProduct = {
                            navController.navigate(MainNavRoute.AboutProductScreen.withArgs(product.id.toString()))
@@ -135,7 +134,6 @@ fun CardProductInBasket(
     id: Int,
     name: String,
     urlImage: String,
-    priceNoDiscount: (Int) -> Int,
     costProducts: (Int) -> Int,
     count: Int,
     getAboutProduct: (Int) -> Unit,
@@ -158,8 +156,6 @@ fun CardProductInBasket(
                 Column(modifier = Modifier.wrapContentWidth()) {
                     TitleProduct(name) { deleteProduct() }
                     CostProducts(
-                        id = id,
-                        priceNoDiscount = {priceNoDiscount(count)},
                         costProducts = { costProducts(count) },
                         count = count,
                         plusCount = {plusCount(count)},
@@ -209,7 +205,7 @@ fun TitleProduct(productName: String, deleteProduct: () -> Unit) {
 }
 
 @Composable
-fun CostProducts(id: Int, priceNoDiscount: (Int) -> Int, costProducts: (Int) -> Int, count: Int, plusCount: (Int) -> Unit, minusCount: (Int) -> Unit) {
+fun CostProducts(costProducts: (Int) -> Int, count: Int, plusCount: (Int) -> Unit, minusCount: (Int) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -217,53 +213,34 @@ fun CostProducts(id: Int, priceNoDiscount: (Int) -> Int, costProducts: (Int) -> 
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Bottom
     ) {
-        if (id == 81 || id == 84) {
-            Column {
-                Text(
-                    text = "${priceNoDiscount(count)}₽",
-                    style = YouWaterTypography.subtitle2,
-                    textDecoration = TextDecoration.LineThrough,
-                    color = Color.Gray
-                )
-                Text(
-                    text = "${costProducts(count)}₽",
-                    style = YouWaterTypography.subtitle1,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Start,
-                    color = Blue500
-                )
+        Text(
+            text = "${costProducts(count)}₽",
+            style = YouWaterTypography.subtitle1,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Start,
+            color = Blue500
+        )
+    }
+    Box(
+        contentAlignment = Alignment.BottomEnd) {
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            MinusProductButton {
+                minusCount(count)
             }
-        } else {
             Text(
-                text = "${costProducts(count)}₽",
-                style = YouWaterTypography.subtitle1,
+                text = "$count",
+                textAlign = TextAlign.Center,
+                color = Color.Gray,
+                style = YouWaterTypography.body1,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Start,
-                color = Blue500
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
             )
-        }
-        Box(
-            contentAlignment = Alignment.BottomEnd) {
-            Row(
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween) {
-                MinusProductButton {
-                    minusCount(count)
-                }
-                Text(
-                    text = "$count",
-                    textAlign = TextAlign.Center,
-                    color = Color.Gray,
-                    style = YouWaterTypography.body1,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                )
-                PlusProductButton {
-                    plusCount(count)
-                }
+            PlusProductButton {
+                plusCount(count)
             }
         }
-
     }
 }
 
@@ -468,7 +445,6 @@ fun GeneralInfoPreview() {
                         productsList1[productIndex].name,
                         productsList1[productIndex].gallery,
                         {productsList1[productIndex].getPriceNoDiscount(1)},
-                        {productsList1[productIndex].getPriceOnCount(1)},
                         productsList1[productIndex].count,
                         {}, {}, {}, {})
                 }

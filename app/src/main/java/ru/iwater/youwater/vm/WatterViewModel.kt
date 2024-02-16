@@ -187,7 +187,7 @@ class WatterViewModel @Inject constructor(
         var generalCostProducts = 0
 
         productsInBasket.forEach { product ->
-            generalCostProducts += product.getPriceOnCount(product.count)
+            generalCostProducts += product.getPriceNoDiscount(product.count)
         }
         Timber.d("General cost no discount = $generalCostProducts")
         _generalCost.value = generalCostProducts
@@ -581,7 +581,7 @@ class WatterViewModel @Inject constructor(
                 order.orderCost = orderCost
                 _productsInBasket.forEach { product ->
                     val productJson =
-                        getJsonProduct(product, product.getPriceOnCount(product.count)/product.count)
+                        getJsonProduct(product, product.getPriceNoDiscount(product.count)/product.count)
                     order.waterEquip.add(productJson)
                 }
                 val orderId = repository.createOrderApp(order)

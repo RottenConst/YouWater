@@ -191,7 +191,7 @@ fun AddInBasketButton(product: Product, addProductInBasket: (Product) -> Unit) {
             )
             Text(
                 modifier = Modifier.padding(4.dp),
-                text = "Добавить за ${product.getPriceOnCount(product.count)}₽",
+                text = "Добавить за ${product.getPriceNoDiscount(product.count)}₽",
                 textAlign = TextAlign.Center
             )
         }

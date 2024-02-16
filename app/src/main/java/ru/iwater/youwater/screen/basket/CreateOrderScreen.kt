@@ -514,8 +514,7 @@ fun DetailsOrder(highSize: Int, products: List<Product>, minusCount: (Product) -
                     productName = product.name,
                     productGallery = product.gallery,
                     productCount = count,
-                    productsPrise = {product.getPriceOnCount(count)},
-                    priseNoDiscount = {product.getPriceNoDiscount(count)},
+                    productsPrise = {product.getPriceNoDiscount(count)},
                     minusCount = {
                         if (count > 1) count--
                         minusCount(product)
@@ -536,7 +535,6 @@ fun ItemProductInOrder(
     productGallery: String,
     productCount: Int,
     productsPrise: (Int) -> Int,
-    priseNoDiscount: (Int) -> Int,
     minusCount: () -> Unit,
     addCount: () -> Unit
 ) {
@@ -565,7 +563,7 @@ fun ItemProductInOrder(
                         tint = Color.LightGray
                     )
                 }
-                PriceAndCount(productCount = productCount, productsPrise = productsPrise, priceNoDiscount = priseNoDiscount)
+                PriceAndCount(productCount = productCount, productsPrise = productsPrise)
                 IconButton(onClick = { addCount() }) {
                     Icon(
                         imageVector = Icons.Default.AddCircle,
@@ -579,19 +577,11 @@ fun ItemProductInOrder(
 }
 
 @Composable
-fun PriceAndCount(productCount: Int, productsPrise: (Int) -> Int, priceNoDiscount:(Int) -> Int) {
+fun PriceAndCount(productCount: Int, productsPrise: (Int) -> Int) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (priceNoDiscount(productCount) != productsPrise(productCount)) {
-            Text(
-                text = "${priceNoDiscount(productCount)}",
-                style = YouWaterTypography.caption,
-                textDecoration = TextDecoration.LineThrough,
-                color = Color.Gray
-            )
-        }
         Text(
             text = "${productsPrise(productCount)}P",
             style = YouWaterTypography.caption,
@@ -801,7 +791,7 @@ fun CreateOrderScreenPreview() {
         mutableIntStateOf(72*productsList.size)
     }
     productsList.forEach {product ->
-        generalPrice += product.getPriceOnCount(product.count)
+        generalPrice += product.getPriceNoDiscount(product.count)
     }
     YourWaterTheme {
         Box(
