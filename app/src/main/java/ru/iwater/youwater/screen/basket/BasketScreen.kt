@@ -44,9 +44,6 @@ fun BasketScreen(
     val products = watterViewModel.products
     val priceProduct by watterViewModel.priceProduct.observeAsState()
     val generalPrice by watterViewModel.generalPrice.observeAsState()
-//    var generalPrice by rememberSaveable {
-//        mutableIntStateOf(watterViewModel.getCostProduct())
-//    }
 
     Column {
         if (products.isNotEmpty()) {

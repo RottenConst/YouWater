@@ -17,10 +17,8 @@ import ru.iwater.youwater.data.Category
 import ru.iwater.youwater.data.Favorite
 import ru.iwater.youwater.data.NewProduct
 import ru.iwater.youwater.iteractor.ClientStorage
-import ru.iwater.youwater.network.ApiClient
 import ru.iwater.youwater.network.ApiOrder
 import ru.iwater.youwater.repository.HomeRepository
-import timber.log.Timber
 
 class HomeViewModel(
     private val repository: HomeRepository
@@ -87,34 +85,13 @@ class HomeViewModel(
         }
     }
 
-    fun addProductToBasket(product: NewProduct) {
-        viewModelScope.launch {
-            val dbProduct = repository.getProductFromDB(product.id)
-            try {
-                if (dbProduct != null && dbProduct.category != 20) {
-                    dbProduct.count += 1
-                    repository.updateNewProductInBasket(dbProduct)
-                } else {
-                    if (product.category == 20 && repository.isStartPocket()) {
-                        repository.addProductInBasket(product.copy(count = 1))
-                    } else {
-                        product.count += 1
-                        repository.addProductInBasket(product)
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e("Error add in basket: $e")
-            }
-        }
-    }
-
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 val application = checkNotNull(extras[APPLICATION_KEY]) as App
                 val token = ClientStorage(application.applicationContext).get().accessToken
-                val repository =    HomeRepository(
+                val repository = HomeRepository(
                     ApiOrder.makeOrderApi(token),
                     YouWaterDB.getYouWaterDB(application.baseContext)?.newProductDao()!!
                 )

@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 //const val ShopId = "248648"
 //const val Key = "live_VPol5OKACLck1xIFichGArRTc4mJdso46woVL9AC2Jk"
 //
-//const val BASE_URL_API = "https://api.iwatercrm.ru/iwater/" //test
+const val BASE_URL_API = "https://api.iwatercrm.ru/iwater/" //test
 const val ImageUrl = "https://orders.dev.iwatercrm.ru/image"//test
 const val BASE_URL_CLIENT_API = "https://client-api-clients.iwatercrm.ru/" //fast api client test
 const val BASE_URL_ORDERS_API = "https://client-api-orders.iwatercrm.ru/"

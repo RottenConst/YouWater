@@ -13,10 +13,6 @@ import androidx.navigation.NavHostController
 import com.pusher.pushnotifications.PushNotifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.iwater.youwater.base.App
 import ru.iwater.youwater.bd.YouWaterDB
@@ -363,7 +359,6 @@ class ClientViewModel(
                 val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]) as App
                 val token = ClientStorage(application.applicationContext).get().accessToken
                 val repository = ClientRepository(
-//                    ApiOrder.makeOrderApi(token),
                     ApiClient.makeClientApi(token),
                     YouWaterDB.getYouWaterDB(application.baseContext)?.newProductDao()!!
                 )

@@ -45,6 +45,7 @@ import androidx.navigation.NavHostController
 import ru.iwater.youwater.R
 import ru.iwater.youwater.data.MyOrder
 import ru.iwater.youwater.data.NewProduct
+import ru.iwater.youwater.data.Price
 import ru.iwater.youwater.screen.MainActivity
 import ru.iwater.youwater.screen.component.product.ImageProduct
 import ru.iwater.youwater.screen.navigation.MainNavRoute
@@ -450,10 +451,30 @@ fun CompleteOrderPreview() {
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(modifier = Modifier.padding(bottom = 80.dp)) {
                 items(1) {
+                    CardOrderInfo(
+                        modifier = Modifier,
+                        order = MyOrder(
+                            id = 1,
+                            address = "address",
+                            cash = "1000",
+                            date = "18",
+                            products = listOf(
+                                NewProduct(
+                                    id = it,
+                                    name = "Plesca Классическая 19л в оборотной таре",
+                                    appName = "Plesca Классическая оборотной таре",
+                                    price = listOf(Price(1, 310)),
+                                    category = 1,
+                                    image = "cat-1.png"
+                                )
+                            ),
+                            status = 0,
+                            typeCash = "online"
+                        )
+                    )
                 }
         }
             HomeButton(modifier = Modifier.align(Alignment.BottomCenter)){}
-
         }
 
     }

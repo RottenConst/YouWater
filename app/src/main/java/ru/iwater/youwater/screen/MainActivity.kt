@@ -49,7 +49,7 @@ class MainActivity : BaseActivity() {
 
 
     private val authURLString = "http://docs.iwatercrm.ru:8080/pusher/beams-auth"
-    private var authToken = "" //viewModel.getAuthClient().session //"mN#h8MjPw3KJ!vi"
+    private lateinit var authToken: String //viewModel.getAuthClient().session //"mN#h8MjPw3KJ!vi"
     private var tokenProvider: BeamsTokenProvider? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

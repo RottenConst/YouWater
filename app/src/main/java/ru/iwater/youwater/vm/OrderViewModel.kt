@@ -452,20 +452,15 @@ class OrderViewModel(
                             inclusive = false
                         }
                     }
-//                    navController.clearBackStack(MainNavRoute.CreateOrderScreen.path)
                     refreshOrder()
                 } else {
                     Timber.d("Order - $orderId, $orderCost")
-//                    getTelNumber()
-//                    Timber.d("Tel num $telNumber, client phone $clientPhone")
                     refreshOrder()
-//                    navController.clearBackStack(MainNavRoute.CreateOrderScreen.path)
                     PaymentActivity.startGenerateToken(
                         navController.context,
                         orderId,
                         orderCost,
                         getTelNumber(clientPhone)
-//                        telNumber
                     )
                 }
             }
@@ -483,8 +478,6 @@ class OrderViewModel(
     }
 
     private fun getTelNumber(clientPhone: String): String {
-//        viewModelScope.launch {
-//            val tel = repository.getClientInfo()?.phone
             Timber.d("tel $clientPhone")
             return clientPhone.removeRange(2, 3).removeRange(5, 7).removeRange(8, 9)
     }
